@@ -11,6 +11,7 @@ class AuthLocalStorage {
   static const String _typeKey = "type"; 
   static const String _emailKey = "email";
   static const String _resetTempToken = "tempToken";
+  static const String _technicianEmail = "technicianEmail";
 
   Future<void> saveUserSession(User user) async {
     if (user.token != null) {
@@ -54,6 +55,14 @@ class AuthLocalStorage {
     await _storage.write(key: _emailKey, value: email);
   }
 
+  Future<void> saveTechnicianEmail(String email) async {
+    await _storage.write(key: _technicianEmail, value: email);
+  }
+
+  Future<String?> getTechnicianEmail() async {
+    return await _storage.read(key: _technicianEmail);
+  }
+
   Future<String?> getToken() async {
     return await _storage.read(key: _tokenKey);
   }
@@ -88,6 +97,14 @@ class AuthLocalStorage {
 
   Future<void> deleteResetTempToken() async {
     await _storage.delete(key: _resetTempToken);
+  }
+
+  Future<void> deleteEmail() async {
+    await _storage.delete(key: _emailKey);
+  }
+
+  Future<void> deleteTechnicianEmail() async {
+    await _storage.delete(key: _technicianEmail);
   }
 
   Future<void> clearSession() async {

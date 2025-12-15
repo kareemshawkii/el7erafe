@@ -2,7 +2,9 @@ import 'package:el7erafe/client.dart';
 import 'package:el7erafe/core/services/local_storage/auth_local_storage.dart';
 import 'package:el7erafe/features/authentication_module/otp_page/data/Repository/otp_repository.dart';
 import 'package:el7erafe/features/authentication_module/otp_page/presentation/cubit/otp_cubit.dart';
+import 'package:el7erafe/features/authentication_module/otp_page/presentation/cubit/technician_otp_cubit.dart';
 import 'package:el7erafe/features/authentication_module/otp_page/presentation/page/otp_page.dart';
+import 'package:el7erafe/features/authentication_module/otp_page/presentation/page/technician_otp_page.dart';
 import 'package:el7erafe/features/authentication_module/technician_regestration/data/repositories/technician_registration_repo.dart';
 import 'package:el7erafe/features/authentication_module/technician_regestration/presentation/cubit/technician_resubmit_cubit.dart';
 import 'package:el7erafe/features/authentication_module/technician_regestration/presentation/cubit/technician_waiting_page_cubit.dart';
@@ -97,6 +99,39 @@ class LoginView extends StatelessWidget {
                 OtpCubit(
                 otpRepository: RepositoryProvider.of<OtpRepository>(context)),
               child:  OtpPage(email: storedEmail),
+              ),
+            ),
+          );
+          }
+          else{
+            if (!context.mounted) return;
+              ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('حدث خطأ ما، يرجى المحاولة مرة أخرى', textDirection: TextDirection.rtl),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+          }
+          if (state is TechnicianOtpSent) {
+            AuthLocalStorage authLocalStorage = AuthLocalStorage();
+            String? storedEmail = await authLocalStorage.getTechnicianEmail();
+            if (storedEmail != null && storedEmail.isNotEmpty){
+              if (!context.mounted) return;
+              ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('تم إرسال رمز التحقق إلى البريد الإلكتروني', textDirection: TextDirection.rtl),
+                backgroundColor: Colors.green,
+              ),
+            );
+             Navigator.push(
+              context,
+              MaterialPageRoute(
+              builder: (context) => BlocProvider(
+              create: (context) =>
+                TechnicianOtpCubit(
+                otpRepository: RepositoryProvider.of<OtpRepository>(context)),
+              child:  TechnicianOtpPage(email: storedEmail),
               ),
             ),
           );

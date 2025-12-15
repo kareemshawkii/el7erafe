@@ -32,6 +32,7 @@ class _TechnicianRegistrationFormState extends State<TechnicianRegistrationForm>
   final _nameController = TextEditingController();
   final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _emailController = TextEditingController();
   File? frontIdImage ;
   File? backIdImage ;
   File? criminalRecordImage;
@@ -47,6 +48,7 @@ class _TechnicianRegistrationFormState extends State<TechnicianRegistrationForm>
     _phoneController.dispose();
     _passwordController.dispose();
     _nameController.dispose();
+    _emailController.dispose();
     super.dispose();
   }
 
@@ -121,6 +123,7 @@ class _TechnicianRegistrationFormState extends State<TechnicianRegistrationForm>
     context.read<TechnicianRegistrationCubit>().register(
           _nameController.text,
           _phoneController.text,
+          _emailController.text,
           _passwordController.text,
           frontIdImage!,
           backIdImage!,
@@ -209,6 +212,35 @@ class _TechnicianRegistrationFormState extends State<TechnicianRegistrationForm>
                 validator: (value) {
                   if (value == null || value.isEmpty) return 'من فضلك دخل رقم التليفون';
                   if (!RegExp(r'^01[0125][0-9]{8}$').hasMatch(value)) return 'من فضلك دخل رقم التليفون صحيح';
+                  return null;
+                },
+            ),
+          ),
+          SizedBox(height: (16/852)*screenHeight),
+          Text('البريد الإلكتروني', style: GoogleFonts.cairo(fontSize: 16, fontWeight: FontWeight.w400, color: Colors.black)),
+          SizedBox(height: (8/852)*screenHeight),
+          Directionality(
+            textDirection: TextDirection.rtl,
+            child: TextFormField(
+                controller: _emailController,
+                autovalidateMode: AutovalidateMode.onUserInteraction,
+                textAlign: TextAlign.right,
+                decoration: InputDecoration(
+                  prefixIcon: Icon(Icons.email, color: Color(0xFF727070),size: 18,),
+                  hintText: 'name@domain.com',
+                  hintStyle: GoogleFonts.cairo(fontSize: 15, color: const Color(0xFF727070),fontWeight: FontWeight.w400),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFE2DFDF))),
+                  focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFF3775FA))),
+                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFE2DFDF))),
+                  contentPadding: EdgeInsets.all(12),
+                  errorStyle: TextStyle(
+                  fontSize: 11, 
+                  ),
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) return 'من فضلك دخل البريد الإلكتروني';
+                  if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) return 'من فضلك دخل بريد إلكتروني صحيح';
+                  if (value.length > 50) return 'البريد الإلكتروني لازم يكون أقل من 50 حرف';
                   return null;
                 },
             ),

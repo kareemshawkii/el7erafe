@@ -12,7 +12,7 @@ import 'package:http/http.dart' as http;
 class TechnicianRegRepository {
   final String _baseUrl = "https://el7rafe-gma4hrg0e9epfsc0.uaenorth-01.azurewebsites.net"; 
 
-  Future<Either<Failure, TempTechnician>> registerTechnician(
+  Future<Either<Failure, String>> registerTechnician(
       TechnicianRegistrationRequestModel requestModel) async {
         
     final Uri registerUrl = Uri.parse('$_baseUrl/api/auth/register/technician');
@@ -21,6 +21,7 @@ class TechnicianRegRepository {
       var request = http.MultipartRequest('POST', registerUrl);
       request.fields['Name'] = requestModel.name;
       request.fields['PhoneNumber'] = requestModel.phoneNumber;
+      request.fields['Email'] = requestModel.email;
       request.fields['Password'] = requestModel.password;
       request.fields['Governorate'] = requestModel.governorate;
       request.fields['City'] = requestModel.city;
@@ -49,13 +50,9 @@ class TechnicianRegRepository {
       var response = await http.Response.fromStream(streamedResponse);
 
       if (response.statusCode == 201 || response.statusCode == 200) {
-        final Map<String, dynamic> data = jsonDecode(response.body);
-        final tempTechnician = TempTechnician(
-          tempToken: data['tempToken'],
-        );
-        AuthLocalStorage authLocalStorage = AuthLocalStorage();
-        await authLocalStorage.saveTempToken(tempTechnician);
-        return Right(tempTechnician);
+      AuthLocalStorage authLocalStorage = AuthLocalStorage();
+      authLocalStorage.saveTechnicianEmail(requestModel.email);
+      return Right ('تم التسجيل بنجاح. يرجى التحقق من بريدك الإلكتروني لإدخال رمز التحقق.');
       } else if (response.statusCode == 409) {
         return Left(Failure(jsonDecode(response.body)['errorMessage']));
       } else if (response.statusCode == 462) {

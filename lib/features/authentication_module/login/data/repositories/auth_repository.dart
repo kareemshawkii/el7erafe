@@ -37,7 +37,16 @@ class AuthRepository {
             await authLocalStorage.saveEmail(email);
           }
         return Left(Failure("OTP"));
-      } else if (response.statusCode == 460) {
+      } else if (response.statusCode == 453) {
+        final Map<String, dynamic> data = jsonDecode(response.body);
+        final String email = data['email'] ?? ''; 
+          if (email.isNotEmpty) {
+            AuthLocalStorage authLocalStorage = AuthLocalStorage();
+            await authLocalStorage.saveTechnicianEmail(email);
+          }
+        return Left(Failure("TECHNICIANOTP"));
+      }
+      else if (response.statusCode == 460) {
         final Map<String, dynamic> data = jsonDecode(response.body);
         final tempTechnician = TempTechnician(
           tempToken: data['tempToken'],

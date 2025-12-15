@@ -13,7 +13,10 @@ class LoginCubit extends Cubit<LoginState> {
       (failure) {
         if (failure.message == "OTP") {
           emit(OtpSent()); 
-        } else if (failure.message == "PENDING") {
+        } else if (failure.message == "TECHNICIANOTP") {
+          emit(TechnicianOtpSent());
+        }
+        else if (failure.message == "PENDING") {
           emit(AuthPending());
         } else if (failure.message == "REJECTED") {
           emit(AuthRejected());

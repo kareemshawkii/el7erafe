@@ -8,6 +8,8 @@ final class AuthSuccess extends LoginState {}
 
 final class OtpSent extends LoginState {}
 
+final class TechnicianOtpSent extends LoginState {}
+
 final class AuthRejected extends LoginState {}
 
 final class AuthPending extends LoginState {}

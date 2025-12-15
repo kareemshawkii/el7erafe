@@ -1,12 +1,14 @@
+import 'package:el7erafe/core/services/local_storage/auth_local_storage.dart';
 import 'package:el7erafe/features/authentication_module/client_regestration/presentation/cubit/password_strength_cubit.dart';
 import 'package:el7erafe/features/authentication_module/login/data/repositories/auth_repository.dart';
 import 'package:el7erafe/features/authentication_module/login/presentation/cubit/login_cubit.dart';
 import 'package:el7erafe/features/authentication_module/login/presentation/pages/login_page.dart';
+import 'package:el7erafe/features/authentication_module/otp_page/data/Repository/otp_repository.dart';
+import 'package:el7erafe/features/authentication_module/otp_page/presentation/cubit/technician_otp_cubit.dart';
+import 'package:el7erafe/features/authentication_module/otp_page/presentation/page/technician_otp_page.dart';
 import 'package:el7erafe/features/authentication_module/technician_regestration/data/repositories/technician_registration_repo.dart';
 import 'package:el7erafe/features/authentication_module/technician_regestration/presentation/cubit/techincian_registration_cubit.dart';
 import 'package:el7erafe/features/authentication_module/technician_regestration/presentation/cubit/technician_registration_state.dart';
-import 'package:el7erafe/features/authentication_module/technician_regestration/presentation/cubit/technician_waiting_page_cubit.dart';
-import 'package:el7erafe/features/authentication_module/technician_regestration/presentation/pages/technician_waiting_page.dart';
 import 'package:el7erafe/features/authentication_module/technician_regestration/presentation/widgets/technician_registration_form.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -46,7 +48,7 @@ class TechnicianRegistrationView extends StatelessWidget {
     return Scaffold(
       resizeToAvoidBottomInset: true,
       body: BlocListener<TechnicianRegistrationCubit, TechnicianRegistrationState>(
-        listener: (context, state) {
+        listener: (context, state) async {
           if (state is TechnicianRegFailure) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -56,20 +58,24 @@ class TechnicianRegistrationView extends StatelessWidget {
             );
           }
           else if (state is TechnicianRegSuccess) {
+            AuthLocalStorage authLocalStorage = AuthLocalStorage();
+            String? email = await authLocalStorage.getTechnicianEmail();
+            if (!context.mounted) return;
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                content: Text('تم ارسال البيانات بنجاح وفي انتظار التحقق', textDirection: TextDirection.rtl),
+                content: Text('تم ارسال رمز التحقق إلى البريد الإلكتروني', textDirection: TextDirection.rtl),
                 backgroundColor: Colors.green,
               ),
             );
+            if (!context.mounted) return;
             Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(
               builder: (context) => BlocProvider(
-                create: (context) => TechnicianStatusCubit(
-                  statusRepository: RepositoryProvider.of<TechnicianRegRepository>(context),
+                create: (context) => TechnicianOtpCubit(
+                  otpRepository: RepositoryProvider.of<OtpRepository>(context),
                 ),
-                child: TechnicianWaitingPage(), 
+                child: TechnicianOtpPage(email: email!), 
               ),
             ),
             (route) => false

@@ -10,13 +10,14 @@ class TechnicianRegistrationCubit extends Cubit<TechnicianRegistrationState> {
   TechnicianRegistrationCubit({required this.technicianRegRepository})
       : super(TechnicianRegInitial());
 
-  Future<void> register(String name, String phone, String password,
+  Future<void> register(String name, String phone, String email, String password,
       File frontIdImage, File backIdImage, File criminalRecordImage, String governorate, String city, String serviceType) async {
     emit(TechnicianRegLoading());
 
     final requestModel = TechnicianRegistrationRequestModel(
       name: name,
       phoneNumber: phone,
+      email: email,
       password: password,
       frontIdImage: frontIdImage,
       backIdImage: backIdImage,
@@ -37,7 +38,7 @@ class TechnicianRegistrationCubit extends Cubit<TechnicianRegistrationState> {
           emit(TechnicianRegFailure(error: failure.message));
         }
       },
-      (user) => emit(TechnicianRegSuccess()),
+      (success) => emit(TechnicianRegSuccess()),
    );
   }
 }
