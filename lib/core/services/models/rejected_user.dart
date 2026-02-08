@@ -9,27 +9,45 @@ class RejectedUser {
   final bool? criminalRecord;
   final String? rejectionReason;
 
-  RejectedUser({this.name, this.phone, this.governorate, this.city, this.serviceType, this.frontId, this.backId, this.criminalRecord, this.rejectionReason});
+  RejectedUser(
+      {this.name,
+      this.phone,
+      this.governorate,
+      this.city,
+      this.serviceType,
+      this.frontId,
+      this.backId,
+      this.criminalRecord,
+      this.rejectionReason});
 }
 
 class RejectedUserModel extends RejectedUser {
-  RejectedUserModel({super.name, super.phone, super.governorate, super.city, super.serviceType, super.frontId, super.backId, super.criminalRecord, super.rejectionReason});
+  RejectedUserModel(
+      {super.name,
+      super.phone,
+      super.governorate,
+      super.city,
+      super.serviceType,
+      super.frontId,
+      super.backId,
+      super.criminalRecord,
+      super.rejectionReason});
 
   factory RejectedUserModel.fromJson(Map<String, dynamic> json) {
-  final data = json['data'] ?? {};
+    final data = json['data'] ?? {};
 
-  return RejectedUserModel(
-    name: data['name'],
-    phone: data['phone'],
-    governorate: data['governorate'],
-    city: data['city'],
-    serviceType: data['serviceType'],
-    frontId: data['frontId'],
-    backId: data['backId'],
-    criminalRecord: data['criminalRecord'],
-    rejectionReason: json['rejectionReason'], 
-  );
-}
+    return RejectedUserModel(
+      name: data['name'],
+      phone: data['phone'],
+      governorate: data['governorate'],
+      city: data['city'],
+      serviceType: data['serviceType'],
+      frontId: data['frontId'],
+      backId: data['backId'],
+      criminalRecord: data['criminalRecord'],
+      rejectionReason: json['rejectionReason'],
+    );
+  }
 }
 
 extension RejectedUserHelpers on RejectedUser {
@@ -42,6 +60,7 @@ extension RejectedUserHelpers on RejectedUser {
 
     return files;
   }
+
   bool get needsResubmission =>
       frontId == true || backId == true || criminalRecord == true;
 }

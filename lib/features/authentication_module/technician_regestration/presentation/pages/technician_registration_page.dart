@@ -37,7 +37,6 @@ class TechnicianRegistrationPage extends StatelessWidget {
 }
 
 class TechnicianRegistrationView extends StatelessWidget {
-  
   const TechnicianRegistrationView({super.key});
 
   @override
@@ -47,7 +46,8 @@ class TechnicianRegistrationView extends StatelessWidget {
     final double keyboardPadding = MediaQuery.of(context).viewInsets.bottom;
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      body: BlocListener<TechnicianRegistrationCubit, TechnicianRegistrationState>(
+      body: BlocListener<TechnicianRegistrationCubit,
+          TechnicianRegistrationState>(
         listener: (context, state) async {
           if (state is TechnicianRegFailure) {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -56,51 +56,50 @@ class TechnicianRegistrationView extends StatelessWidget {
                 backgroundColor: Colors.red,
               ),
             );
-          }
-          else if (state is TechnicianRegSuccess) {
+          } else if (state is TechnicianRegSuccess) {
             AuthLocalStorage authLocalStorage = AuthLocalStorage();
             String? email = await authLocalStorage.getTechnicianEmail();
             if (!context.mounted) return;
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                content: Text('تم ارسال رمز التحقق إلى البريد الإلكتروني', textDirection: TextDirection.rtl),
+                content: Text('تم ارسال رمز التحقق إلى البريد الإلكتروني',
+                    textDirection: TextDirection.rtl),
                 backgroundColor: Colors.green,
               ),
             );
             if (!context.mounted) return;
             Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(
-              builder: (context) => BlocProvider(
-                create: (context) => TechnicianOtpCubit(
-                  otpRepository: RepositoryProvider.of<OtpRepository>(context),
+                context,
+                MaterialPageRoute(
+                  builder: (context) => BlocProvider(
+                    create: (context) => TechnicianOtpCubit(
+                      otpRepository:
+                          RepositoryProvider.of<OtpRepository>(context),
+                    ),
+                    child: TechnicianOtpPage(email: email!),
+                  ),
                 ),
-                child: TechnicianOtpPage(email: email!), 
-              ),
-            ),
-            (route) => false
-          );
-          }
-          else if (state is TecnicianRegBlocked) {
+                (route) => false);
+          } else if (state is TecnicianRegBlocked) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.message, textDirection: TextDirection.rtl),
                 backgroundColor: Colors.red,
               ),
             );
-             Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => BlocProvider(
-                    create: (_) => LoginCubit(
-                      authRepository:
-                          RepositoryProvider.of<AuthRepository>(context),
-                    ),
-                    child: const LoginPage(),
-                  ),   
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(
+                builder: (_) => BlocProvider(
+                  create: (_) => LoginCubit(
+                    authRepository:
+                        RepositoryProvider.of<AuthRepository>(context),
+                  ),
+                  child: const LoginPage(),
                 ),
-                (route) => false,
-              );
+              ),
+              (route) => false,
+            );
           }
         },
         child: GestureDetector(
@@ -110,24 +109,25 @@ class TechnicianRegistrationView extends StatelessWidget {
               Align(
                 alignment: Alignment.topCenter,
                 child: Container(
-                  padding: EdgeInsets.only(top: (68/852)*screenHeight,bottom: (68/852)*screenHeight),
-                  color: const Color(0xFF3775FA),
-                  width: screenWidth,
-                  height: (267/852)*screenHeight,
-                  child: Align(
-                    alignment: Alignment.topCenter,
-                    child:  SizedBox(
-                    height: (131/852)*screenHeight,
-                    width: (131/393)*screenWidth,
-                    child: Image.asset('images/Logo.png', fit: BoxFit.fill),
-                  ),
-                  )
-                ),
+                    padding: EdgeInsets.only(
+                        top: (68 / 852) * screenHeight,
+                        bottom: (68 / 852) * screenHeight),
+                    color: const Color(0xFF3775FA),
+                    width: screenWidth,
+                    height: (267 / 852) * screenHeight,
+                    child: Align(
+                      alignment: Alignment.topCenter,
+                      child: SizedBox(
+                        height: (131 / 852) * screenHeight,
+                        width: (131 / 393) * screenWidth,
+                        child: Image.asset('images/Logo.png', fit: BoxFit.fill),
+                      ),
+                    )),
               ),
               Align(
                 alignment: Alignment.bottomCenter,
                 child: Container(
-                  height: (629/852)*screenHeight,
+                  height: (629 / 852) * screenHeight,
                   width: double.infinity,
                   decoration: const BoxDecoration(
                     color: Color(0xFFFDFDFD),
@@ -137,7 +137,11 @@ class TechnicianRegistrationView extends StatelessWidget {
                     ),
                   ),
                   child: SingleChildScrollView(
-                    padding: EdgeInsets.fromLTRB((16/393)*screenWidth, (44/852)*screenHeight , (16/393)*screenWidth, (44/852)*screenHeight+keyboardPadding),
+                    padding: EdgeInsets.fromLTRB(
+                        (16 / 393) * screenWidth,
+                        (44 / 852) * screenHeight,
+                        (16 / 393) * screenWidth,
+                        (44 / 852) * screenHeight + keyboardPadding),
                     physics: const ClampingScrollPhysics(),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
@@ -151,7 +155,7 @@ class TechnicianRegistrationView extends StatelessWidget {
                               height: 1.5,
                             ),
                             children: <TextSpan>[
-                              TextSpan(text:"خلينا نعمل حساب"),
+                              TextSpan(text: "خلينا نعمل حساب"),
                               TextSpan(
                                 text: " فني جديد",
                                 style: const TextStyle(
@@ -162,7 +166,7 @@ class TechnicianRegistrationView extends StatelessWidget {
                             ],
                           ),
                         ),
-                        SizedBox(height: (24/852)*screenHeight),
+                        SizedBox(height: (24 / 852) * screenHeight),
                         const TechnicianRegistrationForm(),
                       ],
                     ),

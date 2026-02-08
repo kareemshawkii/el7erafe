@@ -1,10 +1,10 @@
-import 'package:el7erafe/client.dart';
+import 'package:el7erafe/features/client_flow/client_home/presentation/pages/client_home_page.dart';
 import 'package:el7erafe/core/services/local_storage/auth_local_storage.dart';
 import 'package:el7erafe/features/authentication_module/login/data/repositories/auth_repository.dart';
 import 'package:el7erafe/features/authentication_module/login/presentation/cubit/login_cubit.dart';
 import 'package:el7erafe/features/authentication_module/login/presentation/pages/login_page.dart';
 import 'package:el7erafe/features/authentication_module/on_boarding/presentation/cubit/onboarding_cubit.dart';
-import 'package:el7erafe/features/authentication_module/on_boarding/presentation/pages/onboarding_page.dart'  ;
+import 'package:el7erafe/features/authentication_module/on_boarding/presentation/pages/onboarding_page.dart';
 import 'package:el7erafe/features/authentication_module/technician_regestration/data/repositories/technician_registration_repo.dart';
 import 'package:el7erafe/features/authentication_module/technician_regestration/presentation/cubit/technician_waiting_page_cubit.dart';
 import 'package:el7erafe/features/authentication_module/technician_regestration/presentation/pages/technician_waiting_page.dart';
@@ -21,7 +21,6 @@ class SplashController extends StatefulWidget {
 }
 
 class _SplashControllerState extends State<SplashController> {
-
   @override
   void initState() {
     super.initState();
@@ -93,7 +92,7 @@ class _SplashControllerState extends State<SplashController> {
     if (!mounted) return;
     Navigator.pushAndRemoveUntil(
       context,
-      MaterialPageRoute(builder: (_) => const ClientPage()),
+      MaterialPageRoute(builder: (_) => const ClientHomePage()),
       (route) => false,
     );
   }
@@ -114,7 +113,8 @@ class _SplashControllerState extends State<SplashController> {
       MaterialPageRoute(
         builder: (_) => BlocProvider(
           create: (_) => TechnicianStatusCubit(
-            statusRepository: RepositoryProvider.of<TechnicianRegRepository>(context),
+            statusRepository:
+                RepositoryProvider.of<TechnicianRegRepository>(context),
           ),
           child: TechnicianWaitingPage(),
         ),
@@ -130,4 +130,3 @@ class _SplashControllerState extends State<SplashController> {
     );
   }
 }
-

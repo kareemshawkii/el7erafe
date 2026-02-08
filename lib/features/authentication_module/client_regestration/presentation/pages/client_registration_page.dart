@@ -34,7 +34,6 @@ class ClientRegistrationPage extends StatelessWidget {
 }
 
 class ClientRegistrationView extends StatelessWidget {
-  
   const ClientRegistrationView({super.key});
 
   @override
@@ -45,7 +44,7 @@ class ClientRegistrationView extends StatelessWidget {
     return Scaffold(
       resizeToAvoidBottomInset: true,
       body: BlocListener<ClientRegistrationCubit, ClientRegistrationState>(
-        listener: (context, state) async{
+        listener: (context, state) async {
           if (state is ClientRegFailure) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -60,21 +59,22 @@ class ClientRegistrationView extends StatelessWidget {
             if (!context.mounted) return;
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                content: Text('تم ارسال كود التحقق بنجاح', textDirection: TextDirection.rtl),
+                content: Text('تم ارسال كود التحقق بنجاح',
+                    textDirection: TextDirection.rtl),
                 backgroundColor: Colors.green,
               ),
             );
             Navigator.push(
               context,
               MaterialPageRoute(
-              builder: (context) => BlocProvider(
-              create: (context) =>
-                OtpCubit(
-                otpRepository: RepositoryProvider.of<OtpRepository>(context)),
-              child:  OtpPage(email: email!),
+                builder: (context) => BlocProvider(
+                  create: (context) => OtpCubit(
+                      otpRepository:
+                          RepositoryProvider.of<OtpRepository>(context)),
+                  child: OtpPage(email: email!),
+                ),
               ),
-            ),
-          );
+            );
           }
         },
         child: GestureDetector(
@@ -84,24 +84,25 @@ class ClientRegistrationView extends StatelessWidget {
               Align(
                 alignment: Alignment.topCenter,
                 child: Container(
-                  padding: EdgeInsets.only(top: (68/852)*screenHeight,bottom: (68/852)*screenHeight),
-                  color: const Color(0xFF3775FA),
-                  width: screenWidth,
-                  height: (267/852)*screenHeight,
-                  child: Align(
-                    alignment: Alignment.topCenter,
-                    child:  SizedBox(
-                    height: (131/852)*screenHeight,
-                    width: (131/393)*screenWidth,
-                    child: Image.asset('images/Logo.png', fit: BoxFit.fill),
-                  ),
-                  )
-                ),
+                    padding: EdgeInsets.only(
+                        top: (68 / 852) * screenHeight,
+                        bottom: (68 / 852) * screenHeight),
+                    color: const Color(0xFF3775FA),
+                    width: screenWidth,
+                    height: (267 / 852) * screenHeight,
+                    child: Align(
+                      alignment: Alignment.topCenter,
+                      child: SizedBox(
+                        height: (131 / 852) * screenHeight,
+                        width: (131 / 393) * screenWidth,
+                        child: Image.asset('images/Logo.png', fit: BoxFit.fill),
+                      ),
+                    )),
               ),
               Align(
                 alignment: Alignment.bottomCenter,
                 child: Container(
-                  height: (629/852)*screenHeight,
+                  height: (629 / 852) * screenHeight,
                   width: double.infinity,
                   decoration: const BoxDecoration(
                     color: Color(0xFFFDFDFD),
@@ -111,7 +112,11 @@ class ClientRegistrationView extends StatelessWidget {
                     ),
                   ),
                   child: SingleChildScrollView(
-                    padding: EdgeInsets.fromLTRB((16/393)*screenWidth, (44/852)*screenHeight , (16/393)*screenWidth, (44/852)*screenHeight+keyboardPadding),
+                    padding: EdgeInsets.fromLTRB(
+                        (16 / 393) * screenWidth,
+                        (44 / 852) * screenHeight,
+                        (16 / 393) * screenWidth,
+                        (44 / 852) * screenHeight + keyboardPadding),
                     physics: const ClampingScrollPhysics(),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
@@ -125,7 +130,7 @@ class ClientRegistrationView extends StatelessWidget {
                               height: 1.5,
                             ),
                             children: <TextSpan>[
-                              TextSpan(text:"خلينا نعمل حساب"),
+                              TextSpan(text: "خلينا نعمل حساب"),
                               TextSpan(
                                 text: " مستخدم جديد",
                                 style: const TextStyle(
@@ -136,7 +141,7 @@ class ClientRegistrationView extends StatelessWidget {
                             ],
                           ),
                         ),
-                        SizedBox(height: (24/852)*screenHeight),
+                        SizedBox(height: (24 / 852) * screenHeight),
                         const ClientRegistrationForm(),
                       ],
                     ),

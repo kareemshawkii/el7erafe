@@ -4,7 +4,7 @@ import 'package:el7erafe/features/authentication_module/login/presentation/pages
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'dart:math'; 
+import 'dart:math';
 import '../cubit/onboarding_cubit.dart';
 
 class OnBoardingPage extends StatelessWidget {
@@ -55,9 +55,12 @@ class OnBoardingPage extends StatelessWidget {
               Align(
                 alignment: Alignment.bottomCenter,
                 child: Container(
-                  height: (342.0/852.0)*screenHeight,
+                  height: (342.0 / 852.0) * screenHeight,
                   width: screenWidth,
-                  padding: EdgeInsets.only(top: (32.0/852.0)*screenHeight, left: (16.0/393.0)*screenWidth, right: (16.0/393.0)*screenWidth),
+                  padding: EdgeInsets.only(
+                      top: (32.0 / 852.0) * screenHeight,
+                      left: (16.0 / 393.0) * screenWidth,
+                      right: (16.0 / 393.0) * screenWidth),
                   decoration: const BoxDecoration(
                     color: Color(0xFFFAFAFA),
                     borderRadius: BorderRadius.only(
@@ -78,15 +81,19 @@ class OnBoardingPage extends StatelessWidget {
                             width: isActive ? 19 : 8,
                             height: isActive ? 4 : 8,
                             decoration: BoxDecoration(
-                              color: isActive ? const Color(0xFF3F68EC) : const Color(0xFFD9D9D9),
-                              borderRadius: BorderRadius.circular(isActive ? 4 : 8),
+                              color: isActive
+                                  ? const Color(0xFF3F68EC)
+                                  : const Color(0xFFD9D9D9),
+                              borderRadius:
+                                  BorderRadius.circular(isActive ? 4 : 8),
                             ),
                           );
                         }),
                       ),
                       Container(
-                        height: (182.0/852.0)*screenHeight,
-                        margin: EdgeInsets.only(top: (44.0/852.0)*screenHeight),
+                        height: (182.0 / 852.0) * screenHeight,
+                        margin:
+                            EdgeInsets.only(top: (44.0 / 852.0) * screenHeight),
                         child: Text.rich(
                           TextSpan(
                             style: GoogleFonts.cairo(
@@ -118,21 +125,23 @@ class OnBoardingPage extends StatelessWidget {
                             onPressed: () {
                               Navigator.pushAndRemoveUntil(
                                   context,
-                                    MaterialPageRoute(
-                                      builder: (context) => BlocProvider(
-                                        create: (context) => LoginCubit(
-                                          authRepository: RepositoryProvider.of<AuthRepository>(context),
-                                        ),
-                                        child: const LoginPage(), 
+                                  MaterialPageRoute(
+                                    builder: (context) => BlocProvider(
+                                      create: (context) => LoginCubit(
+                                        authRepository: RepositoryProvider.of<
+                                            AuthRepository>(context),
                                       ),
+                                      child: const LoginPage(),
                                     ),
-                                  (route) => false
-                                  );
+                                  ),
+                                  (route) => false);
                             },
                             style: TextButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 12.0, vertical: 8.0),
                               shape: const RoundedRectangleBorder(
-                                borderRadius: BorderRadius.all(Radius.circular(20.0)),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(20.0)),
                               ),
                             ),
                             child: Text(
@@ -148,20 +157,22 @@ class OnBoardingPage extends StatelessWidget {
                             progress: progresses[currentIndex],
                             onPressed: () {
                               if (currentIndex < totalPages - 1) {
-                                context.read<OnboardingCubit>().nextPage(totalPages);
+                                context
+                                    .read<OnboardingCubit>()
+                                    .nextPage(totalPages);
                               } else {
-                              Navigator.pushAndRemoveUntil(
-                                  context,
+                                Navigator.pushAndRemoveUntil(
+                                    context,
                                     MaterialPageRoute(
                                       builder: (context) => BlocProvider(
                                         create: (context) => LoginCubit(
-                                          authRepository: RepositoryProvider.of<AuthRepository>(context),
+                                          authRepository: RepositoryProvider.of<
+                                              AuthRepository>(context),
                                         ),
-                                        child: const LoginPage(), 
+                                        child: const LoginPage(),
                                       ),
                                     ),
-                                  (route) => false
-                                  );
+                                    (route) => false);
                               }
                             },
                           ),
@@ -194,13 +205,13 @@ class CustomProgressButton extends StatelessWidget {
     final double screenWidth = MediaQuery.of(context).size.width;
     final double screenHeight = MediaQuery.of(context).size.height;
     return SizedBox(
-      width: (52/393)*screenWidth, 
-      height: (52/852)*screenHeight,
+      width: (52 / 393) * screenWidth,
+      height: (52 / 852) * screenHeight,
       child: Stack(
         alignment: Alignment.center,
         children: [
           CustomPaint(
-            size:  Size((44/393)*screenWidth, (44/852)*screenHeight),
+            size: Size((44 / 393) * screenWidth, (44 / 852) * screenHeight),
             painter: ProgressArcPainter(
               progress: progress,
               progressColor: const Color.fromARGB(255, 34, 159, 190),
@@ -208,14 +219,15 @@ class CustomProgressButton extends StatelessWidget {
             ),
           ),
           SizedBox(
-            width: (40/393)*screenWidth,
-            height: (40/852)*screenHeight,
+            width: (40 / 393) * screenWidth,
+            height: (40 / 852) * screenHeight,
             child: FloatingActionButton(
               onPressed: onPressed,
               backgroundColor: const Color(0xFF3F68EC),
               elevation: 0,
               shape: const CircleBorder(),
-              child: const Icon(Icons.arrow_forward, size: 16, color: Colors.white),
+              child: const Icon(Icons.arrow_forward,
+                  size: 16, color: Colors.white),
             ),
           ),
         ],
@@ -243,8 +255,8 @@ class ProgressArcPainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round;
     final rect = Rect.fromLTWH(0, 0, size.width, size.height);
-    const startAngle = pi * 0.5; 
-    final sweepAngle = (pi * 1.5) * progress; 
+    const startAngle = pi * 0.5;
+    final sweepAngle = (pi * 1.5) * progress;
     canvas.drawArc(rect, startAngle, sweepAngle, false, paint);
   }
 

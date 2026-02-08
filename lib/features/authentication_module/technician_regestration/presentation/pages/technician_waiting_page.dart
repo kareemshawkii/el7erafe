@@ -16,8 +16,6 @@ import 'package:google_fonts/google_fonts.dart';
 class TechnicianWaitingPage extends StatelessWidget {
   const TechnicianWaitingPage({super.key});
 
-
-
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
@@ -42,7 +40,6 @@ class TechnicianWaitingView extends StatefulWidget {
 }
 
 class _TechnicianWaitingViewState extends State<TechnicianWaitingView> {
-  
   @override
   void initState() {
     super.initState();
@@ -67,14 +64,16 @@ class _TechnicianWaitingViewState extends State<TechnicianWaitingView> {
             if (state.status == "تحت المراجعة") {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text(state.message, textDirection: TextDirection.rtl),
+                  content:
+                      Text(state.message, textDirection: TextDirection.rtl),
                   backgroundColor: Colors.blue,
                 ),
               );
             } else if (state.status == "مرفوض") {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text(state.message, textDirection: TextDirection.rtl),
+                  content:
+                      Text(state.message, textDirection: TextDirection.rtl),
                   backgroundColor: Colors.red,
                 ),
               );
@@ -83,18 +82,19 @@ class _TechnicianWaitingViewState extends State<TechnicianWaitingView> {
                 MaterialPageRoute(
                   builder: (_) => BlocProvider(
                     create: (_) => TechnicianResubmitCubit(
-                      technicianRegRepository: RepositoryProvider.of<TechnicianRegRepository>(context),
+                      technicianRegRepository:
+                          RepositoryProvider.of<TechnicianRegRepository>(
+                              context),
                     ),
                     child: const TechnicianResubmitPage(),
-                  ),   
+                  ),
                 ),
                 (route) => false,
               );
               AuthLocalStorage authStorage = AuthLocalStorage();
               await authStorage.deleteTempToken();
             }
-          }
-          else if (state is TechnicianStatusBlocked) {
+          } else if (state is TechnicianStatusBlocked) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.message, textDirection: TextDirection.rtl),
@@ -102,37 +102,37 @@ class _TechnicianWaitingViewState extends State<TechnicianWaitingView> {
               ),
             );
             Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => BlocProvider(
-                    create: (_) => LoginCubit(
-                      authRepository:
-                          RepositoryProvider.of<AuthRepository>(context),
-                    ),
-                    child: const LoginPage(),
-                  ),   
+              context,
+              MaterialPageRoute(
+                builder: (_) => BlocProvider(
+                  create: (_) => LoginCubit(
+                    authRepository:
+                        RepositoryProvider.of<AuthRepository>(context),
+                  ),
+                  child: const LoginPage(),
                 ),
-                (route) => false,
-              );
-              AuthLocalStorage authStorage = AuthLocalStorage();
-              await authStorage.deleteTempToken();
-          }
-          else if (state is TechnicianStatusApproved) {
+              ),
+              (route) => false,
+            );
+            AuthLocalStorage authStorage = AuthLocalStorage();
+            await authStorage.deleteTempToken();
+          } else if (state is TechnicianStatusApproved) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                content: Text('تم قبول حسابك كحرفي متحمسين نشوف نجاحك بالتوفيق.', textDirection: TextDirection.rtl),
+                content: Text(
+                    'تم قبول حسابك كحرفي متحمسين نشوف نجاحك بالتوفيق.',
+                    textDirection: TextDirection.rtl),
                 backgroundColor: Colors.green,
               ),
             );
             Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (_) => const TechnicianPage()),
-            (route) => false,
-           );
-           AuthLocalStorage authStorage = AuthLocalStorage();
-           await authStorage.deleteTempToken();
-          } 
-          else if (state is TechnicianStatusError) {
+              context,
+              MaterialPageRoute(builder: (_) => const TechnicianPage()),
+              (route) => false,
+            );
+            AuthLocalStorage authStorage = AuthLocalStorage();
+            await authStorage.deleteTempToken();
+          } else if (state is TechnicianStatusError) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.error, textDirection: TextDirection.rtl),
@@ -148,24 +148,25 @@ class _TechnicianWaitingViewState extends State<TechnicianWaitingView> {
               Align(
                 alignment: Alignment.topCenter,
                 child: Container(
-                  padding: EdgeInsets.only(top: (68/852)*screenHeight,bottom: (68/852)*screenHeight),
-                  color: const Color(0xFF3775FA),
-                  width: screenWidth,
-                  height: (267/852)*screenHeight,
-                  child: Align(
-                    alignment: Alignment.topCenter,
-                    child:  SizedBox(
-                    height: (131/852)*screenHeight,
-                    width: (131/393)*screenWidth,
-                    child: Image.asset('images/Logo.png', fit: BoxFit.fill),
-                  ),
-                  )
-                ),
+                    padding: EdgeInsets.only(
+                        top: (68 / 852) * screenHeight,
+                        bottom: (68 / 852) * screenHeight),
+                    color: const Color(0xFF3775FA),
+                    width: screenWidth,
+                    height: (267 / 852) * screenHeight,
+                    child: Align(
+                      alignment: Alignment.topCenter,
+                      child: SizedBox(
+                        height: (131 / 852) * screenHeight,
+                        width: (131 / 393) * screenWidth,
+                        child: Image.asset('images/Logo.png', fit: BoxFit.fill),
+                      ),
+                    )),
               ),
               Align(
                 alignment: Alignment.bottomCenter,
                 child: Container(
-                  height: (629/852)*screenHeight,
+                  height: (629 / 852) * screenHeight,
                   width: double.infinity,
                   decoration: const BoxDecoration(
                     color: Color(0xFFFDFDFD),
@@ -175,66 +176,93 @@ class _TechnicianWaitingViewState extends State<TechnicianWaitingView> {
                     ),
                   ),
                   child: SingleChildScrollView(
-                    padding: EdgeInsets.fromLTRB((16/393)*screenWidth, (44/852)*screenHeight , (16/393)*screenWidth, (44/852)*screenHeight+keyboardPadding),
+                    padding: EdgeInsets.fromLTRB(
+                        (16 / 393) * screenWidth,
+                        (44 / 852) * screenHeight,
+                        (16 / 393) * screenWidth,
+                        (44 / 852) * screenHeight + keyboardPadding),
                     physics: const ClampingScrollPhysics(),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                       Image.asset('images/technician_waiting.png', width: (241/393)*screenWidth, height: (361/852)*screenHeight),
-                       SizedBox(height: (24/852)*screenHeight),
-                        Directionality(textDirection: TextDirection.rtl, 
-                        child: Center(
-                          child: Text(
-                          'شكراً لتسجيلك كحرفي! طلبك بيتراجع دلوقتي ، وهنرد عليك خلال 24 ساعة.',
-                          style: GoogleFonts.cairo(
-                            fontSize: 22,
-                            fontWeight: FontWeight.w600,
-                            color: const Color(0xFF000000),
-                          ),
-                          ),
-                        )
-                        ),
-                          SizedBox(height: (18/852)*screenHeight),
-                          SizedBox(
-                          height: (40/852)*screenHeight,
-                          width: (264/393)*screenWidth,
-                          child: BlocBuilder<TechnicianStatusCubit, TechnicianStatusState>(
-                            builder: (context, state) {
-                              final isLoading = state is TechnicianStatusLoading;
-                              return Container (
-                                width: double.infinity,
-                                height: (40/852)*screenHeight,
-                                decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(12.0),
-                                border: Border.all(
-                                color: Color(0xFF3775FA), 
-                                width: 1.0,
-                                        ),
-                                      ),   
-                                child:ElevatedButton(
-                                onPressed: isLoading ? null : () => _onReloadPressed(context),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFF3775FA),
-                                  foregroundColor: Colors.white,
-                                  disabledBackgroundColor: const Color.fromARGB(158, 55, 117, 250),
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0), side: const BorderSide(color: Colors.white, width: 1.0)),
+                        Image.asset('images/technician_waiting.png',
+                            width: (241 / 393) * screenWidth,
+                            height: (361 / 852) * screenHeight),
+                        SizedBox(height: (24 / 852) * screenHeight),
+                        Directionality(
+                            textDirection: TextDirection.rtl,
+                            child: Center(
+                              child: Text(
+                                'شكراً لتسجيلك كحرفي! طلبك بيتراجع دلوقتي ، وهنرد عليك خلال 24 ساعة.',
+                                style: GoogleFonts.cairo(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w600,
+                                  color: const Color(0xFF000000),
                                 ),
-                                child: isLoading
-                                    ? const SizedBox(
-                                        height: 24,
-                                        width: 24,
-                                        child: CircularProgressIndicator(color: Color(0xFF3775FA), strokeWidth: 3),
-                                      )
-                                    : Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Icon(Icons.refresh, color: Colors.white, size: (24/393)*screenWidth),
-                                        SizedBox(width: (8/393)*screenWidth),
-                                        Text('اعاده تحميل الصفحه', style: GoogleFonts.cairo(fontSize: 16, fontWeight: FontWeight.w500)),
-                                      ],
+                              ),
+                            )),
+                        SizedBox(height: (18 / 852) * screenHeight),
+                        SizedBox(
+                          height: (40 / 852) * screenHeight,
+                          width: (264 / 393) * screenWidth,
+                          child: BlocBuilder<TechnicianStatusCubit,
+                              TechnicianStatusState>(
+                            builder: (context, state) {
+                              final isLoading =
+                                  state is TechnicianStatusLoading;
+                              return Container(
+                                  width: double.infinity,
+                                  height: (40 / 852) * screenHeight,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(12.0),
+                                    border: Border.all(
+                                      color: Color(0xFF3775FA),
+                                      width: 1.0,
                                     ),
-                              )
-                              );
+                                  ),
+                                  child: ElevatedButton(
+                                    onPressed: isLoading
+                                        ? null
+                                        : () => _onReloadPressed(context),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: const Color(0xFF3775FA),
+                                      foregroundColor: Colors.white,
+                                      disabledBackgroundColor:
+                                          const Color.fromARGB(
+                                              158, 55, 117, 250),
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(12.0),
+                                          side: const BorderSide(
+                                              color: Colors.white, width: 1.0)),
+                                    ),
+                                    child: isLoading
+                                        ? const SizedBox(
+                                            height: 24,
+                                            width: 24,
+                                            child: CircularProgressIndicator(
+                                                color: Color(0xFF3775FA),
+                                                strokeWidth: 3),
+                                          )
+                                        : Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Icon(Icons.refresh,
+                                                  color: Colors.white,
+                                                  size:
+                                                      (24 / 393) * screenWidth),
+                                              SizedBox(
+                                                  width:
+                                                      (8 / 393) * screenWidth),
+                                              Text('اعاده تحميل الصفحه',
+                                                  style: GoogleFonts.cairo(
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.w500)),
+                                            ],
+                                          ),
+                                  ));
                             },
                           ),
                         ),
@@ -249,5 +277,4 @@ class _TechnicianWaitingViewState extends State<TechnicianWaitingView> {
       ),
     );
   }
-  
 }

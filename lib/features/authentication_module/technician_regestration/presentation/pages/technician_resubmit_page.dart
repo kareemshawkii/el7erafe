@@ -17,17 +17,16 @@ class TechnicianResubmitPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-          create: (context) => TechnicianResubmitCubit(
-            technicianRegRepository:
-                RepositoryProvider.of<TechnicianRegRepository>(context),
-          ),
-          child: const TechnicianResubmitView(),
-        );
+      create: (context) => TechnicianResubmitCubit(
+        technicianRegRepository:
+            RepositoryProvider.of<TechnicianRegRepository>(context),
+      ),
+      child: const TechnicianResubmitView(),
+    );
   }
 }
 
 class TechnicianResubmitView extends StatelessWidget {
-  
   const TechnicianResubmitView({super.key});
 
   @override
@@ -46,47 +45,47 @@ class TechnicianResubmitView extends StatelessWidget {
                 backgroundColor: Colors.red,
               ),
             );
-          }
-          else if (state is TechnicianResubmitSuccess) {
+          } else if (state is TechnicianResubmitSuccess) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                content: Text('تم ارسال البيانات بنجاح وفي انتظار التحقق', textDirection: TextDirection.rtl),
+                content: Text('تم ارسال البيانات بنجاح وفي انتظار التحقق',
+                    textDirection: TextDirection.rtl),
                 backgroundColor: Colors.green,
               ),
             );
             Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(
-              builder: (context) => BlocProvider(
-                create: (context) => TechnicianStatusCubit(
-                  statusRepository: RepositoryProvider.of<TechnicianRegRepository>(context),
+              context,
+              MaterialPageRoute(
+                builder: (context) => BlocProvider(
+                  create: (context) => TechnicianStatusCubit(
+                    statusRepository:
+                        RepositoryProvider.of<TechnicianRegRepository>(context),
+                  ),
+                  child: TechnicianWaitingPage(),
                 ),
-                child: TechnicianWaitingPage(), 
               ),
-            ),
-            (route) => false,
-          );
-          }
-          else if (state is TechnicianResubmitBlocked) {
+              (route) => false,
+            );
+          } else if (state is TechnicianResubmitBlocked) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(state.message, textDirection: TextDirection.rtl),
                 backgroundColor: Colors.red,
               ),
             );
-             Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => BlocProvider(
-                    create: (_) => LoginCubit(
-                      authRepository:
-                          RepositoryProvider.of<AuthRepository>(context),
-                    ),
-                    child: const LoginPage(),
-                  ),   
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(
+                builder: (_) => BlocProvider(
+                  create: (_) => LoginCubit(
+                    authRepository:
+                        RepositoryProvider.of<AuthRepository>(context),
+                  ),
+                  child: const LoginPage(),
                 ),
-                (route) => false,
-              );
+              ),
+              (route) => false,
+            );
           }
         },
         child: GestureDetector(
@@ -96,24 +95,25 @@ class TechnicianResubmitView extends StatelessWidget {
               Align(
                 alignment: Alignment.topCenter,
                 child: Container(
-                  padding: EdgeInsets.only(top: (68/852)*screenHeight,bottom: (68/852)*screenHeight),
-                  color: const Color(0xFF3775FA),
-                  width: screenWidth,
-                  height: (267/852)*screenHeight,
-                  child: Align(
-                    alignment: Alignment.topCenter,
-                    child:  SizedBox(
-                    height: (131/852)*screenHeight,
-                    width: (131/393)*screenWidth,
-                    child: Image.asset('images/Logo.png', fit: BoxFit.fill),
-                  ),
-                  )
-                ),
+                    padding: EdgeInsets.only(
+                        top: (68 / 852) * screenHeight,
+                        bottom: (68 / 852) * screenHeight),
+                    color: const Color(0xFF3775FA),
+                    width: screenWidth,
+                    height: (267 / 852) * screenHeight,
+                    child: Align(
+                      alignment: Alignment.topCenter,
+                      child: SizedBox(
+                        height: (131 / 852) * screenHeight,
+                        width: (131 / 393) * screenWidth,
+                        child: Image.asset('images/Logo.png', fit: BoxFit.fill),
+                      ),
+                    )),
               ),
               Align(
                 alignment: Alignment.bottomCenter,
                 child: Container(
-                  height: (629/852)*screenHeight,
+                  height: (629 / 852) * screenHeight,
                   width: double.infinity,
                   decoration: const BoxDecoration(
                     color: Color(0xFFFDFDFD),
@@ -123,7 +123,11 @@ class TechnicianResubmitView extends StatelessWidget {
                     ),
                   ),
                   child: SingleChildScrollView(
-                    padding: EdgeInsets.fromLTRB((16/393)*screenWidth, (44/852)*screenHeight , (16/393)*screenWidth, (44/852)*screenHeight+keyboardPadding),
+                    padding: EdgeInsets.fromLTRB(
+                        (16 / 393) * screenWidth,
+                        (44 / 852) * screenHeight,
+                        (16 / 393) * screenWidth,
+                        (44 / 852) * screenHeight + keyboardPadding),
                     physics: const ClampingScrollPhysics(),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
@@ -137,7 +141,7 @@ class TechnicianResubmitView extends StatelessWidget {
                               height: 1.5,
                             ),
                             children: <TextSpan>[
-                              TextSpan(text:"اعاده ارسال البيانات "),
+                              TextSpan(text: "اعاده ارسال البيانات "),
                               TextSpan(
                                 text: "المرفوضة",
                                 style: const TextStyle(
@@ -148,7 +152,7 @@ class TechnicianResubmitView extends StatelessWidget {
                             ],
                           ),
                         ),
-                        SizedBox(height: (24/852)*screenHeight),
+                        SizedBox(height: (24 / 852) * screenHeight),
                         const TechnicianResubmitForm(),
                       ],
                     ),

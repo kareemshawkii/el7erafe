@@ -4,9 +4,9 @@ import 'package:image_picker/image_picker.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-class ImagePickerButton extends StatefulWidget {      
-  final String? disabledImage;       
-  final bool enabled; 
+class ImagePickerButton extends StatefulWidget {
+  final String? disabledImage;
+  final bool enabled;
   final String defaultImage;
   final double height;
   final double width;
@@ -30,16 +30,16 @@ class _ImagePickerButtonState extends State<ImagePickerButton> {
   File? _pickedImage;
   final ImagePicker _picker = ImagePicker();
 
-   Future<void> _checkPermissionAndPickImage(ImageSource source) async {
+  Future<void> _checkPermissionAndPickImage(ImageSource source) async {
     Permission permission;
-  
+
     if (source == ImageSource.camera) {
       permission = Permission.camera;
     } else {
       if (Platform.isAndroid) {
-        permission = Permission.photos; 
+        permission = Permission.photos;
       } else {
-        permission = Permission.photos; 
+        permission = Permission.photos;
       }
     }
 
@@ -50,7 +50,9 @@ class _ImagePickerButtonState extends State<ImagePickerButton> {
     } else if (status.isDenied) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('الرجاء السماح بالوصول إلى الكاميرا أو المعرض.', textDirection: TextDirection.rtl)),
+        const SnackBar(
+            content: Text('الرجاء السماح بالوصول إلى الكاميرا أو المعرض.',
+                textDirection: TextDirection.rtl)),
       );
     } else if (status.isPermanentlyDenied) {
       if (!mounted) return;
@@ -62,7 +64,8 @@ class _ImagePickerButtonState extends State<ImagePickerButton> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('إعدادات الإذن مطلوبة', textDirection: TextDirection.rtl),
+        title: const Text('إعدادات الإذن مطلوبة',
+            textDirection: TextDirection.rtl),
         content: const Text(
           'تم رفض الوصول إلى الكاميرا بشكل دائم. يرجى تمكينه في إعدادات التطبيق لالتقاط الصور.',
           textDirection: TextDirection.rtl,
@@ -75,7 +78,7 @@ class _ImagePickerButtonState extends State<ImagePickerButton> {
           TextButton(
             onPressed: () {
               Navigator.of(ctx).pop();
-              openAppSettings(); 
+              openAppSettings();
             },
             child: const Text('فتح الإعدادات'),
           ),
@@ -118,66 +121,67 @@ class _ImagePickerButtonState extends State<ImagePickerButton> {
   }
 
   Future<void> _pickImage(ImageSource source) async {
-            try {
-              final XFile? pickedFile = await _picker.pickImage(
-                source: source,
-                maxWidth: 800,
-                imageQuality: 80,
-              );
+    try {
+      final XFile? pickedFile = await _picker.pickImage(
+        source: source,
+        maxWidth: 800,
+        imageQuality: 80,
+      );
 
-              if (pickedFile == null) {
-          return; 
-        }
+      if (pickedFile == null) {
+        return;
+      }
 
+      final String extension = pickedFile.name.split('.').last.toLowerCase();
 
-        final String extension = pickedFile.name.split('.').last.toLowerCase();
+      if (extension != 'jpg' && extension != 'jpeg' && extension != 'png') {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("من فضلك اختر صورة بصيغة JPG أو PNG فقط.",
+                textDirection: TextDirection.rtl),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
 
-        if (extension != 'jpg' && extension != 'jpeg' && extension != 'png') {
-          if (!mounted) return;
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text("من فضلك اختر صورة بصيغة JPG أو PNG فقط." , textDirection: TextDirection.rtl),
-              backgroundColor: Colors.red,
-            ),
-          );
-          return;
-        }
+      final int sizeInBytes = await pickedFile.length();
+      const int maxSizeInBytes = 1 * 1024 * 1024;
 
-        final int sizeInBytes = await pickedFile.length();
-        const int maxSizeInBytes = 1 * 1024 * 1024; 
+      if (sizeInBytes > maxSizeInBytes) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("حجم الصورة يجب ألا يتجاوز 1 ميجابايت.",
+                textDirection: TextDirection.rtl),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
 
-        if (sizeInBytes > maxSizeInBytes) {
-          if (!mounted) return;
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text("حجم الصورة يجب ألا يتجاوز 1 ميجابايت.", textDirection: TextDirection.rtl),
-              backgroundColor: Colors.red,
-            ),
-          );
-          return;
-        }
+      if (sizeInBytes == 0) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("الصورة المختارة غير صالحة. من فضلك اختر صورة أخرى.",
+                textDirection: TextDirection.rtl),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
 
-        if (sizeInBytes == 0) {
-          if (!mounted) return;
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text("الصورة المختارة غير صالحة. من فضلك اختر صورة أخرى.", textDirection: TextDirection.rtl),
-              backgroundColor: Colors.red,
-            ),
-          );
-          return;
-        }
+      final File newImageFile = File(pickedFile.path);
 
-        final File newImageFile = File(pickedFile.path);
+      setState(() {
+        _pickedImage = newImageFile;
+      });
 
-        setState(() {
-          _pickedImage = newImageFile;
-        });
-
-        if (widget.onImagePicked != null) {
-          widget.onImagePicked!(newImageFile);
-        }
-      
+      if (widget.onImagePicked != null) {
+        widget.onImagePicked!(newImageFile);
+      }
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -189,9 +193,9 @@ class _ImagePickerButtonState extends State<ImagePickerButton> {
   @override
   Widget build(BuildContext context) {
     final bool isDisabled = !widget.enabled;
-    
+
     return Opacity(
-      opacity: isDisabled ? 0.5 : 1,             
+      opacity: isDisabled ? 0.5 : 1,
       child: SizedBox(
         width: widget.width,
         height: widget.height,

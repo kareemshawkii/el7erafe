@@ -11,32 +11,29 @@ class TechnicianResubmitCubit extends Cubit<TechnicianResubmitState> {
       : super(TechnicianResubmitInitial());
 
   Future<void> resubmitTechnicianRegistration(
-  RejectedTechnicianModel requestModel,
-  RejectedUser rejectedUser,
-) async {
-  emit(TechnicianResubmitLoading());
+    RejectedTechnicianModel requestModel,
+    RejectedUser rejectedUser,
+  ) async {
+    emit(TechnicianResubmitLoading());
 
-  final result = await technicianRegRepository.resubmitTechnicianFiles(
-    requestModel,
-    rejectedUser,
-  );
+    final result = await technicianRegRepository.resubmitTechnicianFiles(
+      requestModel,
+      rejectedUser,
+    );
 
-  result.fold(
-    (failure) {
-      if (failure.message == 'BLOCKED') {
-        emit(TechnicianResubmitBlocked(
-          message: 'تم حظر حسابك ولا يمكنك إعادة التقديم.',
-        ));
-      } 
-      else {
-        emit(TechnicianResubmitFailure(error: failure.message));
-      }
-    },
-    (success) {
-      emit(TechnicianResubmitSuccess());
-    },
-  );
-}
-
-
+    result.fold(
+      (failure) {
+        if (failure.message == 'BLOCKED') {
+          emit(TechnicianResubmitBlocked(
+            message: 'تم حظر حسابك ولا يمكنك إعادة التقديم.',
+          ));
+        } else {
+          emit(TechnicianResubmitFailure(error: failure.message));
+        }
+      },
+      (success) {
+        emit(TechnicianResubmitSuccess());
+      },
+    );
+  }
 }

@@ -81,7 +81,6 @@ class EgyptGovernoratePicker extends StatefulWidget {
 class _EgyptGovernoratePickerState extends State<EgyptGovernoratePicker> {
   final List<Governorate> _governorates = [];
   List<City> _cities = [];
-  
 
   Governorate? _selectedGovernorate;
   City? _selectedCity;
@@ -98,8 +97,7 @@ class _EgyptGovernoratePickerState extends State<EgyptGovernoratePicker> {
       var jsonMap = jsonDecode(jsonString);
       var govList = jsonMap['governorates'] as List;
 
-      var governorates =
-          govList.map((g) => Governorate.fromJson(g)).toList();
+      var governorates = govList.map((g) => Governorate.fromJson(g)).toList();
       governorates.sort((a, b) {
         return widget.language == Language.arabic
             ? a.nameAr.compareTo(b.nameAr)
@@ -135,8 +133,7 @@ class _EgyptGovernoratePickerState extends State<EgyptGovernoratePicker> {
         City? defaultCity;
         try {
           defaultCity = defaultGov.cities.firstWhere((c) =>
-              c.nameEn == widget.currentCity ||
-              c.nameAr == widget.currentCity);
+              c.nameEn == widget.currentCity || c.nameAr == widget.currentCity);
         } catch (e) {
           defaultCity = null;
         }
@@ -215,102 +212,102 @@ class _EgyptGovernoratePickerState extends State<EgyptGovernoratePicker> {
   }
 
   Widget _buildGovernorateDropdown() {
-    return Directionality(textDirection: TextDirection.rtl, 
-    child: DropdownButtonFormField2<Governorate>(
-      alignment: AlignmentDirectional.centerEnd,
-      decoration: InputDecoration(
-        hintText: widget.governorateDropdownLabel.tr(widget.language),
-        border: const OutlineInputBorder(),
-        contentPadding: const EdgeInsets.all(8),
-        enabledBorder: OutlineInputBorder(
-          borderSide: BorderSide(
-            color: Color(0xFFE2DFDF),
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: DropdownButtonFormField2<Governorate>(
+        alignment: AlignmentDirectional.centerEnd,
+        decoration: InputDecoration(
+          hintText: widget.governorateDropdownLabel.tr(widget.language),
+          border: const OutlineInputBorder(),
+          contentPadding: const EdgeInsets.all(8),
+          enabledBorder: OutlineInputBorder(
+            borderSide: BorderSide(
+              color: Color(0xFFE2DFDF),
+            ),
+            borderRadius: BorderRadius.circular(12.0),
           ),
-          borderRadius: BorderRadius.circular(12.0),
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(
+              color: Color(0xFF3775FA),
+            ),
+            borderRadius: BorderRadius.circular(12.0),
+          ),
         ),
-        focusedBorder: OutlineInputBorder(
-          borderSide: BorderSide(
-            color: Color(0xFF3775FA),
+        dropdownStyleData: DropdownStyleData(
+          maxHeight: (200 / 852) * MediaQuery.of(context).size.height,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12.0),
+            color: Colors.white,
           ),
-          borderRadius: BorderRadius.circular(12.0),
         ),
+        isExpanded: true,
+        value: _selectedGovernorate,
+        items: _governorates.map((Governorate gov) {
+          return DropdownMenuItem<Governorate>(
+              alignment: AlignmentDirectional.centerEnd,
+              value: gov,
+              child: Align(
+                alignment: Alignment.centerRight,
+                child: Text(
+                  _getGovernorateName(gov),
+                  style: widget.selectedItemStyle,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ));
+        }).toList(),
+        onChanged: (val) => _onGovernorateSelected(val),
+        disabledHint: Text(widget.governorateDropdownLabel.tr(widget.language)),
       ),
-      dropdownStyleData: DropdownStyleData(
-                  maxHeight: (200/852)*MediaQuery.of(context).size.height,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12.0),
-                    color: Colors.white,
-                  ),
-      ),
-      isExpanded: true,
-      value: _selectedGovernorate,
-      items: _governorates.map((Governorate gov) {
-        return DropdownMenuItem<Governorate>(
-          alignment: AlignmentDirectional.centerEnd,
-          value: gov,
-          child: Align(
-            alignment: Alignment.centerRight,
-            child:  Text(
-            _getGovernorateName(gov),
-            style: widget.selectedItemStyle,
-            overflow: TextOverflow.ellipsis,
-          ),
-          )
-        );
-      }).toList(),
-      onChanged: (val) => _onGovernorateSelected(val),
-      disabledHint: Text(widget.governorateDropdownLabel.tr(widget.language)),
-    ),
     );
   }
 
   Widget _buildCityDropdown() {
     bool isGovSelected = _selectedGovernorate != null;
-    return Directionality(textDirection: TextDirection.rtl,
-    child: DropdownButtonFormField2<City>(
-      decoration: InputDecoration(
-        hintText: widget.cityDropdownLabel.tr(widget.language),
-        border: const OutlineInputBorder(),
-        contentPadding: const EdgeInsets.all(8),
-        enabledBorder: OutlineInputBorder(
-          borderSide: BorderSide(
-            color: Color(0xFFE2DFDF),
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: DropdownButtonFormField2<City>(
+        decoration: InputDecoration(
+          hintText: widget.cityDropdownLabel.tr(widget.language),
+          border: const OutlineInputBorder(),
+          contentPadding: const EdgeInsets.all(8),
+          enabledBorder: OutlineInputBorder(
+            borderSide: BorderSide(
+              color: Color(0xFFE2DFDF),
+            ),
+            borderRadius: BorderRadius.circular(12.0),
           ),
-          borderRadius: BorderRadius.circular(12.0),
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(
+              color: Color(0xFF3775FA),
+            ),
+            borderRadius: BorderRadius.circular(12.0),
+          ),
         ),
-        focusedBorder: OutlineInputBorder(
-          borderSide: BorderSide(
-            color: Color(0xFF3775FA),
+        dropdownStyleData: DropdownStyleData(
+          maxHeight: (200 / 852) * MediaQuery.of(context).size.height,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12.0),
+            color: Colors.white,
           ),
-          borderRadius: BorderRadius.circular(12.0),
         ),
+        isExpanded: true,
+        value: _selectedCity,
+        items: _cities.map((City city) {
+          return DropdownMenuItem<City>(
+              alignment: AlignmentDirectional.centerEnd,
+              value: city,
+              child: Align(
+                alignment: Alignment.centerRight,
+                child: Text(
+                  _getCityName(city),
+                  style: widget.selectedItemStyle,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ));
+        }).toList(),
+        onChanged: isGovSelected ? (val) => _onCitySelected(val) : null,
+        disabledHint: Text(widget.cityDropdownLabel.tr(widget.language)),
       ),
-      dropdownStyleData: DropdownStyleData(
-                  maxHeight: (200/852)*MediaQuery.of(context).size.height,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12.0),
-                    color: Colors.white,
-                  ),
-      ),
-      isExpanded: true,
-      value: _selectedCity,
-      items: _cities.map((City city) {
-        return DropdownMenuItem<City>(
-          alignment: AlignmentDirectional.centerEnd,
-          value: city,
-          child: Align(
-            alignment: Alignment.centerRight,
-            child: Text(
-            _getCityName(city),
-            style: widget.selectedItemStyle,
-            overflow: TextOverflow.ellipsis,
-          ),
-          )
-        );
-      }).toList(),
-      onChanged: isGovSelected ? (val) => _onCitySelected(val) : null,
-      disabledHint: Text(widget.cityDropdownLabel.tr(widget.language)),
-    ),
     );
   }
 }

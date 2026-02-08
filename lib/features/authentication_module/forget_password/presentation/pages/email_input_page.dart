@@ -12,7 +12,7 @@ class EmailInputPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return  EmailInputView();
+    return EmailInputView();
   }
 }
 
@@ -20,14 +20,14 @@ class EmailInputView extends StatelessWidget {
   final TextEditingController _emailController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
-   EmailInputView({super.key});
+  EmailInputView({super.key});
 
   void _onSendPressed(BuildContext context) {
-  FocusScope.of(context).unfocus();
-  if (_formKey.currentState!.validate()) {
-    context.read<EmailInputCubit>().sendEmail(_emailController.text);
+    FocusScope.of(context).unfocus();
+    if (_formKey.currentState!.validate()) {
+      context.read<EmailInputCubit>().sendEmail(_emailController.text);
+    }
   }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +42,8 @@ class EmailInputView extends StatelessWidget {
           if (state is EmailInputInvalid) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(state.errorMessage, textDirection: TextDirection.rtl),
+                content:
+                    Text(state.errorMessage, textDirection: TextDirection.rtl),
                 backgroundColor: Colors.red,
               ),
             );
@@ -50,22 +51,23 @@ class EmailInputView extends StatelessWidget {
           if (state is EmailInputValid) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                content: Text('تم ارسال كود التحقق الي البريد الإلكتروني بنجاح', textDirection: TextDirection.rtl),
+                content: Text('تم ارسال كود التحقق الي البريد الإلكتروني بنجاح',
+                    textDirection: TextDirection.rtl),
                 backgroundColor: Colors.green,
               ),
             );
             Navigator.push(
               context,
               MaterialPageRoute(
-              builder: (context) => BlocProvider(
-              create: (context) =>
-                ForgetOtpCubit(
-                  otpForgetRepository: RepositoryProvider.of<OtpForgetRepository>(context), 
-                ),   
-                child: ForgetOtpPage(email: _emailController.text), 
+                builder: (context) => BlocProvider(
+                  create: (context) => ForgetOtpCubit(
+                    otpForgetRepository:
+                        RepositoryProvider.of<OtpForgetRepository>(context),
                   ),
+                  child: ForgetOtpPage(email: _emailController.text),
                 ),
-              );
+              ),
+            );
           }
         },
         child: GestureDetector(
@@ -75,24 +77,25 @@ class EmailInputView extends StatelessWidget {
               Align(
                 alignment: Alignment.topCenter,
                 child: Container(
-                  padding: EdgeInsets.only(top: (68/852)*screenHeight,bottom: (68/852)*screenHeight),
-                  color: const Color(0xFF3775FA),
-                  width: screenWidth,
-                  height: (267/852)*screenHeight,
-                  child: Align(
-                    alignment: Alignment.topCenter,
-                    child:  SizedBox(
-                    height: (131/852)*screenHeight,
-                    width: (131/393)*screenWidth,
-                    child: Image.asset('images/Logo.png', fit: BoxFit.fill),
-                  ),
-                  )
-                ),
+                    padding: EdgeInsets.only(
+                        top: (68 / 852) * screenHeight,
+                        bottom: (68 / 852) * screenHeight),
+                    color: const Color(0xFF3775FA),
+                    width: screenWidth,
+                    height: (267 / 852) * screenHeight,
+                    child: Align(
+                      alignment: Alignment.topCenter,
+                      child: SizedBox(
+                        height: (131 / 852) * screenHeight,
+                        width: (131 / 393) * screenWidth,
+                        child: Image.asset('images/Logo.png', fit: BoxFit.fill),
+                      ),
+                    )),
               ),
               Align(
                 alignment: Alignment.bottomCenter,
                 child: Container(
-                  height: (629/852)*screenHeight,
+                  height: (629 / 852) * screenHeight,
                   width: double.infinity,
                   decoration: const BoxDecoration(
                     color: Color(0xFFFDFDFD),
@@ -102,16 +105,21 @@ class EmailInputView extends StatelessWidget {
                     ),
                   ),
                   child: SingleChildScrollView(
-                    padding: EdgeInsets.fromLTRB((16/393)*screenWidth, (44/852)*screenHeight , (16/393)*screenWidth, (44/852)*screenHeight + keyboardPadding),
+                    padding: EdgeInsets.fromLTRB(
+                        (16 / 393) * screenWidth,
+                        (44 / 852) * screenHeight,
+                        (16 / 393) * screenWidth,
+                        (44 / 852) * screenHeight + keyboardPadding),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         SizedBox(
-                         height: (136/852)*screenHeight,
-                         width: (147/393)*screenWidth,
-                         child: Image.asset('images/email_input.png', fit: BoxFit.fill),
+                          height: (136 / 852) * screenHeight,
+                          width: (147 / 393) * screenWidth,
+                          child: Image.asset('images/email_input.png',
+                              fit: BoxFit.fill),
                         ),
-                        SizedBox(height: (32/852)*screenHeight),
+                        SizedBox(height: (32 / 852) * screenHeight),
                         Text(
                           'نسيت كلمه السر ؟',
                           textAlign: TextAlign.center,
@@ -130,74 +138,110 @@ class EmailInputView extends StatelessWidget {
                             color: const Color(0xFF000000),
                           ),
                         ),
-                        SizedBox(height: (32/852)*screenHeight),
+                        SizedBox(height: (32 / 852) * screenHeight),
                         Form(
-                           key: _formKey,
-                           autovalidateMode: AutovalidateMode.onUserInteraction,
-                          child:Directionality(
-                          textDirection: TextDirection.rtl,
-                          child: TextFormField(
+                          key: _formKey,
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
+                          child: Directionality(
+                            textDirection: TextDirection.rtl,
+                            child: TextFormField(
                               controller: _emailController,
-                              autovalidateMode: AutovalidateMode.onUserInteraction,
+                              autovalidateMode:
+                                  AutovalidateMode.onUserInteraction,
                               textAlign: TextAlign.right,
                               decoration: InputDecoration(
-                                prefixIcon: Icon(Icons.email, color: Color(0xFF727070),size: 18,),
+                                prefixIcon: Icon(
+                                  Icons.email,
+                                  color: Color(0xFF727070),
+                                  size: 18,
+                                ),
                                 hintText: 'name@domain.com',
-                                hintStyle: GoogleFonts.cairo(fontSize: 15, color: const Color(0xFF727070),fontWeight: FontWeight.w400),
-                                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFE2DFDF))),
-                                focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFF3775FA))),
-                                enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFE2DFDF))),
+                                hintStyle: GoogleFonts.cairo(
+                                    fontSize: 15,
+                                    color: const Color(0xFF727070),
+                                    fontWeight: FontWeight.w400),
+                                border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: const BorderSide(
+                                        color: Color(0xFFE2DFDF))),
+                                focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: const BorderSide(
+                                        color: Color(0xFF3775FA))),
+                                enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: const BorderSide(
+                                        color: Color(0xFFE2DFDF))),
                                 contentPadding: EdgeInsets.all(12),
                                 errorStyle: TextStyle(
-                                fontSize: 11, 
+                                  fontSize: 11,
                                 ),
                               ),
                               validator: (value) {
-                                if (value == null || value.isEmpty) return 'من فضلك دخل البريد الإلكتروني';
-                                if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) return 'من فضلك دخل بريد إلكتروني صحيح';
-                                if (value.length > 50) return 'البريد الإلكتروني لازم يكون أقل من 50 حرف';
+                                if (value == null || value.isEmpty) {
+                                  return 'من فضلك دخل البريد الإلكتروني';
+                                }
+                                if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+                                    .hasMatch(value)) {
+                                  return 'من فضلك دخل بريد إلكتروني صحيح';
+                                }
+                                if (value.length > 50) {
+                                  return 'البريد الإلكتروني لازم يكون أقل من 50 حرف';
+                                }
                                 return null;
                               },
+                            ),
                           ),
                         ),
-                        ),
-                        SizedBox(height: (24/852)*screenHeight),
-                         SizedBox(
-            width: double.infinity,
-            height: (40/852)*screenHeight,
-            child: BlocBuilder<EmailInputCubit, EmailInputState>(
-              builder: (context, state) {
-                final isLoading = state is EmailInputLoading;
-                return Container (
-                  width: double.infinity,
-                          height: (40/852)*screenHeight,
-                          decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12.0),
-                          border: Border.all(
-                            color: Color(0xFF3775FA), 
-                            width: 1.0,
+                        SizedBox(height: (24 / 852) * screenHeight),
+                        SizedBox(
+                          width: double.infinity,
+                          height: (40 / 852) * screenHeight,
+                          child: BlocBuilder<EmailInputCubit, EmailInputState>(
+                            builder: (context, state) {
+                              final isLoading = state is EmailInputLoading;
+                              return Container(
+                                  width: double.infinity,
+                                  height: (40 / 852) * screenHeight,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(12.0),
+                                    border: Border.all(
+                                      color: Color(0xFF3775FA),
+                                      width: 1.0,
+                                    ),
+                                  ),
+                                  child: ElevatedButton(
+                                    onPressed: isLoading
+                                        ? null
+                                        : () => _onSendPressed(context),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: const Color(0xFF3775FA),
+                                      foregroundColor: Colors.white,
+                                      disabledBackgroundColor:
+                                          const Color.fromARGB(
+                                              158, 55, 117, 250),
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(12.0),
+                                          side: const BorderSide(
+                                              color: Colors.white, width: 1.0)),
+                                    ),
+                                    child: isLoading
+                                        ? const SizedBox(
+                                            height: 24,
+                                            width: 24,
+                                            child: CircularProgressIndicator(
+                                                color: Color(0xFF3775FA),
+                                                strokeWidth: 3),
+                                          )
+                                        : Text('ارسال',
+                                            style: GoogleFonts.cairo(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w500)),
+                                  ));
+                            },
                           ),
-                        ),   
-                              child:ElevatedButton(
-                              onPressed: isLoading ? null : () => _onSendPressed(context),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFF3775FA),
-                                foregroundColor: Colors.white,
-                                disabledBackgroundColor: const Color.fromARGB(158, 55, 117, 250),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0), side: const BorderSide(color: Colors.white, width: 1.0)),
-                              ),
-                              child: isLoading
-                                  ? const SizedBox(
-                                      height: 24,
-                                      width: 24,
-                                      child: CircularProgressIndicator(color: Color(0xFF3775FA), strokeWidth: 3),
-                                    )
-                                  : Text('ارسال', style: GoogleFonts.cairo(fontSize: 16, fontWeight: FontWeight.w500)),
-                            )
-                            );
-                          },
                         ),
-                      ),
                       ],
                     ),
                   ),

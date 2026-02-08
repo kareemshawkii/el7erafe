@@ -1,5 +1,6 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:el7erafe/core/services/models/user.dart' show TempTechnician, User;
+import 'package:el7erafe/core/services/models/user.dart'
+    show TempTechnician, User;
 
 class AuthLocalStorage {
   final _storage = const FlutterSecureStorage();
@@ -8,7 +9,7 @@ class AuthLocalStorage {
   static const String _userNameKey = "userName";
   static const String _userIdKey = "userId";
   static const String _tempTokenKey = "tempToken";
-  static const String _typeKey = "type"; 
+  static const String _typeKey = "type";
   static const String _emailKey = "email";
   static const String _resetTempToken = "tempToken";
   static const String _technicianEmail = "technicianEmail";
@@ -47,7 +48,7 @@ class AuthLocalStorage {
     }
   }
 
-  Future <void> saveResetTempToken (String tempToken) async {
+  Future<void> saveResetTempToken(String tempToken) async {
     await _storage.write(key: _resetTempToken, value: tempToken);
   }
 
@@ -76,7 +77,7 @@ class AuthLocalStorage {
   }
 
   Future<String?> getUserId() async {
-    return await _storage.read(key: _userIdKey); 
+    return await _storage.read(key: _userIdKey);
   }
 
   Future<String?> getTempToken() async {

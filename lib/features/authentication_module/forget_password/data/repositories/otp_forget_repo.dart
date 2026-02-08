@@ -5,11 +5,13 @@ import 'package:el7erafe/core/utils/login_failure.dart';
 import 'package:http/http.dart' as http;
 
 class OtpForgetRepository {
-  final String _baseUrl = "https://el7rafe-gma4hrg0e9epfsc0.uaenorth-01.azurewebsites.net"; 
+  final String _baseUrl =
+      "https://el7rafe-gma4hrg0e9epfsc0.uaenorth-01.azurewebsites.net";
 
-  Future<Either<Failure, String>> verifyOtp(String email, String otpCode) async {
+  Future<Either<Failure, String>> verifyOtp(
+      String email, String otpCode) async {
     final Uri verifyUrl = Uri.parse('$_baseUrl/api/auth/verify-reset-otp');
-    
+
     try {
       final response = await http.post(
         verifyUrl,
@@ -21,23 +23,25 @@ class OtpForgetRepository {
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-         AuthLocalStorage authLocalStorage = AuthLocalStorage();
-        await authLocalStorage.saveResetTempToken(jsonDecode(response.body)['tempToken']);
-        return  Right('accepted');
+        AuthLocalStorage authLocalStorage = AuthLocalStorage();
+        await authLocalStorage
+            .saveResetTempToken(jsonDecode(response.body)['tempToken']);
+        return Right('accepted');
       } else if (response.statusCode == 400) {
         return Left(Failure(jsonDecode(response.body)['errorMessage']));
       } else {
-        return const Left(Failure("حصل خطأ غير متوقع. يرجى المحاولة مرة أخرى لاحقًا."));
+        return const Left(
+            Failure("حصل خطأ غير متوقع. يرجى المحاولة مرة أخرى لاحقًا."));
       }
     } catch (e) {
-      return const Left(Failure("حصل خطأ غير متوقع. يرجى التأكد من اتصالك بالإنترنت."));
+      return const Left(
+          Failure("حصل خطأ غير متوقع. يرجى التأكد من اتصالك بالإنترنت."));
     }
-
   }
 
   Future<Either<Failure, String>> resendOtp(String email) async {
     final Uri resendUrl = Uri.parse('$_baseUrl/api/auth/resend-otp');
-    
+
     try {
       final response = await http.post(
         resendUrl,
@@ -49,15 +53,14 @@ class OtpForgetRepository {
 
       if (response.statusCode == 200) {
         return const Right('تم إعادة إرسال رمز التحقق بنجاح');
-      } 
-      else if (response.statusCode == 400) {
+      } else if (response.statusCode == 400) {
         return Left(Failure(jsonDecode(response.body)['errorMessage']));
-      } 
-      else {
+      } else {
         return Left(Failure(jsonDecode(response.body)['errorMessage']));
       }
     } catch (e) {
-      return const Left(Failure("حصل خطأ غير متوقع. يرجى التأكد من اتصالك بالإنترنت."));
+      return const Left(
+          Failure("حصل خطأ غير متوقع. يرجى التأكد من اتصالك بالإنترنت."));
     }
   }
 }

@@ -17,7 +17,8 @@ class ForgetOtpPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => ForgetOtpCubit(
-        otpForgetRepository: RepositoryProvider.of<OtpForgetRepository>(context),
+        otpForgetRepository:
+            RepositoryProvider.of<OtpForgetRepository>(context),
       ),
       child: ForgetOtpView(email: email),
     );
@@ -33,13 +34,13 @@ class ForgetOtpView extends StatefulWidget {
 }
 
 class _ForgetOtpViewState extends State<ForgetOtpView> {
-  String _enteredOtp = ""; 
+  String _enteredOtp = "";
 
   void _onOtpPressed() {
     FocusScope.of(context).unfocus();
     if (_enteredOtp.length == 6) {
       context.read<ForgetOtpCubit>().otpAuth(
-            widget.email, 
+            widget.email,
             _enteredOtp,
           );
     } else {
@@ -73,28 +74,30 @@ class _ForgetOtpViewState extends State<ForgetOtpView> {
           if (state is ForgetOtpSuccess) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                content:
-                    Text('تم التحقق من الرمز بنجاح', textDirection: TextDirection.rtl),
+                content: Text('تم التحقق من الرمز بنجاح',
+                    textDirection: TextDirection.rtl),
                 backgroundColor: Colors.green,
               ),
             );
             Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(
-              builder: (context) => BlocProvider(
-                create: (context) => ResetPasswordCubit(
-                  resetPasswordRepository: RepositoryProvider.of<ResetPasswordRepository>(context),
+              context,
+              MaterialPageRoute(
+                builder: (context) => BlocProvider(
+                  create: (context) => ResetPasswordCubit(
+                    resetPasswordRepository:
+                        RepositoryProvider.of<ResetPasswordRepository>(context),
+                  ),
+                  child: ResetPasswordPage(),
                 ),
-                child: ResetPasswordPage(), 
               ),
-            ),
-            (route) => false,
-          );
+              (route) => false,
+            );
           }
           if (state is ForgetOtpResent) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text('تم إعادة إرسال رمز التحقق بنجاح', textDirection: TextDirection.rtl),
+                content: Text('تم إعادة إرسال رمز التحقق بنجاح',
+                    textDirection: TextDirection.rtl),
                 backgroundColor: Colors.green,
               ),
             );
@@ -107,24 +110,25 @@ class _ForgetOtpViewState extends State<ForgetOtpView> {
               Align(
                 alignment: Alignment.topCenter,
                 child: Container(
-                  padding: EdgeInsets.only(top: (68/852)*screenHeight,bottom: (68/852)*screenHeight),
-                  color: const Color(0xFF3775FA),
-                  width: screenWidth,
-                  height: (267/852)*screenHeight,
-                  child: Align(
-                    alignment: Alignment.topCenter,
-                    child:  SizedBox(
-                    height: (131/852)*screenHeight,
-                    width: (131/393)*screenWidth,
-                    child: Image.asset('images/Logo.png', fit: BoxFit.fill),
-                  ),
-                  )
-                ),
+                    padding: EdgeInsets.only(
+                        top: (68 / 852) * screenHeight,
+                        bottom: (68 / 852) * screenHeight),
+                    color: const Color(0xFF3775FA),
+                    width: screenWidth,
+                    height: (267 / 852) * screenHeight,
+                    child: Align(
+                      alignment: Alignment.topCenter,
+                      child: SizedBox(
+                        height: (131 / 852) * screenHeight,
+                        width: (131 / 393) * screenWidth,
+                        child: Image.asset('images/Logo.png', fit: BoxFit.fill),
+                      ),
+                    )),
               ),
               Align(
                 alignment: Alignment.bottomCenter,
                 child: Container(
-                  height: (629/852)*screenHeight,
+                  height: (629 / 852) * screenHeight,
                   width: double.infinity,
                   decoration: const BoxDecoration(
                     color: Color(0xFFFDFDFD),
@@ -134,18 +138,22 @@ class _ForgetOtpViewState extends State<ForgetOtpView> {
                     ),
                   ),
                   child: SingleChildScrollView(
-                    padding: EdgeInsets.fromLTRB((16/393)*screenWidth, (44/852)*screenHeight , (16/393)*screenWidth, (44/852)*screenHeight + keyboardPadding),
+                    padding: EdgeInsets.fromLTRB(
+                        (16 / 393) * screenWidth,
+                        (44 / 852) * screenHeight,
+                        (16 / 393) * screenWidth,
+                        (44 / 852) * screenHeight + keyboardPadding),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         Center(
-                          child: SizedBox(
-                          height: (136/852)*screenHeight,
-                          width: (182/393)*screenWidth,
-                          child: Image.asset('images/otp.png', fit: BoxFit.fill),
-                        )
-                        ),
-                        SizedBox(height: (32/852)*screenHeight),
+                            child: SizedBox(
+                          height: (136 / 852) * screenHeight,
+                          width: (182 / 393) * screenWidth,
+                          child:
+                              Image.asset('images/otp.png', fit: BoxFit.fill),
+                        )),
+                        SizedBox(height: (32 / 852) * screenHeight),
                         Center(
                           child: Text(
                             'أدخل رمز التحقق',
@@ -156,7 +164,7 @@ class _ForgetOtpViewState extends State<ForgetOtpView> {
                             ),
                           ),
                         ),
-                        SizedBox(height: (8/852)*screenHeight),
+                        SizedBox(height: (8 / 852) * screenHeight),
                         Center(
                           child: Text(
                             'أدخل الكود المرسل على بريدك لإكمال العملية',
@@ -167,11 +175,11 @@ class _ForgetOtpViewState extends State<ForgetOtpView> {
                             ),
                           ),
                         ),
-                        SizedBox(height: (24/852)*screenHeight),
-                         OtpTextField(
+                        SizedBox(height: (24 / 852) * screenHeight),
+                        OtpTextField(
                           numberOfFields: 6,
-                          fieldWidth: (50/393)*screenWidth,
-                          fieldHeight: (50/852)*screenHeight,
+                          fieldWidth: (50 / 393) * screenWidth,
+                          fieldHeight: (50 / 852) * screenHeight,
                           borderColor: const Color(0xFF3775FA),
                           enabledBorderColor: const Color(0xFFE2DFDF),
                           focusedBorderColor: const Color(0xFF3775FA),
@@ -188,50 +196,69 @@ class _ForgetOtpViewState extends State<ForgetOtpView> {
                             });
                           },
                         ),
-                        SizedBox(height: (24/852)*screenHeight),
+                        SizedBox(height: (24 / 852) * screenHeight),
                         BlocBuilder<ForgetOtpCubit, ForgetOtpState>(
                           builder: (context, state) {
                             final isLoading = state is ForgetOtpLoading;
-                            return Container (
-                           width: double.infinity,
-                          height: (40/852)*screenHeight,
-                          decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12.0),
-                          border: Border.all(
-                            color: Color(0xFF3775FA), 
-                            width: 1.0,
-                           ),
-                          ),   
-                          child:ElevatedButton(
-                          onPressed: isLoading ? null : _onOtpPressed,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF3775FA),
-                            foregroundColor: Colors.white,
-                            disabledBackgroundColor: const Color.fromARGB(158, 55, 117, 250),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0), side: const BorderSide(color: Colors.white, width: 1.0)),
-                          ),
-                          child: isLoading
-                              ? const SizedBox(
-                                  height: 24,
-                                  width: 24,
-                                  child: CircularProgressIndicator(color: Color(0xFF3775FA), strokeWidth: 3),
-                                )
-                              : Text('تحقق', style: GoogleFonts.cairo(fontSize: 16, fontWeight: FontWeight.w500)),
-                        )
-                        );
+                            return Container(
+                                width: double.infinity,
+                                height: (40 / 852) * screenHeight,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(12.0),
+                                  border: Border.all(
+                                    color: Color(0xFF3775FA),
+                                    width: 1.0,
+                                  ),
+                                ),
+                                child: ElevatedButton(
+                                  onPressed: isLoading ? null : _onOtpPressed,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color(0xFF3775FA),
+                                    foregroundColor: Colors.white,
+                                    disabledBackgroundColor:
+                                        const Color.fromARGB(158, 55, 117, 250),
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(12.0),
+                                        side: const BorderSide(
+                                            color: Colors.white, width: 1.0)),
+                                  ),
+                                  child: isLoading
+                                      ? const SizedBox(
+                                          height: 24,
+                                          width: 24,
+                                          child: CircularProgressIndicator(
+                                              color: Color(0xFF3775FA),
+                                              strokeWidth: 3),
+                                        )
+                                      : Text('تحقق',
+                                          style: GoogleFonts.cairo(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w500)),
+                                ));
                           },
                         ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           textDirection: TextDirection.rtl,
                           children: [
-                              Text('ماوصلكش الكود؟  ابعت طلب', style: GoogleFonts.cairo(fontSize: 14, color: const Color(0xFF727070),fontWeight: FontWeight.w400)),
-                              TextButton(
-                                onPressed: () {
-                                  context.read<ForgetOtpCubit>().resendOtp(widget.email);
-                                },
-                                child: Text('لإعادة الإرسال', style: GoogleFonts.cairo(fontSize: 14, color: const Color(0xFF3775FA),fontWeight: FontWeight.w400)),
-                              ),
+                            Text('ماوصلكش الكود؟  ابعت طلب',
+                                style: GoogleFonts.cairo(
+                                    fontSize: 14,
+                                    color: const Color(0xFF727070),
+                                    fontWeight: FontWeight.w400)),
+                            TextButton(
+                              onPressed: () {
+                                context
+                                    .read<ForgetOtpCubit>()
+                                    .resendOtp(widget.email);
+                              },
+                              child: Text('لإعادة الإرسال',
+                                  style: GoogleFonts.cairo(
+                                      fontSize: 14,
+                                      color: const Color(0xFF3775FA),
+                                      fontWeight: FontWeight.w400)),
+                            ),
                           ],
                         ),
                       ],

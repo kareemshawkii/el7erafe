@@ -10,8 +10,18 @@ class TechnicianRegistrationCubit extends Cubit<TechnicianRegistrationState> {
   TechnicianRegistrationCubit({required this.technicianRegRepository})
       : super(TechnicianRegInitial());
 
-  Future<void> register(String name, String phone, String email, String password,
-      File frontIdImage, File backIdImage, File criminalRecordImage, String governorate, String city, String serviceType) async {
+  Future<void> register(
+      String name,
+      String phone,
+      String email,
+      String password,
+      File profileImage,
+      File frontIdImage,
+      File backIdImage,
+      File criminalRecordImage,
+      String governorate,
+      String city,
+      String serviceType) async {
     emit(TechnicianRegLoading());
 
     final requestModel = TechnicianRegistrationRequestModel(
@@ -19,6 +29,7 @@ class TechnicianRegistrationCubit extends Cubit<TechnicianRegistrationState> {
       phoneNumber: phone,
       email: email,
       password: password,
+      profileImage: profileImage,
       frontIdImage: frontIdImage,
       backIdImage: backIdImage,
       criminalRecordImage: criminalRecordImage,
@@ -33,12 +44,14 @@ class TechnicianRegistrationCubit extends Cubit<TechnicianRegistrationState> {
     result.fold(
       (failure) {
         if (failure.message.contains('BLOCKED')) {
-          emit(TecnicianRegBlocked(message: 'تم حظر حسابك. الرجاء التواصل مع الدعم لمزيد من المعلومات.'));
+          emit(TecnicianRegBlocked(
+              message:
+                  'تم حظر حسابك. الرجاء التواصل مع الدعم لمزيد من المعلومات.'));
         } else {
           emit(TechnicianRegFailure(error: failure.message));
         }
       },
       (success) => emit(TechnicianRegSuccess()),
-   );
+    );
   }
 }

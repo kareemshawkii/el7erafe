@@ -47,8 +47,7 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         title: 'El7erafe',
         theme: ThemeData(
-          colorScheme:
-              ColorScheme.fromSeed(seedColor: const Color(0xFF3775FA)),
+          colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF3775FA)),
           textTheme: GoogleFonts.cairoTextTheme(),
           useMaterial3: true,
         ),
@@ -67,8 +66,7 @@ class MyApp extends StatelessWidget {
           );
         },
         home: const SplashController(),
-        routes: {
-        },
+        routes: {},
       ),
     );
   }

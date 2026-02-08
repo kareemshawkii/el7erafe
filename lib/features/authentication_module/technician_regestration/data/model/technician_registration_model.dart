@@ -5,6 +5,7 @@ class TechnicianRegistrationRequestModel {
   final String phoneNumber;
   final String email;
   final String password;
+  final File profileImage;
   final File frontIdImage;
   final File backIdImage;
   final File criminalRecordImage;
@@ -17,6 +18,7 @@ class TechnicianRegistrationRequestModel {
     required this.phoneNumber,
     required this.email,
     required this.password,
+    required this.profileImage,
     required this.frontIdImage,
     required this.backIdImage,
     required this.criminalRecordImage,

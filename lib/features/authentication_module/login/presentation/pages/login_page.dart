@@ -1,4 +1,4 @@
-import 'package:el7erafe/client.dart';
+import 'package:el7erafe/features/client_flow/client_home/presentation/pages/client_home_page.dart';
 import 'package:el7erafe/core/services/local_storage/auth_local_storage.dart';
 import 'package:el7erafe/features/authentication_module/otp_page/data/Repository/otp_repository.dart';
 import 'package:el7erafe/features/authentication_module/otp_page/presentation/cubit/otp_cubit.dart';
@@ -52,30 +52,32 @@ class LoginView extends StatelessWidget {
             if (type == 'C') {
               if (!context.mounted) return;
               Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(builder: (_) => const ClientPage()),
-              (route) => false,
-            );
+                context,
+                MaterialPageRoute(builder: (_) =>  ClientHomePage()),
+                (route) => false,
+              );
             } else if (type == 'T') {
               if (!context.mounted) return;
               Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(builder: (_) => const TechnicianPage()),
-              (route) => false,
-            );
+                context,
+                MaterialPageRoute(builder: (_) => const TechnicianPage()),
+                (route) => false,
+              );
             } else {
               if (!context.mounted) return;
               ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('حصلت مشكله غير متوقعه جرب تسجل تاني', textDirection: TextDirection.rtl),
-                backgroundColor: Colors.red,
-              ),
-            );
+                SnackBar(
+                  content: Text('حصلت مشكله غير متوقعه جرب تسجل تاني',
+                      textDirection: TextDirection.rtl),
+                  backgroundColor: Colors.red,
+                ),
+              );
             }
             if (!context.mounted) return;
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                content: Text('تم تسجيل الدخول بنجاح', textDirection: TextDirection.rtl),
+                content: Text('تم تسجيل الدخول بنجاح',
+                    textDirection: TextDirection.rtl),
                 backgroundColor: Colors.green,
               ),
             );
@@ -83,116 +85,125 @@ class LoginView extends StatelessWidget {
           if (state is OtpSent) {
             AuthLocalStorage authLocalStorage = AuthLocalStorage();
             String? storedEmail = await authLocalStorage.getEmail();
-            if (storedEmail != null && storedEmail.isNotEmpty){
+            if (storedEmail != null && storedEmail.isNotEmpty) {
               if (!context.mounted) return;
               ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('تم إرسال رمز التحقق إلى البريد الإلكتروني', textDirection: TextDirection.rtl),
-                backgroundColor: Colors.green,
-              ),
-            );
-             Navigator.push(
-              context,
-              MaterialPageRoute(
-              builder: (context) => BlocProvider(
-              create: (context) =>
-                OtpCubit(
-                otpRepository: RepositoryProvider.of<OtpRepository>(context)),
-              child:  OtpPage(email: storedEmail),
-              ),
-            ),
-          );
-          }
-          else{
-            if (!context.mounted) return;
+                const SnackBar(
+                  content: Text('تم إرسال رمز التحقق إلى البريد الإلكتروني',
+                      textDirection: TextDirection.rtl),
+                  backgroundColor: Colors.green,
+                ),
+              );
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => BlocProvider(
+                    create: (context) => OtpCubit(
+                        otpRepository:
+                            RepositoryProvider.of<OtpRepository>(context)),
+                    child: OtpPage(email: storedEmail),
+                  ),
+                ),
+              );
+            } else {
+              if (!context.mounted) return;
               ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('حدث خطأ ما، يرجى المحاولة مرة أخرى', textDirection: TextDirection.rtl),
-                backgroundColor: Colors.red,
-              ),
-            );
-          }
+                const SnackBar(
+                  content: Text('حدث خطأ ما، يرجى المحاولة مرة أخرى',
+                      textDirection: TextDirection.rtl),
+                  backgroundColor: Colors.red,
+                ),
+              );
+            }
           }
           if (state is TechnicianOtpSent) {
             AuthLocalStorage authLocalStorage = AuthLocalStorage();
             String? storedEmail = await authLocalStorage.getTechnicianEmail();
-            if (storedEmail != null && storedEmail.isNotEmpty){
+            if (storedEmail != null && storedEmail.isNotEmpty) {
               if (!context.mounted) return;
               ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('تم إرسال رمز التحقق إلى البريد الإلكتروني', textDirection: TextDirection.rtl),
-                backgroundColor: Colors.green,
-              ),
-            );
-             Navigator.push(
-              context,
-              MaterialPageRoute(
-              builder: (context) => BlocProvider(
-              create: (context) =>
-                TechnicianOtpCubit(
-                otpRepository: RepositoryProvider.of<OtpRepository>(context)),
-              child:  TechnicianOtpPage(email: storedEmail),
-              ),
-            ),
-          );
-          }
-          else{
-            if (!context.mounted) return;
+                const SnackBar(
+                  content: Text('تم إرسال رمز التحقق إلى البريد الإلكتروني',
+                      textDirection: TextDirection.rtl),
+                  backgroundColor: Colors.green,
+                ),
+              );
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => BlocProvider(
+                    create: (context) => TechnicianOtpCubit(
+                        otpRepository:
+                            RepositoryProvider.of<OtpRepository>(context)),
+                    child: TechnicianOtpPage(email: storedEmail),
+                  ),
+                ),
+              );
+            } else {
+              if (!context.mounted) return;
               ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('حدث خطأ ما، يرجى المحاولة مرة أخرى', textDirection: TextDirection.rtl),
-                backgroundColor: Colors.red,
-              ),
-            );
+                const SnackBar(
+                  content: Text('حدث خطأ ما، يرجى المحاولة مرة أخرى',
+                      textDirection: TextDirection.rtl),
+                  backgroundColor: Colors.red,
+                ),
+              );
+            }
           }
-          }
-          if (state is AuthPending){
+          if (state is AuthPending) {
             if (!context.mounted) return;
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                content: Text('لم يتم قبول الطلب بعد سيتم إعلامك عند القبول قريبا...', textDirection: TextDirection.rtl),
+                content: Text(
+                    'لم يتم قبول الطلب بعد سيتم إعلامك عند القبول قريبا...',
+                    textDirection: TextDirection.rtl),
                 backgroundColor: Colors.blue,
               ),
             );
             Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(
-              builder: (context) => BlocProvider(
-                create: (context) => TechnicianStatusCubit(
-                  statusRepository: RepositoryProvider.of<TechnicianRegRepository>(context),
+              context,
+              MaterialPageRoute(
+                builder: (context) => BlocProvider(
+                  create: (context) => TechnicianStatusCubit(
+                    statusRepository:
+                        RepositoryProvider.of<TechnicianRegRepository>(context),
+                  ),
+                  child: TechnicianWaitingPage(),
                 ),
-                child: TechnicianWaitingPage(), 
               ),
-            ),
-            (route) => false,
-          );
+              (route) => false,
+            );
           }
-          if (state is AuthRejected){
+          if (state is AuthRejected) {
             if (!context.mounted) return;
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                content: Text('تم رفض طلبك، يرجى مراجعه الملفات المرفقه واعاده ارسال طلب اخر', textDirection: TextDirection.rtl),
+                content: Text(
+                    'تم رفض طلبك، يرجى مراجعه الملفات المرفقه واعاده ارسال طلب اخر',
+                    textDirection: TextDirection.rtl),
                 backgroundColor: Colors.red,
               ),
             );
             Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(
-              builder: (context) => BlocProvider(
-                create: (context) => TechnicianResubmitCubit(
-                  technicianRegRepository: RepositoryProvider.of<TechnicianRegRepository>(context),
+              context,
+              MaterialPageRoute(
+                builder: (context) => BlocProvider(
+                  create: (context) => TechnicianResubmitCubit(
+                    technicianRegRepository:
+                        RepositoryProvider.of<TechnicianRegRepository>(context),
+                  ),
+                  child: TechnicianResubmitPage(),
                 ),
-                child: TechnicianResubmitPage(), 
               ),
-            ),
-            (route) => false,
-          );
+              (route) => false,
+            );
           }
-          if (state is AuthBlocked){
+          if (state is AuthBlocked) {
             if (!context.mounted) return;
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                content: Text('تم حظر حسابك دائما، يرجى التواصل مع الدعم الفني', textDirection: TextDirection.rtl),
+                content: Text('تم حظر حسابك دائما، يرجى التواصل مع الدعم الفني',
+                    textDirection: TextDirection.rtl),
                 backgroundColor: Colors.red,
               ),
             );
@@ -205,24 +216,25 @@ class LoginView extends StatelessWidget {
               Align(
                 alignment: Alignment.topCenter,
                 child: Container(
-                  padding: EdgeInsets.only(top: (68/852)*screenHeight,bottom: (68/852)*screenHeight),
-                  color: const Color(0xFF3775FA),
-                  width: screenWidth,
-                  height: (267/852)*screenHeight,
-                  child: Align(
-                    alignment: Alignment.topCenter,
-                    child:  SizedBox(
-                    height: (131/852)*screenHeight,
-                    width: (131/393)*screenWidth,
-                    child: Image.asset('images/Logo.png', fit: BoxFit.fill),
-                  ),
-                  )
-                ),
+                    padding: EdgeInsets.only(
+                        top: (68 / 852) * screenHeight,
+                        bottom: (68 / 852) * screenHeight),
+                    color: const Color(0xFF3775FA),
+                    width: screenWidth,
+                    height: (267 / 852) * screenHeight,
+                    child: Align(
+                      alignment: Alignment.topCenter,
+                      child: SizedBox(
+                        height: (131 / 852) * screenHeight,
+                        width: (131 / 393) * screenWidth,
+                        child: Image.asset('images/Logo.png', fit: BoxFit.fill),
+                      ),
+                    )),
               ),
               Align(
                 alignment: Alignment.bottomCenter,
                 child: Container(
-                  height: (629/852)*screenHeight,
+                  height: (629 / 852) * screenHeight,
                   width: double.infinity,
                   decoration: const BoxDecoration(
                     color: Color(0xFFFDFDFD),
@@ -232,13 +244,21 @@ class LoginView extends StatelessWidget {
                     ),
                   ),
                   child: SingleChildScrollView(
-                    padding: EdgeInsets.fromLTRB((16/393)*screenWidth, (44/852)*screenHeight , (16/393)*screenWidth, (44/852)*screenHeight + keyboardPadding),
+                    padding: EdgeInsets.fromLTRB(
+                        (16 / 393) * screenWidth,
+                        (44 / 852) * screenHeight,
+                        (16 / 393) * screenWidth,
+                        (44 / 852) * screenHeight + keyboardPadding),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        Text('تسجيل الدخول', style: GoogleFonts.cairo(fontSize: 24, fontWeight: FontWeight.w600, color: Colors.black)),
-                        SizedBox(height: (24/852)*screenHeight),
-                        const LoginForm(), 
+                        Text('تسجيل الدخول',
+                            style: GoogleFonts.cairo(
+                                fontSize: 24,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.black)),
+                        SizedBox(height: (24 / 852) * screenHeight),
+                        const LoginForm(),
                       ],
                     ),
                   ),

@@ -6,7 +6,8 @@ import 'package:el7erafe/features/authentication_module/forget_password/data/mod
 import 'package:http/http.dart' as http;
 
 class ResetPasswordRepository {
-  final String _baseUrl = "https://el7rafe-gma4hrg0e9epfsc0.uaenorth-01.azurewebsites.net"; 
+  final String _baseUrl =
+      "https://el7rafe-gma4hrg0e9epfsc0.uaenorth-01.azurewebsites.net";
 
   Future<Either<Failure, String>> resetPassword({
     required String password,
@@ -14,7 +15,7 @@ class ResetPasswordRepository {
     AuthLocalStorage authLocalStorage = AuthLocalStorage();
     String? tempToken = await authLocalStorage.getResetTempToken();
     final Uri registerUrl = Uri.parse('$_baseUrl/api/auth/reset-password');
-    
+
     final requestModel = ResetPasswordModel(
       password: password,
     );
@@ -32,16 +33,13 @@ class ResetPasswordRepository {
       if (response.statusCode == 200 || response.statusCode == 201) {
         await authLocalStorage.deleteResetTempToken();
         return Right('accepted');
-      }
-      else if (response.statusCode == 404) {
+      } else if (response.statusCode == 404) {
         return Left(Failure(jsonDecode(response.body)['errorMessage']));
-      } 
-      else if (response.statusCode == 403) {
-         return Left(Failure(jsonDecode(response.body)['errorMessage']));
-      }else if (response.statusCode == 429) {
-         return Left(Failure(jsonDecode(response.body)['errorMessage']));
-      }
-      else {
+      } else if (response.statusCode == 403) {
+        return Left(Failure(jsonDecode(response.body)['errorMessage']));
+      } else if (response.statusCode == 429) {
+        return Left(Failure(jsonDecode(response.body)['errorMessage']));
+      } else {
         return Left(Failure(jsonDecode(response.body)['errorMessage']));
       }
     } catch (e) {

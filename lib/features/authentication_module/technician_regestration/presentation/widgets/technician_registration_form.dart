@@ -16,15 +16,16 @@ import 'package:el7erafe/features/authentication_module/technician_regestration/
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:http/http.dart' as http;
 
-
 class TechnicianRegistrationForm extends StatefulWidget {
   const TechnicianRegistrationForm({super.key});
 
   @override
-  State<TechnicianRegistrationForm> createState() => _TechnicianRegistrationFormState();
+  State<TechnicianRegistrationForm> createState() =>
+      _TechnicianRegistrationFormState();
 }
 
-class _TechnicianRegistrationFormState extends State<TechnicianRegistrationForm> {
+class _TechnicianRegistrationFormState
+    extends State<TechnicianRegistrationForm> {
   final _formKey = GlobalKey<FormState>();
   bool _isPasswordObscured = true;
   bool _isConfirmPasswordObscured = true;
@@ -33,15 +34,15 @@ class _TechnicianRegistrationFormState extends State<TechnicianRegistrationForm>
   final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
   final _emailController = TextEditingController();
-  File? frontIdImage ;
-  File? backIdImage ;
+  File? profileImage;
+  File? frontIdImage;
+  File? backIdImage;
   File? criminalRecordImage;
   String? _selectedGovernorate;
   String? _selectedCity;
   bool isLoading = false;
   List<String> services = [];
   String? selectedService;
-
 
   @override
   void dispose() {
@@ -69,7 +70,8 @@ class _TechnicianRegistrationFormState extends State<TechnicianRegistrationForm>
   }
 
   Future<List<String>> getServices() async {
-    var url = Uri.parse('https://el7rafe-gma4hrg0e9epfsc0.uaenorth-01.azurewebsites.net/api/public/services');
+    var url = Uri.parse(
+        'https://el7rafe-gma4hrg0e9epfsc0.uaenorth-01.azurewebsites.net/api/public/services');
     try {
       var response = await http.get(url);
       if (response.statusCode == 200) {
@@ -87,54 +89,60 @@ class _TechnicianRegistrationFormState extends State<TechnicianRegistrationForm>
     return [];
   }
 
-
   void _onRegisterPressed() {
     FocusScope.of(context).unfocus();
 
     if (_formKey.currentState!.validate()) {
       if (frontIdImage == null ||
           backIdImage == null ||
-          criminalRecordImage == null) {
+          criminalRecordImage == null ||
+          profileImage == null) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-              content:
-                  Text('الرجاء إرفاق جميع الصور المطلوبة', textDirection: TextDirection.rtl),
+              content: Text('الرجاء إرفاق جميع الصور المطلوبة',
+                  textDirection: TextDirection.rtl),
               backgroundColor: Colors.red),
         );
         return;
       }
     }
-      
-      if (_selectedGovernorate == null || _selectedCity == null) {
-         ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('الرجاء اختيار المحافظة والمدينة', textDirection: TextDirection.rtl), backgroundColor: Colors.red),
-          );
-         return;
-      }
 
-      if (selectedService == null) {
-         ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('الرجاء اختيار نوع الحرفة', textDirection: TextDirection.rtl), backgroundColor: Colors.red),
-          );
-         return;
-      }
+    if (_selectedGovernorate == null || _selectedCity == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('الرجاء اختيار المحافظة والمدينة',
+                textDirection: TextDirection.rtl),
+            backgroundColor: Colors.red),
+      );
+      return;
+    }
 
-  if (_formKey.currentState!.validate()) {
-    context.read<TechnicianRegistrationCubit>().register(
-          _nameController.text,
-          _phoneController.text,
-          _emailController.text,
-          _passwordController.text,
-          frontIdImage!,
-          backIdImage!,
-          criminalRecordImage!,
-          _selectedGovernorate!,
-          _selectedCity!,
-          selectedService!,
-        );
-    
+    if (selectedService == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('الرجاء اختيار نوع الحرفة',
+                textDirection: TextDirection.rtl),
+            backgroundColor: Colors.red),
+      );
+      return;
+    }
+
+    if (_formKey.currentState!.validate()) {
+      context.read<TechnicianRegistrationCubit>().register(
+            _nameController.text,
+            _phoneController.text,
+            _emailController.text,
+            _passwordController.text,
+            profileImage!,
+            frontIdImage!,
+            backIdImage!,
+            criminalRecordImage!,
+            _selectedGovernorate!,
+            _selectedCity!,
+            selectedService!,
+          );
+    }
   }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -146,451 +154,673 @@ class _TechnicianRegistrationFormState extends State<TechnicianRegistrationForm>
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           Container(
-            padding: EdgeInsets.fromLTRB((8/393)*screenWidth, (12/852)*screenHeight, (8/393)*screenWidth, (12/852)*screenHeight),
-            decoration: BoxDecoration(
-              border: Border.all(color: Color(0xFFE2DFDF), width: 1.0),
-              borderRadius: BorderRadius.circular(16.0),
-            ),
-            child: Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-          Text('البيانات الاساسيه', style: GoogleFonts.cairo(fontSize: 15, fontWeight: FontWeight.w500, color: Color(0xFF3775FA))),
-          SizedBox(height: (16/852)*screenHeight),
-          Text('الاسم', style: GoogleFonts.cairo(fontSize: 16, fontWeight: FontWeight.w400, color: Colors.black)),
-          SizedBox(height: (8/852)*screenHeight),
-          Directionality(
-            textDirection: TextDirection.rtl,
-            child: TextFormField(
-                controller: _nameController,
-                autovalidateMode: AutovalidateMode.onUserInteraction,
-                textAlign: TextAlign.right,
-                decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.person_2_outlined, color: Color(0xFF727070),size: 18,),
-                  hintText: 'ادخل اسمك ثنائي ',
-                  hintStyle: GoogleFonts.cairo(fontSize: 15, color: const Color(0xFF727070),fontWeight: FontWeight.w400),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFE2DFDF))),
-                  focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFF3775FA))),
-                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFE2DFDF))),
-                  contentPadding: EdgeInsets.all(12),
-                  errorStyle: TextStyle(
-                  fontSize: 11, 
-                  ),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) return 'من فضلك دخل اسمك الثنائي';
-                  if (!RegExp(r'^([A-Za-z\u0600-\u06FF\s]+)$').hasMatch(value)) return 'الاسم لازم يكون حروف عربية أو إنجليزية فقط';
-                  if (!RegExp(r'^[A-Za-z\u0600-\u06FF]+\s+[A-Za-z\u0600-\u06FF]+$').hasMatch(value)) {
-                    return 'الرجاء إدخال الاسم الأول والأخير (مثال: كريم شوقي)';
-                  }
-                  if (value.length > 50) return 'الاسم لازم يكون أقل من 50 حرف';
-                  return null;
-                },
-            ),
-          ),
-          SizedBox(height: (16/852)*screenHeight),
-          Text('رقم التليفون', style: GoogleFonts.cairo(fontSize: 16, fontWeight: FontWeight.w400, color: Colors.black)),
-          SizedBox(height: (8/852)*screenHeight),
-          Directionality(
-            textDirection: TextDirection.rtl,
-            child: TextFormField(
-                controller: _phoneController,
-                autovalidateMode: AutovalidateMode.onUserInteraction,
-                textAlign: TextAlign.right,
-                keyboardType: TextInputType.phone,
-                decoration: InputDecoration(
-                  prefixIcon: Icon(Iconsax.call, color: Color(0xFF727070),size: 18,),
-                  hintText: '01X XXX XXXX',
-                  hintStyle: GoogleFonts.cairo(fontSize: 15, color: const Color(0xFF727070),fontWeight: FontWeight.w400),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFE2DFDF))),
-                  focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFF3775FA))),
-                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFE2DFDF))),
-                  contentPadding: EdgeInsets.all(12),
-                  errorStyle: TextStyle(
-                  fontSize: 11, 
-                  ),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) return 'من فضلك دخل رقم التليفون';
-                  if (!RegExp(r'^01[0125][0-9]{8}$').hasMatch(value)) return 'من فضلك دخل رقم التليفون صحيح';
-                  return null;
-                },
-            ),
-          ),
-          SizedBox(height: (16/852)*screenHeight),
-          Text('البريد الإلكتروني', style: GoogleFonts.cairo(fontSize: 16, fontWeight: FontWeight.w400, color: Colors.black)),
-          SizedBox(height: (8/852)*screenHeight),
-          Directionality(
-            textDirection: TextDirection.rtl,
-            child: TextFormField(
-                controller: _emailController,
-                autovalidateMode: AutovalidateMode.onUserInteraction,
-                textAlign: TextAlign.right,
-                decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.email, color: Color(0xFF727070),size: 18,),
-                  hintText: 'name@domain.com',
-                  hintStyle: GoogleFonts.cairo(fontSize: 15, color: const Color(0xFF727070),fontWeight: FontWeight.w400),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFE2DFDF))),
-                  focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFF3775FA))),
-                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFE2DFDF))),
-                  contentPadding: EdgeInsets.all(12),
-                  errorStyle: TextStyle(
-                  fontSize: 11, 
-                  ),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) return 'من فضلك دخل البريد الإلكتروني';
-                  if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) return 'من فضلك دخل بريد إلكتروني صحيح';
-                  if (value.length > 50) return 'البريد الإلكتروني لازم يكون أقل من 50 حرف';
-                  return null;
-                },
-            ),
-          ),
-          SizedBox(height: (16/852)*screenHeight),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              Text("المدينة" , style: GoogleFonts.cairo(fontSize: 16, fontWeight: FontWeight.w400, color: Colors.black)),
-              SizedBox(width: (123/393)*screenWidth),
-              Text("المحافظة" , style: GoogleFonts.cairo(fontSize: 16, fontWeight: FontWeight.w400, color: Colors.black)),
-            ],
-          ),
-          SizedBox(height: (8/852)*screenHeight),
-          Directionality(
-            textDirection: TextDirection.rtl,
-            child: EgyptGovernoratePicker(
-              language: Language.arabic,
-              layout: Layout.horizontal,
-              showCities: true, 
-              governorateDropdownLabel: "المحافظة",
-              cityDropdownLabel: "المدينة",
-              assetDataPath:"assets/data/egypt_data.json", 
-              onGovernorateChanged: (String? newGov) {
-                setState(() {
-                  _selectedGovernorate = newGov;
-                  _selectedCity = null;
-                });
-              },
-              onCityChanged: (String? newCity) {
-                setState(() {
-                  _selectedCity = newCity;
-                });
-              },
-            ),
-          ),
-          SizedBox(height: (16/852)*screenHeight),
-          Text('الحرفة', style: GoogleFonts.cairo(fontSize: 16, fontWeight: FontWeight.w400, color: Colors.black)),
-          SizedBox(height: (8/852)*screenHeight),
-          Directionality(
-              textDirection: TextDirection.rtl,
-              child: SizedBox(
-                width: (175/393)*screenWidth,
-                child:DropdownButtonFormField2<String>(
-                decoration: InputDecoration(
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: const BorderSide(
-                      color: Color(0xFFE2DFDF),
-                    ),
-                    borderRadius: BorderRadius.circular(12.0),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: const BorderSide(
-                      color: Color(0xFF3775FA),
-                    ),
-                    borderRadius: BorderRadius.circular(12.0),
-                  ),
-                contentPadding: const EdgeInsets.all( 8),                  
-                hintText: isLoading ? "جارٍ تحميل الحرف..." : "اختار حرفتك",
-                ),
-                disabledHint: const Text("جارٍ تحميل الحرف..."),
-                value: selectedService,
-                isExpanded: true,
-                dropdownStyleData: DropdownStyleData(
-                  maxHeight: (200/852)*screenHeight,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12.0),
-                    color: Colors.white,
-                  ),
-                ),
-                items: isLoading
-                    ? [
-                        const DropdownMenuItem<String>(
-                          value: null,
-                          enabled: false,
-                          child: Center(
-                            child: SizedBox(
-                              width: 24,
-                              height: 24,
-                              child: CircularProgressIndicator(strokeWidth: 3),
-                            ),
-                          ),
+              padding: EdgeInsets.fromLTRB(
+                  (8 / 393) * screenWidth,
+                  (12 / 852) * screenHeight,
+                  (8 / 393) * screenWidth,
+                  (12 / 852) * screenHeight),
+              decoration: BoxDecoration(
+                border: Border.all(color: Color(0xFFE2DFDF), width: 1.0),
+                borderRadius: BorderRadius.circular(16.0),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text('البيانات الاساسيه',
+                      style: GoogleFonts.cairo(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500,
+                          color: Color(0xFF3775FA))),
+                  SizedBox(height: (16 / 852) * screenHeight),
+                  Text('الاسم',
+                      style: GoogleFonts.cairo(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w400,
+                          color: Colors.black)),
+                  SizedBox(height: (8 / 852) * screenHeight),
+                  Directionality(
+                    textDirection: TextDirection.rtl,
+                    child: TextFormField(
+                      controller: _nameController,
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      textAlign: TextAlign.right,
+                      decoration: InputDecoration(
+                        prefixIcon: Icon(
+                          Icons.person_2_outlined,
+                          color: Color(0xFF727070),
+                          size: 18,
                         ),
-                      ]
-                    : services.map((service) {
-                        return DropdownMenuItem<String>(
-                          alignment: AlignmentDirectional.centerEnd,
-                          value: service,
-                          child: Align(
-                            alignment: Alignment.centerRight,
-                            child: Text(
-                            service,
-                            style: GoogleFonts.cairo(
-                                fontSize: 15,
-                                color: const Color.fromARGB(255, 0, 0, 0),
-                                fontWeight: FontWeight.w400),
-                            overflow: TextOverflow.ellipsis,
-                            textDirection: TextDirection.rtl,
-                          ),
-                          )
-                        );
-                      }).toList(),
-                onChanged: isLoading
-                    ? null
-                    : (newValue) {
+                        hintText: 'ادخل اسمك ثنائي ',
+                        hintStyle: GoogleFonts.cairo(
+                            fontSize: 15,
+                            color: const Color(0xFF727070),
+                            fontWeight: FontWeight.w400),
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide:
+                                const BorderSide(color: Color(0xFFE2DFDF))),
+                        focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide:
+                                const BorderSide(color: Color(0xFF3775FA))),
+                        enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide:
+                                const BorderSide(color: Color(0xFFE2DFDF))),
+                        contentPadding: EdgeInsets.all(12),
+                        errorStyle: TextStyle(
+                          fontSize: 11,
+                        ),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'من فضلك دخل اسمك الثنائي';
+                        }
+                        if (!RegExp(r'^([A-Za-z\u0600-\u06FF\s]+)$')
+                            .hasMatch(value)) {
+                          return 'الاسم لازم يكون حروف عربية أو إنجليزية فقط';
+                        }
+                        if (!RegExp(
+                                r'^[A-Za-z\u0600-\u06FF]+\s+[A-Za-z\u0600-\u06FF]+$')
+                            .hasMatch(value)) {
+                          return 'الرجاء إدخال الاسم الأول والأخير (مثال: كريم شوقي)';
+                        }
+                        if (value.length > 50) {
+                          return 'الاسم لازم يكون أقل من 50 حرف';
+                        }
+                        return null;
+                      },
+                    ),
+                  ),
+                  SizedBox(height: (16 / 852) * screenHeight),
+                  Text('رقم التليفون',
+                      style: GoogleFonts.cairo(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w400,
+                          color: Colors.black)),
+                  SizedBox(height: (8 / 852) * screenHeight),
+                  Directionality(
+                    textDirection: TextDirection.rtl,
+                    child: TextFormField(
+                      controller: _phoneController,
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      textAlign: TextAlign.right,
+                      keyboardType: TextInputType.phone,
+                      decoration: InputDecoration(
+                        prefixIcon: Icon(
+                          Iconsax.call,
+                          color: Color(0xFF727070),
+                          size: 18,
+                        ),
+                        hintText: '01X XXX XXXX',
+                        hintStyle: GoogleFonts.cairo(
+                            fontSize: 15,
+                            color: const Color(0xFF727070),
+                            fontWeight: FontWeight.w400),
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide:
+                                const BorderSide(color: Color(0xFFE2DFDF))),
+                        focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide:
+                                const BorderSide(color: Color(0xFF3775FA))),
+                        enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide:
+                                const BorderSide(color: Color(0xFFE2DFDF))),
+                        contentPadding: EdgeInsets.all(12),
+                        errorStyle: TextStyle(
+                          fontSize: 11,
+                        ),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'من فضلك دخل رقم التليفون';
+                        }
+                        if (!RegExp(r'^01[0125][0-9]{8}$').hasMatch(value)) {
+                          return 'من فضلك دخل رقم التليفون صحيح';
+                        }
+                        return null;
+                      },
+                    ),
+                  ),
+                  SizedBox(height: (16 / 852) * screenHeight),
+                  Text('البريد الإلكتروني',
+                      style: GoogleFonts.cairo(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w400,
+                          color: Colors.black)),
+                  SizedBox(height: (8 / 852) * screenHeight),
+                  Directionality(
+                    textDirection: TextDirection.rtl,
+                    child: TextFormField(
+                      controller: _emailController,
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      textAlign: TextAlign.right,
+                      decoration: InputDecoration(
+                        prefixIcon: Icon(
+                          Icons.email,
+                          color: Color(0xFF727070),
+                          size: 18,
+                        ),
+                        hintText: 'name@domain.com',
+                        hintStyle: GoogleFonts.cairo(
+                            fontSize: 15,
+                            color: const Color(0xFF727070),
+                            fontWeight: FontWeight.w400),
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide:
+                                const BorderSide(color: Color(0xFFE2DFDF))),
+                        focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide:
+                                const BorderSide(color: Color(0xFF3775FA))),
+                        enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide:
+                                const BorderSide(color: Color(0xFFE2DFDF))),
+                        contentPadding: EdgeInsets.all(12),
+                        errorStyle: TextStyle(
+                          fontSize: 11,
+                        ),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'من فضلك دخل البريد الإلكتروني';
+                        }
+                        if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+                            .hasMatch(value)) {
+                          return 'من فضلك دخل بريد إلكتروني صحيح';
+                        }
+                        if (value.length > 50) {
+                          return 'البريد الإلكتروني لازم يكون أقل من 50 حرف';
+                        }
+                        return null;
+                      },
+                    ),
+                  ),
+                  SizedBox(height: (16 / 852) * screenHeight),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Text("المدينة",
+                          style: GoogleFonts.cairo(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w400,
+                              color: Colors.black)),
+                      SizedBox(width: (123 / 393) * screenWidth),
+                      Text("المحافظة",
+                          style: GoogleFonts.cairo(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w400,
+                              color: Colors.black)),
+                    ],
+                  ),
+                  SizedBox(height: (8 / 852) * screenHeight),
+                  Directionality(
+                    textDirection: TextDirection.rtl,
+                    child: EgyptGovernoratePicker(
+                      language: Language.arabic,
+                      layout: Layout.horizontal,
+                      showCities: true,
+                      governorateDropdownLabel: "المحافظة",
+                      cityDropdownLabel: "المدينة",
+                      assetDataPath: "assets/data/egypt_data.json",
+                      onGovernorateChanged: (String? newGov) {
                         setState(() {
-                          selectedService = newValue;
+                          _selectedGovernorate = newGov;
+                          _selectedCity = null;
                         });
                       },
-                      
-              ),
-              )
-            ),
-              ],
-            )
-          ),
-          SizedBox(height: (14/852)*screenHeight),
+                      onCityChanged: (String? newCity) {
+                        setState(() {
+                          _selectedCity = newCity;
+                        });
+                      },
+                    ),
+                  ),
+                  SizedBox(height: (16 / 852) * screenHeight),
+                  Text('الحرفة',
+                      style: GoogleFonts.cairo(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w400,
+                          color: Colors.black)),
+                  SizedBox(height: (8 / 852) * screenHeight),
+                  Directionality(
+                      textDirection: TextDirection.rtl,
+                      child: SizedBox(
+                        width: (175 / 393) * screenWidth,
+                        child: DropdownButtonFormField2<String>(
+                          decoration: InputDecoration(
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: const BorderSide(
+                                color: Color(0xFFE2DFDF),
+                              ),
+                              borderRadius: BorderRadius.circular(12.0),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderSide: const BorderSide(
+                                color: Color(0xFF3775FA),
+                              ),
+                              borderRadius: BorderRadius.circular(12.0),
+                            ),
+                            contentPadding: const EdgeInsets.all(8),
+                            hintText: isLoading
+                                ? "جارٍ تحميل الحرف..."
+                                : "اختار حرفتك",
+                          ),
+                          disabledHint: const Text("جارٍ تحميل الحرف..."),
+                          value: selectedService,
+                          isExpanded: true,
+                          dropdownStyleData: DropdownStyleData(
+                            maxHeight: (200 / 852) * screenHeight,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12.0),
+                              color: Colors.white,
+                            ),
+                          ),
+                          items: isLoading
+                              ? [
+                                  const DropdownMenuItem<String>(
+                                    value: null,
+                                    enabled: false,
+                                    child: Center(
+                                      child: SizedBox(
+                                        width: 24,
+                                        height: 24,
+                                        child: CircularProgressIndicator(
+                                            strokeWidth: 3),
+                                      ),
+                                    ),
+                                  ),
+                                ]
+                              : services.map((service) {
+                                  return DropdownMenuItem<String>(
+                                      alignment: AlignmentDirectional.centerEnd,
+                                      value: service,
+                                      child: Align(
+                                        alignment: Alignment.centerRight,
+                                        child: Text(
+                                          service,
+                                          style: GoogleFonts.cairo(
+                                              fontSize: 15,
+                                              color: const Color.fromARGB(
+                                                  255, 0, 0, 0),
+                                              fontWeight: FontWeight.w400),
+                                          overflow: TextOverflow.ellipsis,
+                                          textDirection: TextDirection.rtl,
+                                        ),
+                                      ));
+                                }).toList(),
+                          onChanged: isLoading
+                              ? null
+                              : (newValue) {
+                                  setState(() {
+                                    selectedService = newValue;
+                                  });
+                                },
+                        ),
+                      )),
+                  SizedBox(height: (16 / 852) * screenHeight),
+                  Text('صوره شخصيه',
+                      style: GoogleFonts.cairo(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w400,
+                          color: Colors.black)),
+                  SizedBox(height: (8 / 852) * screenHeight),
+                  ImagePickerButton(
+                    width: (337 / 393) * screenWidth,
+                    height: (118 / 852) * screenHeight,
+                    defaultImage: 'images/profileImage.svg',
+                    onImagePicked: (file) {
+                      setState(() {
+                        profileImage = file;
+                      });
+                    },
+                  ),
+                ],
+              )),
+          SizedBox(height: (14 / 852) * screenHeight),
           Container(
-            padding: EdgeInsets.fromLTRB((8/393)*screenWidth, (12/852)*screenHeight, (8/393)*screenWidth, (12/852)*screenHeight),
-            decoration: BoxDecoration(
-              border: Border.all(color: Color(0xFFE2DFDF), width: 1.0),
-              borderRadius: BorderRadius.circular(16.0),
-            ),
-            child: Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Text('توثيق حسابك', style: GoogleFonts.cairo(fontSize: 16, fontWeight: FontWeight.w400, color: Color(0xFF3775FA))),
-              SizedBox(height: (16/852)*screenHeight),
-              Text('بطاقتك الشخصية', style: GoogleFonts.cairo(fontSize: 17, fontWeight: FontWeight.w600, color: Color(0xFF000000))),
-              SizedBox(height: (16/852)*screenHeight),
+              padding: EdgeInsets.fromLTRB(
+                  (8 / 393) * screenWidth,
+                  (12 / 852) * screenHeight,
+                  (8 / 393) * screenWidth,
+                  (12 / 852) * screenHeight),
+              decoration: BoxDecoration(
+                border: Border.all(color: Color(0xFFE2DFDF), width: 1.0),
+                borderRadius: BorderRadius.circular(16.0),
+              ),
+              child:
+                  Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+                Text('توثيق حسابك',
+                    style: GoogleFonts.cairo(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w400,
+                        color: Color(0xFF3775FA))),
+                SizedBox(height: (16 / 852) * screenHeight),
+                Text('بطاقتك الشخصية',
+                    style: GoogleFonts.cairo(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF000000))),
+                SizedBox(height: (16 / 852) * screenHeight),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                          Column(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                Text('صورة البطاقة من الوش', style: GoogleFonts.cairo(fontSize: 13, fontWeight: FontWeight.w400, color: Colors.black)),
-                                const SizedBox(height: 8),
-                                ImagePickerButton(
-                                  width: (345/393)*screenWidth,
-                                  height: (94/852)*screenHeight,
-                                  defaultImage: 'images/id_front_placeholder.svg', 
-                                  onImagePicked: (file) {
-                                    setState(() {
-                                      frontIdImage = file;
-                                    });
-                                  },
-                                ),
-                              ],
-                            ),
-                        SizedBox(height: (12/852)*screenHeight),
-                        Text('صورة البطاقة من الظهر', style: GoogleFonts.cairo(fontSize: 13, fontWeight: FontWeight.w400, color: Colors.black)),
+                        Text('صورة البطاقة من الوش',
+                            style: GoogleFonts.cairo(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w400,
+                                color: Colors.black)),
                         const SizedBox(height: 8),
                         ImagePickerButton(
-                          width: (345/393)*screenWidth,
-                          height: (94/852)*screenHeight,
-                          defaultImage: 'images/id_back_placeholder.svg', 
+                          width: (345 / 393) * screenWidth,
+                          height: (94 / 852) * screenHeight,
+                          defaultImage: 'images/id_front_placeholder.svg',
                           onImagePicked: (file) {
                             setState(() {
-                              backIdImage = file;
+                              frontIdImage = file;
                             });
                           },
                         ),
                       ],
                     ),
-                   
-                  const SizedBox(height: 16),
-                  Text( 'الفيش الجنائي', style: GoogleFonts.cairo(fontSize: 17, fontWeight: FontWeight.w600, color: Color(0xFF000000))),
-                  SizedBox(height: (16/852)*screenHeight),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: Text('ارفع نسخة واضحة من الفيش الجنائي', style: GoogleFonts.cairo(fontSize: 13, fontWeight: FontWeight.w400, color: Colors.black)),
-                      ), 
-                      SizedBox(height: (16/852)*screenHeight),
-                      ImagePickerButton(
-                        width: (345/393)*screenWidth,
-                        height: (94/852)*screenHeight,
-                        defaultImage: 'images/criminal_record_placeholder.svg',
-                        onImagePicked: (file) {
-                          setState(() {
-                            criminalRecordImage = file;
-                          });
-                        },
-                      ),
-                    ],
-                  ),
-          ]
-            )
-          ),
-          SizedBox(height: (14/852)*screenHeight),
+                    SizedBox(height: (12 / 852) * screenHeight),
+                    Text('صورة البطاقة من الظهر',
+                        style: GoogleFonts.cairo(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w400,
+                            color: Colors.black)),
+                    const SizedBox(height: 8),
+                    ImagePickerButton(
+                      width: (345 / 393) * screenWidth,
+                      height: (94 / 852) * screenHeight,
+                      defaultImage: 'images/id_back_placeholder.svg',
+                      onImagePicked: (file) {
+                        setState(() {
+                          backIdImage = file;
+                        });
+                      },
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Text('الفيش الجنائي',
+                    style: GoogleFonts.cairo(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF000000))),
+                SizedBox(height: (16 / 852) * screenHeight),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: Text('ارفع نسخة واضحة من الفيش الجنائي',
+                          style: GoogleFonts.cairo(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w400,
+                              color: Colors.black)),
+                    ),
+                    SizedBox(height: (16 / 852) * screenHeight),
+                    ImagePickerButton(
+                      width: (345 / 393) * screenWidth,
+                      height: (94 / 852) * screenHeight,
+                      defaultImage: 'images/criminal_record_placeholder.svg',
+                      onImagePicked: (file) {
+                        setState(() {
+                          criminalRecordImage = file;
+                        });
+                      },
+                    ),
+                  ],
+                ),
+              ])),
+          SizedBox(height: (14 / 852) * screenHeight),
           Container(
-            padding: EdgeInsets.fromLTRB((8/393)*screenWidth, (12/852)*screenHeight, (8/393)*screenWidth, (12/852)*screenHeight),
-            decoration: BoxDecoration(
-              border: Border.all(color: Color(0xFFE2DFDF), width: 1.0),
-              borderRadius: BorderRadius.circular(16.0),
-            ),
-            child: Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-          Text('أمان حسابك', style: GoogleFonts.cairo(fontSize: 15, fontWeight: FontWeight.w500, color: Color(0xFF3775FA))),
-          SizedBox(height: (16/852)*screenHeight),
-          Text('كلمة السر', style: GoogleFonts.cairo(fontSize: 16, fontWeight: FontWeight.w400, color: Colors.black)),
-          SizedBox(height: (8/852)*screenHeight),
-          Directionality(
-            textDirection: TextDirection.rtl,
-            child: TextFormField(
-                autovalidateMode: AutovalidateMode.onUserInteraction,
-                textAlign: TextAlign.right,
-                obscureText: _isPasswordObscured,
-                decoration: InputDecoration(
-                  hintText: 'من فضلك دخل كلمه السر',
-                  hintStyle: GoogleFonts.cairo(fontSize: 13, color: const Color(0xFF727070),fontWeight: FontWeight.w400),
-                  prefixIcon: const Icon(Iconsax.lock, color: Color(0xFF727070),size: 18,),
-                  suffixIcon: IconButton(
-                      icon: Icon(_isPasswordObscured ? Icons.visibility : Icons.visibility_off, color: const Color(0xFF727070),size: 18,),
-                      onPressed: () => setState(() => _isPasswordObscured = !_isPasswordObscured),
-                  ),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFE2DFDF))),
-                  focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFF3775FA))),
-                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFE2DFDF))),
-                  contentPadding: EdgeInsets.all(12),
-                  errorStyle: TextStyle(
-                  fontSize: 11, 
-                  ),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) return 'من فضلك دخل كلمة السر';
-                  if (!RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{10,})').hasMatch(value)) {
-                    return 'كلمة السر لازم تحتوي على حرف كبير، رقم، رمز وطولها 10 أحرف على الأقل';
-                  }
-                  if (value.length > 32) {
-                    return 'كلمة السر لازم تكون أقل من 32 حرف';
-                  }
-                  return null;
-                },
-                onChanged: (val){
-                  _password = val;
-                  context.read<PasswordStrengthCubit>().validatePassword(val);
-                },
-            ),
-          ),
-          SizedBox(height: (12/852)*screenHeight),
-          Text(':كلمة السر لازم تحتوي على', style: GoogleFonts.cairo(fontSize: 13, fontWeight: FontWeight.w400, color: Color(0xFF727070))),
-          SizedBox(height: (12/852)*screenHeight),
-          BlocBuilder<PasswordStrengthCubit, PasswordStrengthState>(
-                builder: (context, state) {
-                  return Column(
-                    children: [
-                      _buildValidationCheckItem(
-                        text: '١٠ حروف أو أكثر',
-                        isValid: state.hasMinLength,
-                      ),
-                      SizedBox(height: (8/852)*screenHeight),
-                      _buildValidationCheckItem(
-                        text: '(A-Z) حرف كابيتال واحد على الأقل ',
-                        isValid: state.hasCapitalLetter,
-                      ),
-                      SizedBox(height: (8/852)*screenHeight),
-                      _buildValidationCheckItem(
-                        text: 'رقم واحد على الأقل (0-9)',
-                        isValid: state.hasNumber,
-                      ),
-                      SizedBox(height: (8/852)*screenHeight),
-                      _buildValidationCheckItem(
-                        text: '(!@#) رمز خاص واحد على الأقل ',
-                        isValid: state.hasSpecialChar,
-                      ),
-                    ],
-                  );
-                },
+              padding: EdgeInsets.fromLTRB(
+                  (8 / 393) * screenWidth,
+                  (12 / 852) * screenHeight,
+                  (8 / 393) * screenWidth,
+                  (12 / 852) * screenHeight),
+              decoration: BoxDecoration(
+                border: Border.all(color: Color(0xFFE2DFDF), width: 1.0),
+                borderRadius: BorderRadius.circular(16.0),
               ),
-          SizedBox(height: (16/852)*screenHeight),
-          Text('تأكيد كلمة السر', style: GoogleFonts.cairo(fontSize: 16, fontWeight: FontWeight.w400, color: Colors.black)),
-          SizedBox(height: (8/852)*screenHeight),
-          Directionality(
-            textDirection: TextDirection.rtl,
-            child: TextFormField(
-                controller: _passwordController,
-                autovalidateMode: AutovalidateMode.onUserInteraction,
-                textAlign: TextAlign.right,
-                obscureText: _isConfirmPasswordObscured,
-                decoration: InputDecoration(
-                  hintText: 'من فضلك دخل كلمه السر مره تانيه للتأكيد',
-                  hintStyle: GoogleFonts.cairo(fontSize: 13, color: const Color(0xFF727070),fontWeight: FontWeight.w400),
-                  prefixIcon: const Icon(Iconsax.lock, color: Color(0xFF727070),size: 18,),
-                  suffixIcon: IconButton(
-                      icon: Icon(_isConfirmPasswordObscured ? Icons.visibility : Icons.visibility_off, color: const Color(0xFF727070),size: 18,),
-                      onPressed: () => setState(() => _isConfirmPasswordObscured = !_isConfirmPasswordObscured),
-                  ),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFE2DFDF))),
-                  focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFF3775FA))),
-                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFE2DFDF))),
-                  contentPadding: EdgeInsets.all(12),
-                  errorStyle: TextStyle(
-                  fontSize: 11, 
+              child:
+                  Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+                Text('أمان حسابك',
+                    style: GoogleFonts.cairo(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w500,
+                        color: Color(0xFF3775FA))),
+                SizedBox(height: (16 / 852) * screenHeight),
+                Text('كلمة السر',
+                    style: GoogleFonts.cairo(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w400,
+                        color: Colors.black)),
+                SizedBox(height: (8 / 852) * screenHeight),
+                Directionality(
+                  textDirection: TextDirection.rtl,
+                  child: TextFormField(
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    textAlign: TextAlign.right,
+                    obscureText: _isPasswordObscured,
+                    decoration: InputDecoration(
+                      hintText: 'من فضلك دخل كلمه السر',
+                      hintStyle: GoogleFonts.cairo(
+                          fontSize: 13,
+                          color: const Color(0xFF727070),
+                          fontWeight: FontWeight.w400),
+                      prefixIcon: const Icon(
+                        Iconsax.lock,
+                        color: Color(0xFF727070),
+                        size: 18,
+                      ),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _isPasswordObscured
+                              ? Icons.visibility
+                              : Icons.visibility_off,
+                          color: const Color(0xFF727070),
+                          size: 18,
+                        ),
+                        onPressed: () => setState(
+                            () => _isPasswordObscured = !_isPasswordObscured),
+                      ),
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide:
+                              const BorderSide(color: Color(0xFFE2DFDF))),
+                      focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide:
+                              const BorderSide(color: Color(0xFF3775FA))),
+                      enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide:
+                              const BorderSide(color: Color(0xFFE2DFDF))),
+                      contentPadding: EdgeInsets.all(12),
+                      errorStyle: TextStyle(
+                        fontSize: 11,
+                      ),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'من فضلك دخل كلمة السر';
+                      }
+                      if (!RegExp(
+                              r'^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{10,})')
+                          .hasMatch(value)) {
+                        return 'كلمة السر لازم تحتوي على حرف كبير، رقم، رمز وطولها 10 أحرف على الأقل';
+                      }
+                      if (value.length > 32) {
+                        return 'كلمة السر لازم تكون أقل من 32 حرف';
+                      }
+                      return null;
+                    },
+                    onChanged: (val) {
+                      _password = val;
+                      context
+                          .read<PasswordStrengthCubit>()
+                          .validatePassword(val);
+                    },
                   ),
                 ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) return 'من فضلك دخل كلمه السر مره تانيه للتأكيد';
-                  if (!RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{10,})').hasMatch(value)) {
-                    return 'كلمة السر لازم تحتوي على حرف كبير، رقم، رمز وطولها 10 أحرف على الأقل';
-                  }
-                  if (value.length > 32) {
-                    return 'كلمة السر لازم تكون أقل من 32 حرف';
-                  }
-                  if (value != _password) return 'كلمة السر مش متطابقة';
-                  return null;
-                },
-            ),
-          ),
-          ]
-            )
-          ),
-          SizedBox(height: (24/852)*screenHeight),
+                SizedBox(height: (12 / 852) * screenHeight),
+                Text(':كلمة السر لازم تحتوي على',
+                    style: GoogleFonts.cairo(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w400,
+                        color: Color(0xFF727070))),
+                SizedBox(height: (12 / 852) * screenHeight),
+                BlocBuilder<PasswordStrengthCubit, PasswordStrengthState>(
+                  builder: (context, state) {
+                    return Column(
+                      children: [
+                        _buildValidationCheckItem(
+                          text: '١٠ حروف أو أكثر',
+                          isValid: state.hasMinLength,
+                        ),
+                        SizedBox(height: (8 / 852) * screenHeight),
+                        _buildValidationCheckItem(
+                          text: '(A-Z) حرف كابيتال واحد على الأقل ',
+                          isValid: state.hasCapitalLetter,
+                        ),
+                        SizedBox(height: (8 / 852) * screenHeight),
+                        _buildValidationCheckItem(
+                          text: 'رقم واحد على الأقل (0-9)',
+                          isValid: state.hasNumber,
+                        ),
+                        SizedBox(height: (8 / 852) * screenHeight),
+                        _buildValidationCheckItem(
+                          text: '(!@#) رمز خاص واحد على الأقل ',
+                          isValid: state.hasSpecialChar,
+                        ),
+                      ],
+                    );
+                  },
+                ),
+                SizedBox(height: (16 / 852) * screenHeight),
+                Text('تأكيد كلمة السر',
+                    style: GoogleFonts.cairo(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w400,
+                        color: Colors.black)),
+                SizedBox(height: (8 / 852) * screenHeight),
+                Directionality(
+                  textDirection: TextDirection.rtl,
+                  child: TextFormField(
+                    controller: _passwordController,
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                    textAlign: TextAlign.right,
+                    obscureText: _isConfirmPasswordObscured,
+                    decoration: InputDecoration(
+                      hintText: 'من فضلك دخل كلمه السر مره تانيه للتأكيد',
+                      hintStyle: GoogleFonts.cairo(
+                          fontSize: 13,
+                          color: const Color(0xFF727070),
+                          fontWeight: FontWeight.w400),
+                      prefixIcon: const Icon(
+                        Iconsax.lock,
+                        color: Color(0xFF727070),
+                        size: 18,
+                      ),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _isConfirmPasswordObscured
+                              ? Icons.visibility
+                              : Icons.visibility_off,
+                          color: const Color(0xFF727070),
+                          size: 18,
+                        ),
+                        onPressed: () => setState(() =>
+                            _isConfirmPasswordObscured =
+                                !_isConfirmPasswordObscured),
+                      ),
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide:
+                              const BorderSide(color: Color(0xFFE2DFDF))),
+                      focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide:
+                              const BorderSide(color: Color(0xFF3775FA))),
+                      enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide:
+                              const BorderSide(color: Color(0xFFE2DFDF))),
+                      contentPadding: EdgeInsets.all(12),
+                      errorStyle: TextStyle(
+                        fontSize: 11,
+                      ),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'من فضلك دخل كلمه السر مره تانيه للتأكيد';
+                      }
+                      if (!RegExp(
+                              r'^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{10,})')
+                          .hasMatch(value)) {
+                        return 'كلمة السر لازم تحتوي على حرف كبير، رقم، رمز وطولها 10 أحرف على الأقل';
+                      }
+                      if (value.length > 32) {
+                        return 'كلمة السر لازم تكون أقل من 32 حرف';
+                      }
+                      if (value != _password) return 'كلمة السر مش متطابقة';
+                      return null;
+                    },
+                  ),
+                ),
+              ])),
+          SizedBox(height: (24 / 852) * screenHeight),
           SizedBox(
             width: double.infinity,
-            height: (40/852)*screenHeight,
-            child: BlocBuilder<TechnicianRegistrationCubit, TechnicianRegistrationState>(
+            height: (40 / 852) * screenHeight,
+            child: BlocBuilder<TechnicianRegistrationCubit,
+                TechnicianRegistrationState>(
               builder: (context, state) {
                 final isLoading = state is TechnicianRegLoading;
-                return Container (
-                  width: double.infinity,
-                          height: (40/852)*screenHeight,
-                          decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12.0),
-                          border: Border.all(
-                            color: Color(0xFF3775FA), 
-                            width: 1.0,
-                          ),
-                        ),   
-                  child:ElevatedButton(
-                  onPressed: isLoading ? null : _onRegisterPressed,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF3775FA),
-                    foregroundColor: Colors.white,
-                    disabledBackgroundColor: const Color.fromARGB(158, 55, 117, 250),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0), side: const BorderSide(color: Colors.white, width: 1.0)),
-                  ),
-                  child: isLoading
-                      ? const SizedBox(
-                          height: 24,
-                          width: 24,
-                          child: CircularProgressIndicator(color: Color(0xFF3775FA), strokeWidth: 3),
-                        )
-                      : Text('سجل دخولك', style: GoogleFonts.cairo(fontSize: 16, fontWeight: FontWeight.w500)),
-                )
-                );
+                return Container(
+                    width: double.infinity,
+                    height: (40 / 852) * screenHeight,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12.0),
+                      border: Border.all(
+                        color: Color(0xFF3775FA),
+                        width: 1.0,
+                      ),
+                    ),
+                    child: ElevatedButton(
+                      onPressed: isLoading ? null : _onRegisterPressed,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF3775FA),
+                        foregroundColor: Colors.white,
+                        disabledBackgroundColor:
+                            const Color.fromARGB(158, 55, 117, 250),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12.0),
+                            side: const BorderSide(
+                                color: Colors.white, width: 1.0)),
+                      ),
+                      child: isLoading
+                          ? const SizedBox(
+                              height: 24,
+                              width: 24,
+                              child: CircularProgressIndicator(
+                                  color: Color(0xFF3775FA), strokeWidth: 3),
+                            )
+                          : Text('سجل دخولك',
+                              style: GoogleFonts.cairo(
+                                  fontSize: 16, fontWeight: FontWeight.w500)),
+                    ));
               },
             ),
           ),
@@ -598,22 +828,31 @@ class _TechnicianRegistrationFormState extends State<TechnicianRegistrationForm>
             mainAxisAlignment: MainAxisAlignment.center,
             textDirection: TextDirection.rtl,
             children: [
-                Text('لو عندك حساب تقدر تعمل', style: GoogleFonts.cairo(fontSize: 14, color: const Color(0xFF727070),fontWeight: FontWeight.w400)),
-                TextButton(
-                  onPressed: () {
-                      Navigator.pushAndRemoveUntil(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => BlocProvider(
-                            create: (context) => LoginCubit(authRepository: context.read<AuthRepository>()),
-                            child: LoginPage(),
-                          ),
-                        ),
-                        (route) => false,
-                      );
-                  },
-                  child: Text('تسجيل دخول ؟', style: GoogleFonts.cairo(fontSize: 14, color: const Color(0xFF3775FA),fontWeight: FontWeight.w400)),
-                ),
+              Text('لو عندك حساب تقدر تعمل',
+                  style: GoogleFonts.cairo(
+                      fontSize: 14,
+                      color: const Color(0xFF727070),
+                      fontWeight: FontWeight.w400)),
+              TextButton(
+                onPressed: () {
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => BlocProvider(
+                        create: (context) => LoginCubit(
+                            authRepository: context.read<AuthRepository>()),
+                        child: LoginPage(),
+                      ),
+                    ),
+                    (route) => false,
+                  );
+                },
+                child: Text('تسجيل دخول ؟',
+                    style: GoogleFonts.cairo(
+                        fontSize: 14,
+                        color: const Color(0xFF3775FA),
+                        fontWeight: FontWeight.w400)),
+              ),
             ],
           ),
         ],
@@ -622,7 +861,8 @@ class _TechnicianRegistrationFormState extends State<TechnicianRegistrationForm>
   }
 }
 
-Widget _buildValidationCheckItem({required String text, required bool isValid}) {
+Widget _buildValidationCheckItem(
+    {required String text, required bool isValid}) {
   final Color color = isValid ? Colors.green : Colors.grey.shade600;
   return Row(
     textDirection: TextDirection.rtl,
@@ -630,18 +870,17 @@ Widget _buildValidationCheckItem({required String text, required bool isValid}) 
       Icon(
         isValid ? Icons.check_circle : Icons.error_outline,
         color: color,
-        size: 12, 
+        size: 12,
       ),
       const SizedBox(width: 8),
       Text(
         text,
         style: GoogleFonts.cairo(
           color: color,
-          fontSize: 12, 
-          fontWeight: FontWeight.w400, 
+          fontSize: 12,
+          fontWeight: FontWeight.w400,
         ),
       ),
     ],
   );
 }
-

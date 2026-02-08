@@ -17,10 +17,16 @@ class RejectedLocalStorage {
 
     if (model.name != null) await prefs.setString(_name, model.name!);
     if (model.phone != null) await prefs.setString(_phone, model.phone!);
-    if (model.governorate != null) await prefs.setString(_governorate, model.governorate!);
+    if (model.governorate != null) {
+      await prefs.setString(_governorate, model.governorate!);
+    }
     if (model.city != null) await prefs.setString(_city, model.city!);
-    if (model.serviceType != null) await prefs.setString(_serviceType, model.serviceType!);
-    if (model.rejectionReason != null) await prefs.setString(_rejectionReason, model.rejectionReason!);
+    if (model.serviceType != null) {
+      await prefs.setString(_serviceType, model.serviceType!);
+    }
+    if (model.rejectionReason != null) {
+      await prefs.setString(_rejectionReason, model.rejectionReason!);
+    }
     await prefs.setBool(_frontId, model.frontId!);
     await prefs.setBool(_backId, model.backId!);
     await prefs.setBool(_criminalRecord, model.criminalRecord!);

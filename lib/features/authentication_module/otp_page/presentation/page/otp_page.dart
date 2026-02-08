@@ -1,4 +1,4 @@
-import 'package:el7erafe/client.dart';
+import 'package:el7erafe/features/client_flow/client_home/presentation/pages/client_home_page.dart';
 import 'package:el7erafe/features/authentication_module/otp_page/data/Repository/otp_repository.dart';
 import 'package:el7erafe/features/authentication_module/otp_page/presentation/cubit/otp_cubit.dart';
 import 'package:el7erafe/features/authentication_module/otp_page/presentation/cubit/otp_state.dart';
@@ -78,7 +78,7 @@ class _OtpViewState extends State<OtpView> {
             );
           Navigator.pushAndRemoveUntil(
           context,
-          MaterialPageRoute(builder: (_) => const ClientPage()),
+          MaterialPageRoute(builder: (_) => const ClientHomePage()),
           (route) => false,
           );
           }

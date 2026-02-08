@@ -15,29 +15,32 @@ class TechnicianStatusCubit extends Cubit<TechnicianStatusState> {
 
     final String? tempToken = await authLocalStorage.getTempToken();
     if (tempToken == null || tempToken.isEmpty) {
-      emit(TechnicianStatusError(error: 'الرمز المؤقت غير موجود. الرجاء تسجيل الدخول مرة أخرى.'));
+      emit(TechnicianStatusError(
+          error: 'الرمز المؤقت غير موجود. الرجاء تسجيل الدخول مرة أخرى.'));
       return;
     }
     final result = await statusRepository.checkTechnicianStatus(tempToken);
 
     result.fold(
       (failure) {
-        if (failure.message.contains('PENDING') || failure.message.contains('REJECTED')) {
-           final message = failure.message.contains('PENDING') ?
-             'طلبك بيتراجع حاليا وهنرد عليك خلال 24 ساعة....' :
-             'تم رفض طلبك. برجاء مراجعه الملفات المرفقه ومحاولة التسجيل مرة أخرى.';
-           final statusType = failure.message.contains('PENDING') ? 'تحت المراجعة' : 'مرفوض';
-           emit(TechnicianStatusDenied(
-             message: message,
-             status: statusType,
-           ));
+        if (failure.message.contains('PENDING') ||
+            failure.message.contains('REJECTED')) {
+          final message = failure.message.contains('PENDING')
+              ? 'طلبك بيتراجع حاليا وهنرد عليك خلال 24 ساعة....'
+              : 'تم رفض طلبك. برجاء مراجعه الملفات المرفقه ومحاولة التسجيل مرة أخرى.';
+          final statusType =
+              failure.message.contains('PENDING') ? 'تحت المراجعة' : 'مرفوض';
+          emit(TechnicianStatusDenied(
+            message: message,
+            status: statusType,
+          ));
         } else if (failure.message.contains('BLOCKED')) {
           emit(TechnicianStatusBlocked(
-            message: 'تم حظر حسابك. الرجاء التواصل مع الدعم لمزيد من المعلومات.',
+            message:
+                'تم حظر حسابك. الرجاء التواصل مع الدعم لمزيد من المعلومات.',
           ));
-        }
-        else {
-           emit(TechnicianStatusError(error: failure.message));
+        } else {
+          emit(TechnicianStatusError(error: failure.message));
         }
       },
       (success) {
