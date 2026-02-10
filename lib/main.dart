@@ -4,13 +4,23 @@ import 'package:el7erafe/features/authentication_module/forget_password/data/rep
 import 'package:el7erafe/features/authentication_module/forget_password/data/repositories/reset_password_repo.dart';
 import 'package:el7erafe/features/authentication_module/login/data/repositories/auth_repository.dart';
 import 'package:el7erafe/features/authentication_module/otp_page/data/Repository/otp_repository.dart';
+import 'package:el7erafe/features/authentication_module/splash/splash_control.dart';
 import 'package:el7erafe/features/authentication_module/technician_regestration/data/repositories/technician_registration_repo.dart';
+import 'package:el7erafe/features/client_flow/client_home/data/repositories/home_repository.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'features/authentication_module/splash/splash_control.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
   runApp(const MyApp());
 }
 
@@ -41,6 +51,9 @@ class MyApp extends StatelessWidget {
         ),
         RepositoryProvider(
           create: (context) => ResetPasswordRepository(),
+        ),
+        RepositoryProvider(
+          create: (context) => HomeRepository(),
         ),
       ],
       child: MaterialApp(
