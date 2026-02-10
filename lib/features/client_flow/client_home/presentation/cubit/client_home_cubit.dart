@@ -9,11 +9,19 @@ class HomeCubit extends Cubit<HomeState> {
 
   void fetchServices() async {
     emit(HomeLoading());
-    try {
-      final services = await _repository.getServices();
-      emit(HomeLoaded(services));
-    } catch (e) {
-      emit(HomeError(e.toString()));
-    }
+    final result = await _repository.getServices();
+
+    result.fold(
+      (errorMessage) {
+        if (errorMessage.contains("401")) {
+          emit(HomeUnauthorized("جلسة المستخدم انتهت، الرجاء تسجيل الدخول مرة أخرى."));
+        } else {
+          emit(HomeError(errorMessage));
+        }
+      },
+      (servicesList) {
+        emit(HomeLoaded(servicesList));
+      },
+    );
   }
 }

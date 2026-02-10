@@ -53,7 +53,7 @@ class LoginView extends StatelessWidget {
               if (!context.mounted) return;
               Navigator.pushAndRemoveUntil(
                 context,
-                MaterialPageRoute(builder: (_) =>  ClientHomePage()),
+                MaterialPageRoute(builder: (_) => const ClientHomePage()),
                 (route) => false,
               );
             } else if (type == 'T') {

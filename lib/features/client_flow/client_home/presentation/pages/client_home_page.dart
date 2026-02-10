@@ -1,11 +1,13 @@
 import 'package:el7erafe/core/services/local_storage/auth_local_storage.dart';
+import 'package:el7erafe/features/authentication_module/login/data/repositories/auth_repository.dart';
+import 'package:el7erafe/features/authentication_module/login/presentation/cubit/login_cubit.dart';
+import 'package:el7erafe/features/authentication_module/login/presentation/pages/login_page.dart';
 //import 'package:el7erafe/features/client_flow/client_home/data/models/quick_reservation_request.dart';
 import 'package:el7erafe/features/client_flow/client_home/data/models/service_item.dart';
 import 'package:el7erafe/features/client_flow/client_home/data/repositories/home_repository.dart';
-import 'package:el7erafe/features/client_flow/client_home/presentation/cubit/client_home_cubot.dart';
+import 'package:el7erafe/features/client_flow/client_home/presentation/cubit/client_home_cubit.dart';
 import 'package:el7erafe/features/client_flow/client_home/presentation/cubit/client_home_state.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -207,7 +209,29 @@ class _ClientHomePageViewState extends State<ClientHomePageView> {
                                 color: const Color(0xFF3775FA), size: 24),
                           ])),
                   SizedBox(height: (16 / 852) * height),
-                  BlocBuilder<HomeCubit, HomeState>(
+                  BlocConsumer<HomeCubit, HomeState>(
+                    listener: (context, state) {
+                      if (state is HomeUnauthorized) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(state.message,
+                                textDirection: TextDirection.rtl),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                        Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => BlocProvider(
+                              create: (context) =>
+                                  LoginCubit(authRepository: AuthRepository()),
+                              child: const LoginPage(),
+                            ),
+                          ),
+                          (route) => false,
+                        );
+                      }
+                    },
                     builder: (context, state) {
                       if (state is HomeLoading) {
                         return Center(child: CircularProgressIndicator());
