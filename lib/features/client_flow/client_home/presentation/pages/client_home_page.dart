@@ -238,7 +238,10 @@ class _ClientHomePageViewState extends State<ClientHomePageView> {
                       } else if (state is HomeError) {
                         return Center(child: Text(state.message));
                       } else if (state is HomeLoaded) {
-                        return GridView.builder(
+                        return Align(
+                          alignment: Alignment.centerRight,
+                          child:Directionality(textDirection: TextDirection.rtl, 
+                          child: GridView.builder(
                           padding: const EdgeInsets.all(16),
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
@@ -254,6 +257,7 @@ class _ClientHomePageViewState extends State<ClientHomePageView> {
                             return _buildServiceCard(
                                 context, state.services[index]);
                           },
+                        ))
                         );
                       }
                       return const SizedBox();
