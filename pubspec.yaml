@@ -73,3 +73,5 @@ flutter:
     - images/warning-2.svg
     - images/profileImage.svg
     - images/home_image.svg 
+    - images/quick_reserve.svg
+    - images/select_technician.svg

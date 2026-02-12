@@ -1,4 +1,5 @@
 import 'package:el7erafe/core/services/local_storage/auth_local_storage.dart';
+import 'package:el7erafe/core/utils/animated_navigation.dart';
 import 'package:el7erafe/features/authentication_module/login/data/repositories/auth_repository.dart';
 import 'package:el7erafe/features/authentication_module/login/presentation/cubit/login_cubit.dart';
 import 'package:el7erafe/features/authentication_module/login/presentation/pages/login_page.dart';
@@ -280,9 +281,12 @@ Widget _buildServiceCard(BuildContext context, ServiceItem service) {
     onTap: () {
       Navigator.push(
         context,
-        MaterialPageRoute(
-            builder: (_) => ServiceRequestPage(
-                serviceId: service.id, serviceName: service.name)),
+        SlideRightRoute(
+          page: QuickReservePage(
+            serviceId: service.id,
+            serviceName: service.name,
+          ),
+        ),
       );
     },
     child: Card(

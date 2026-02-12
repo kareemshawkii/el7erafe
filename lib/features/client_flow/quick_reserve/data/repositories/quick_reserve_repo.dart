@@ -23,34 +23,34 @@ class ServiceRequestRepository {
         'Content-Type': 'multipart/form-data',
       });
 
-      multipartRequest.fields['service_id'] = request.serviceId.toString();
-      multipartRequest.fields['description'] = request.description ?? "";
+      multipartRequest.fields['ServiceId'] = request.serviceId.toString();
+      multipartRequest.fields['Description'] = request.description ?? "";
       if (request.governorate != null) {
-        multipartRequest.fields['governorate'] = request.governorate!;
+        multipartRequest.fields['Governorate'] = request.governorate!;
       }
-      if (request.city != null) multipartRequest.fields['city'] = request.city!;
+      if (request.city != null) multipartRequest.fields['City'] = request.city!;
       if (request.street != null) {
-        multipartRequest.fields['street'] = request.street!;
+        multipartRequest.fields['Street'] = request.street!;
       }
       if (request.specialSign != null) {
-        multipartRequest.fields['special_sign'] = request.specialSign!;
+        multipartRequest.fields['SpecialSign'] = request.specialSign!;
       }
       if (request.day != null) {
-        multipartRequest.fields['day'] = request.day!
+        multipartRequest.fields['ServiceDate'] = request.day!
             .toIso8601String()
             .split('T')
             .first; // Format YYYY-MM-DD
       }
 
-      multipartRequest.fields['allDayAvialabilty'] =
+      multipartRequest.fields['AllDayAvailability'] =
           request.allDayAvailability ? "1" : "0";
 
       if (!request.allDayAvailability) {
         if (request.availableFrom != null) {
-          multipartRequest.fields['avialable_from'] = request.availableFrom!;
+          multipartRequest.fields['AvailableFrom'] = request.availableFrom!;
         }
         if (request.availableTo != null) {
-          multipartRequest.fields['avialable_to'] = request.availableTo!;
+          multipartRequest.fields['AvailableTo'] = request.availableTo!;
         }
       }
 
@@ -59,7 +59,7 @@ class ServiceRequestRepository {
           var stream = http.ByteStream(imageFile.openRead());
           var length = await imageFile.length();
           var multipartFile = http.MultipartFile(
-            'images',
+            'Images',
             stream,
             length,
             filename: imageFile.path.split('/').last,
@@ -77,7 +77,7 @@ class ServiceRequestRepository {
       } else {
         try {
           final Map<String, dynamic> errorBody = jsonDecode(response.body);
-          return Left(errorBody['message'] ?? "فشل إرسال الطلب");
+          return Left(errorBody['errorMessage'] ?? "فشل إرسال الطلب");
         } catch (_) {
           return const Left("فشل إرسال الطلب، حاول مرة أخرى");
         }
