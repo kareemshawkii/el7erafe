@@ -176,7 +176,7 @@ class _ForgetOtpViewState extends State<ForgetOtpView> {
                           ),
                         ),
                         SizedBox(height: (24 / 852) * screenHeight),
-                        OtpTextField(
+                        Directionality(textDirection: TextDirection.ltr, child: OtpTextField(
                           numberOfFields: 6,
                           fieldWidth: (50 / 393) * screenWidth,
                           fieldHeight: (50 / 852) * screenHeight,
@@ -195,7 +195,7 @@ class _ForgetOtpViewState extends State<ForgetOtpView> {
                               _enteredOtp = code;
                             });
                           },
-                        ),
+                        ),),
                         SizedBox(height: (24 / 852) * screenHeight),
                         BlocBuilder<ForgetOtpCubit, ForgetOtpState>(
                           builder: (context, state) {

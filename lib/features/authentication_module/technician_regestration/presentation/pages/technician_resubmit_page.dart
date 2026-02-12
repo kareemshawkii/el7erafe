@@ -130,7 +130,7 @@ class TechnicianResubmitView extends StatelessWidget {
                         (44 / 852) * screenHeight + keyboardPadding),
                     physics: const ClampingScrollPhysics(),
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text.rich(
                           TextSpan(

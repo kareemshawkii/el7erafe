@@ -7,6 +7,7 @@ import 'package:el7erafe/features/client_flow/client_home/data/models/service_it
 import 'package:el7erafe/features/client_flow/client_home/data/repositories/home_repository.dart';
 import 'package:el7erafe/features/client_flow/client_home/presentation/cubit/client_home_cubit.dart';
 import 'package:el7erafe/features/client_flow/client_home/presentation/cubit/client_home_state.dart';
+import 'package:el7erafe/features/client_flow/quick_reserve/presentation/pages/quick_reserve_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
@@ -113,6 +114,31 @@ class _ClientHomePageViewState extends State<ClientHomePageView> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
+                          Text.rich(
+                            TextSpan(
+                              style: GoogleFonts.cairo(
+                                fontSize: 23,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.black,
+                                height: 1.5,
+                              ),
+                              children: <TextSpan>[
+                                TextSpan(
+                                  text: "أهلا.. ",
+                                  style: const TextStyle(
+                                    color: Colors.blueAccent,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: userName,
+                                ),
+                              ],
+                            ),
+                            textAlign: TextAlign.center,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                           Row(
                             children: [
                               SizedBox(width: (16 / 852) * width),
@@ -150,31 +176,6 @@ class _ClientHomePageViewState extends State<ClientHomePageView> {
                               ),
                             ],
                           ),
-                          Text.rich(
-                            TextSpan(
-                              style: GoogleFonts.cairo(
-                                fontSize: 23,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.black,
-                                height: 1.5,
-                              ),
-                              children: <TextSpan>[
-                                TextSpan(
-                                  text: "أهلا.. ",
-                                  style: const TextStyle(
-                                    color: Colors.blueAccent,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                TextSpan(
-                                  text: userName,
-                                ),
-                              ],
-                            ),
-                            textAlign: TextAlign.center,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
                         ],
                       )),
                   SizedBox(height: (16 / 852) * height),
@@ -193,8 +194,11 @@ class _ClientHomePageViewState extends State<ClientHomePageView> {
                         right: (16 / 393) * width,
                       ),
                       child: Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
+                          mainAxisAlignment: MainAxisAlignment.start,
                           children: [
+                            Icon(Iconsax.user_search,
+                                color: const Color(0xFF3775FA), size: 24),
+                            SizedBox(width: (8 / 393) * width),
                             Text(
                               "اختر خدمتك",
                               style: GoogleFonts.cairo(
@@ -204,9 +208,6 @@ class _ClientHomePageViewState extends State<ClientHomePageView> {
                                 height: 1.5,
                               ),
                             ),
-                            SizedBox(width: (8 / 393) * width),
-                            Icon(Iconsax.user_search,
-                                color: const Color(0xFF3775FA), size: 24),
                           ])),
                   SizedBox(height: (16 / 852) * height),
                   BlocConsumer<HomeCubit, HomeState>(
@@ -239,26 +240,26 @@ class _ClientHomePageViewState extends State<ClientHomePageView> {
                         return Center(child: Text(state.message));
                       } else if (state is HomeLoaded) {
                         return Align(
-                          alignment: Alignment.centerRight,
-                          child:Directionality(textDirection: TextDirection.rtl, 
-                          child: GridView.builder(
-                          padding: const EdgeInsets.all(16),
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 3,
-                            childAspectRatio: 0.8,
-                            crossAxisSpacing: 10,
-                            mainAxisSpacing: 10,
-                          ),
-                          itemCount: state.services.length,
-                          itemBuilder: (context, index) {
-                            return _buildServiceCard(
-                                context, state.services[index]);
-                          },
-                        ))
-                        );
+                            alignment: Alignment.centerRight,
+                            child: Directionality(
+                                textDirection: TextDirection.rtl,
+                                child: GridView.builder(
+                                  padding: const EdgeInsets.all(16),
+                                  shrinkWrap: true,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  gridDelegate:
+                                      const SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 3,
+                                    childAspectRatio: 0.8,
+                                    crossAxisSpacing: 10,
+                                    mainAxisSpacing: 10,
+                                  ),
+                                  itemCount: state.services.length,
+                                  itemBuilder: (context, index) {
+                                    return _buildServiceCard(
+                                        context, state.services[index]);
+                                  },
+                                )));
                       }
                       return const SizedBox();
                     },
@@ -272,8 +273,12 @@ class _ClientHomePageViewState extends State<ClientHomePageView> {
 Widget _buildServiceCard(BuildContext context, ServiceItem service) {
   return InkWell(
     onTap: () {
-      //ReservationRequest partialRequest = ReservationRequest(serviceId: service.id,serviceName: service.name,);
-      // Navigator.push(context,MaterialPageRoute(builder: (context) => ServiceRequestPage(requestModel: partialRequest),),);
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (_) => ServiceRequestPage(
+                serviceId: service.id, serviceName: service.name)),
+      );
     },
     child: Card(
       color: Colors.white,

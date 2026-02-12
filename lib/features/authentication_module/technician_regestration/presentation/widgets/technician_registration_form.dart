@@ -164,7 +164,7 @@ class _TechnicianRegistrationFormState
                 borderRadius: BorderRadius.circular(16.0),
               ),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text('البيانات الاساسيه',
                       style: GoogleFonts.cairo(
@@ -343,19 +343,20 @@ class _TechnicianRegistrationFormState
                   ),
                   SizedBox(height: (16 / 852) * screenHeight),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
+                    mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      Text("المدينة",
-                          style: GoogleFonts.cairo(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w400,
-                              color: Colors.black)),
-                      SizedBox(width: (123 / 393) * screenWidth),
                       Text("المحافظة",
                           style: GoogleFonts.cairo(
                               fontSize: 16,
                               fontWeight: FontWeight.w400,
                               color: Colors.black)),
+                              SizedBox(width: (123 / 393) * screenWidth),
+                      Text("المدينة",
+                          style: GoogleFonts.cairo(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w400,
+                              color: Colors.black)),    
+                      
                     ],
                   ),
                   SizedBox(height: (8 / 852) * screenHeight),
@@ -494,7 +495,7 @@ class _TechnicianRegistrationFormState
                 borderRadius: BorderRadius.circular(16.0),
               ),
               child:
-                  Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+                  Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text('توثيق حسابك',
                     style: GoogleFonts.cairo(
                         fontSize: 16,
@@ -508,10 +509,10 @@ class _TechnicianRegistrationFormState
                         color: Color(0xFF000000))),
                 SizedBox(height: (16 / 852) * screenHeight),
                 Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text('صورة البطاقة من الوش',
                             style: GoogleFonts.cairo(
@@ -558,7 +559,7 @@ class _TechnicianRegistrationFormState
                         color: Color(0xFF000000))),
                 SizedBox(height: (16 / 852) * screenHeight),
                 Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Align(
                       alignment: Alignment.centerRight,
@@ -594,7 +595,7 @@ class _TechnicianRegistrationFormState
                 borderRadius: BorderRadius.circular(16.0),
               ),
               child:
-                  Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+                  Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text('أمان حسابك',
                     style: GoogleFonts.cairo(
                         fontSize: 15,

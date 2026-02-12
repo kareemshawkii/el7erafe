@@ -54,7 +54,7 @@ class _ClientRegistrationFormState extends State<ClientRegistrationForm> {
     return Form(
       key: _formKey,
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text('الاسم',
               style: GoogleFonts.cairo(

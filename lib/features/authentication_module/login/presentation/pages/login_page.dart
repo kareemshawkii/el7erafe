@@ -250,7 +250,7 @@ class LoginView extends StatelessWidget {
                         (16 / 393) * screenWidth,
                         (44 / 852) * screenHeight + keyboardPadding),
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text('تسجيل الدخول',
                             style: GoogleFonts.cairo(

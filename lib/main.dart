@@ -7,6 +7,7 @@ import 'package:el7erafe/features/authentication_module/otp_page/data/Repository
 import 'package:el7erafe/features/authentication_module/splash/splash_control.dart';
 import 'package:el7erafe/features/authentication_module/technician_regestration/data/repositories/technician_registration_repo.dart';
 import 'package:el7erafe/features/client_flow/client_home/data/repositories/home_repository.dart';
+import 'package:el7erafe/features/client_flow/quick_reserve/data/repositories/quick_reserve_repo.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -30,57 +31,66 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiRepositoryProvider(
-      providers: [
-        RepositoryProvider(
-          create: (context) => AuthRepository(),
-        ),
-        RepositoryProvider(
-          create: (context) => ClientRegRepository(),
-        ),
-        RepositoryProvider(
-          create: (context) => OtpRepository(),
-        ),
-        RepositoryProvider(
-          create: (context) => TechnicianRegRepository(),
-        ),
-        RepositoryProvider(
-          create: (context) => EmailInputRepository(),
-        ),
-        RepositoryProvider(
-          create: (context) => OtpForgetRepository(),
-        ),
-        RepositoryProvider(
-          create: (context) => ResetPasswordRepository(),
-        ),
-        RepositoryProvider(
-          create: (context) => HomeRepository(),
-        ),
-      ],
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'El7erafe',
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF3775FA)),
-          textTheme: GoogleFonts.cairoTextTheme(),
-          useMaterial3: true,
-        ),
-        builder: (context, child) {
-          final mediaQueryData = MediaQuery.of(context);
-          final textScaler = mediaQueryData.textScaler;
-          final clampedTextScaler = textScaler.clamp(
-            minScaleFactor: 0.9,
-            maxScaleFactor: 1.0,
-          );
-          return MediaQuery(
-            data: mediaQueryData.copyWith(
-              textScaler: clampedTextScaler,
+        providers: [
+          RepositoryProvider(
+            create: (context) => AuthRepository(),
+          ),
+          RepositoryProvider(
+            create: (context) => ClientRegRepository(),
+          ),
+          RepositoryProvider(
+            create: (context) => OtpRepository(),
+          ),
+          RepositoryProvider(
+            create: (context) => TechnicianRegRepository(),
+          ),
+          RepositoryProvider(
+            create: (context) => EmailInputRepository(),
+          ),
+          RepositoryProvider(
+            create: (context) => OtpForgetRepository(),
+          ),
+          RepositoryProvider(
+            create: (context) => ResetPasswordRepository(),
+          ),
+          RepositoryProvider(
+            create: (context) => HomeRepository(),
+          ),
+          RepositoryProvider(
+            create: (context) => ServiceRequestRepository(),
+          ),
+        ],
+        child: MaterialApp(
+          locale: const Locale('ar'),
+          debugShowCheckedModeBanner: false,
+          title: 'El7erafe',
+          theme: ThemeData(
+            colorScheme: ColorScheme.fromSeed(
+              seedColor: const Color(0xFF3775FA),
             ),
-            child: child!,
-          );
-        },
-        home: const SplashController(),
-        routes: {},
-      ),
-    );
+            textTheme: GoogleFonts.cairoTextTheme(),
+            useMaterial3: true,
+          ),
+          builder: (context, child) {
+            final mediaQueryData = MediaQuery.of(context);
+            final textScaler = mediaQueryData.textScaler;
+            final clampedTextScaler = textScaler.clamp(
+              minScaleFactor: 0.9,
+              maxScaleFactor: 1.0,
+            );
+
+            return Directionality(
+              textDirection: TextDirection.rtl,
+              child: MediaQuery(
+                data: mediaQueryData.copyWith(
+                  textScaler: clampedTextScaler,
+                ),
+                child: child!,
+              ),
+            );
+          },
+          home: const SplashController(),
+          routes: {},
+        ));
   }
 }

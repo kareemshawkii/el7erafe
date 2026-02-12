@@ -121,6 +121,29 @@ class OnBoardingPage extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
+                          CustomProgressButton(
+                            progress: progresses[currentIndex],
+                            onPressed: () {
+                              if (currentIndex < totalPages - 1) {
+                                context
+                                    .read<OnboardingCubit>()
+                                    .nextPage(totalPages);
+                              } else {
+                                Navigator.pushAndRemoveUntil(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => BlocProvider(
+                                        create: (context) => LoginCubit(
+                                          authRepository: RepositoryProvider.of<
+                                              AuthRepository>(context),
+                                        ),
+                                        child: const LoginPage(),
+                                      ),
+                                    ),
+                                    (route) => false);
+                              }
+                            },
+                          ),
                           TextButton(
                             onPressed: () {
                               Navigator.pushAndRemoveUntil(
@@ -152,29 +175,6 @@ class OnBoardingPage extends StatelessWidget {
                                 color: const Color(0xFF3F68EC),
                               ),
                             ),
-                          ),
-                          CustomProgressButton(
-                            progress: progresses[currentIndex],
-                            onPressed: () {
-                              if (currentIndex < totalPages - 1) {
-                                context
-                                    .read<OnboardingCubit>()
-                                    .nextPage(totalPages);
-                              } else {
-                                Navigator.pushAndRemoveUntil(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => BlocProvider(
-                                        create: (context) => LoginCubit(
-                                          authRepository: RepositoryProvider.of<
-                                              AuthRepository>(context),
-                                        ),
-                                        child: const LoginPage(),
-                                      ),
-                                    ),
-                                    (route) => false);
-                              }
-                            },
                           ),
                         ],
                       )
@@ -226,8 +226,8 @@ class CustomProgressButton extends StatelessWidget {
               backgroundColor: const Color(0xFF3F68EC),
               elevation: 0,
               shape: const CircleBorder(),
-              child: const Icon(Icons.arrow_forward,
-                  size: 16, color: Colors.white),
+              child:
+                  const Icon(Icons.arrow_back, size: 16, color: Colors.white),
             ),
           ),
         ],

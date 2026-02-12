@@ -248,18 +248,18 @@ class _TechnicianWaitingViewState extends State<TechnicianWaitingView> {
                                             mainAxisAlignment:
                                                 MainAxisAlignment.center,
                                             children: [
-                                              Icon(Icons.refresh,
-                                                  color: Colors.white,
-                                                  size:
-                                                      (24 / 393) * screenWidth),
-                                              SizedBox(
-                                                  width:
-                                                      (8 / 393) * screenWidth),
                                               Text('اعاده تحميل الصفحه',
                                                   style: GoogleFonts.cairo(
                                                       fontSize: 16,
                                                       fontWeight:
                                                           FontWeight.w500)),
+                                              SizedBox(
+                                                  width:
+                                                      (8 / 393) * screenWidth),
+                                              Icon(Icons.refresh,
+                                                  color: Colors.white,
+                                                  size:
+                                                      (24 / 393) * screenWidth),
                                             ],
                                           ),
                                   ));
