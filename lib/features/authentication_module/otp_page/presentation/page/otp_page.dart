@@ -116,144 +116,151 @@ class _OtpViewState extends State<OtpView> {
               ),
               Align(
                 alignment: Alignment.bottomCenter,
-                child: Container(
-                  height: (629 / 852) * screenHeight,
-                  width: double.infinity,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFFFDFDFD),
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(44),
-                      topRight: Radius.circular(44),
-                    ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular((44 )),
+                    topRight: Radius.circular((44) ),
                   ),
-                  child: SingleChildScrollView(
-                    padding: EdgeInsets.fromLTRB(
-                        (16 / 393) * screenWidth,
-                        (44 / 852) * screenHeight,
-                        (16 / 393) * screenWidth,
-                        (44 / 852) * screenHeight + keyboardPadding),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Center(
-                            child: SizedBox(
-                          height: (136 / 852) * screenHeight,
-                          width: (182 / 393) * screenWidth,
-                          child:
-                              Image.asset('images/otp.png', fit: BoxFit.fill),
-                        )),
-                        SizedBox(height: (32 / 852) * screenHeight),
-                        Center(
-                          child: Text(
-                            'أدخل رمز التحقق',
-                            style: GoogleFonts.cairo(
-                              fontSize: 24,
-                              fontWeight: FontWeight.w600,
-                              color: const Color(0xFF1E1E1E),
+                  child: Container(
+                    height: (629 / 852) * screenHeight,
+                    width: double.infinity,
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFFDFDFD),
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(44),
+                        topRight: Radius.circular(44),
+                      ),
+                    ),
+                    child: SingleChildScrollView(
+                      padding: EdgeInsets.fromLTRB(
+                          (16 / 393) * screenWidth,
+                          (44 / 852) * screenHeight,
+                          (16 / 393) * screenWidth,
+                          (44 / 852) * screenHeight + keyboardPadding),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Center(
+                              child: SizedBox(
+                            height: (136 / 852) * screenHeight,
+                            width: (182 / 393) * screenWidth,
+                            child:
+                                Image.asset('images/otp.png', fit: BoxFit.fill),
+                          )),
+                          SizedBox(height: (32 / 852) * screenHeight),
+                          Center(
+                            child: Text(
+                              'أدخل رمز التحقق',
+                              style: GoogleFonts.cairo(
+                                fontSize: 24,
+                                fontWeight: FontWeight.w600,
+                                color: const Color(0xFF1E1E1E),
+                              ),
                             ),
                           ),
-                        ),
-                        SizedBox(height: (8 / 852) * screenHeight),
-                        Center(
-                          child: Text(
-                            'أدخل الكود المرسل على بريدك لإكمال العملية',
-                            style: GoogleFonts.cairo(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w400,
-                              color: const Color(0xFF6B6B6B),
+                          SizedBox(height: (8 / 852) * screenHeight),
+                          Center(
+                            child: Text(
+                              'أدخل الكود المرسل على بريدك لإكمال العملية',
+                              style: GoogleFonts.cairo(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w400,
+                                color: const Color(0xFF6B6B6B),
+                              ),
                             ),
                           ),
-                        ),
-                        SizedBox(height: (24 / 852) * screenHeight),
-                        Directionality(
-                          textDirection: TextDirection.ltr,
-                          child: OtpTextField(
-                            numberOfFields: 6,
-                            fieldWidth: (50 / 393) * screenWidth,
-                            fieldHeight: (50 / 852) * screenHeight,
-                            borderColor: const Color(0xFF3775FA),
-                            enabledBorderColor: const Color(0xFFE2DFDF),
-                            focusedBorderColor: const Color(0xFF3775FA),
-                            borderRadius: BorderRadius.circular(12.0),
-                            showFieldAsBox: true,
-                            onSubmit: (String verificationCode) {
-                              setState(() {
-                                _enteredOtp = verificationCode;
-                              });
-                            },
-                            onCodeChanged: (String code) {
-                              setState(() {
-                                _enteredOtp = code;
-                              });
-                            },
-                          ),
-                        ),
-                        SizedBox(height: (24 / 852) * screenHeight),
-                        BlocBuilder<OtpCubit, OtpState>(
-                          builder: (context, state) {
-                            final isLoading = state is OtpLoading;
-                            return Container(
-                                width: double.infinity,
-                                height: (40 / 852) * screenHeight,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(12.0),
-                                  border: Border.all(
-                                    color: Color(0xFF3775FA),
-                                    width: 1.0,
-                                  ),
-                                ),
-                                child: ElevatedButton(
-                                  onPressed: isLoading ? null : _onOtpPressed,
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: const Color(0xFF3775FA),
-                                    foregroundColor: Colors.white,
-                                    disabledBackgroundColor:
-                                        const Color.fromARGB(158, 55, 117, 250),
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(12.0),
-                                        side: const BorderSide(
-                                            color: Colors.white, width: 1.0)),
-                                  ),
-                                  child: isLoading
-                                      ? const SizedBox(
-                                          height: 24,
-                                          width: 24,
-                                          child: CircularProgressIndicator(
-                                              color: Color(0xFF3775FA),
-                                              strokeWidth: 3),
-                                        )
-                                      : Text('تحقق',
-                                          style: GoogleFonts.cairo(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.w500)),
-                                ));
-                          },
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          textDirection: TextDirection.rtl,
-                          children: [
-                            Text('ماوصلكش الكود؟  ابعت طلب',
-                                style: GoogleFonts.cairo(
-                                    fontSize: 14,
-                                    color: const Color(0xFF727070),
-                                    fontWeight: FontWeight.w400)),
-                            TextButton(
-                              onPressed: () {
-                                context
-                                    .read<OtpCubit>()
-                                    .resendOtp(widget.email);
+                          SizedBox(height: (24 / 852) * screenHeight),
+                          Directionality(
+                            textDirection: TextDirection.ltr,
+                            child: OtpTextField(
+                              numberOfFields: 6,
+                              fieldWidth: (50 / 393) * screenWidth,
+                              fieldHeight: (50 / 852) * screenHeight,
+                              borderColor: const Color(0xFF3775FA),
+                              enabledBorderColor: const Color(0xFFE2DFDF),
+                              focusedBorderColor: const Color(0xFF3775FA),
+                              borderRadius: BorderRadius.circular(12.0),
+                              showFieldAsBox: true,
+                              onSubmit: (String verificationCode) {
+                                setState(() {
+                                  _enteredOtp = verificationCode;
+                                });
                               },
-                              child: Text('لإعادة الإرسال',
+                              onCodeChanged: (String code) {
+                                setState(() {
+                                  _enteredOtp = code;
+                                });
+                              },
+                            ),
+                          ),
+                          SizedBox(height: (24 / 852) * screenHeight),
+                          BlocBuilder<OtpCubit, OtpState>(
+                            builder: (context, state) {
+                              final isLoading = state is OtpLoading;
+                              return Container(
+                                  width: double.infinity,
+                                  height: (40 / 852) * screenHeight,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(12.0),
+                                    border: Border.all(
+                                      color: Color(0xFF3775FA),
+                                      width: 1.0,
+                                    ),
+                                  ),
+                                  child: ElevatedButton(
+                                    onPressed: isLoading ? null : _onOtpPressed,
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: const Color(0xFF3775FA),
+                                      foregroundColor: Colors.white,
+                                      disabledBackgroundColor:
+                                          const Color.fromARGB(
+                                              158, 55, 117, 250),
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(12.0),
+                                          side: const BorderSide(
+                                              color: Colors.white, width: 1.0)),
+                                    ),
+                                    child: isLoading
+                                        ? const SizedBox(
+                                            height: 24,
+                                            width: 24,
+                                            child: CircularProgressIndicator(
+                                                color: Color(0xFF3775FA),
+                                                strokeWidth: 3),
+                                          )
+                                        : Text('تحقق',
+                                            style: GoogleFonts.cairo(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w500)),
+                                  ));
+                            },
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            textDirection: TextDirection.rtl,
+                            children: [
+                              Text('ماوصلكش الكود؟  ابعت طلب',
                                   style: GoogleFonts.cairo(
                                       fontSize: 14,
-                                      color: const Color(0xFF3775FA),
+                                      color: const Color(0xFF727070),
                                       fontWeight: FontWeight.w400)),
-                            ),
-                          ],
-                        ),
-                      ],
+                              TextButton(
+                                onPressed: () {
+                                  context
+                                      .read<OtpCubit>()
+                                      .resendOtp(widget.email);
+                                },
+                                child: Text('لإعادة الإرسال',
+                                    style: GoogleFonts.cairo(
+                                        fontSize: 14,
+                                        color: const Color(0xFF3775FA),
+                                        fontWeight: FontWeight.w400)),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),

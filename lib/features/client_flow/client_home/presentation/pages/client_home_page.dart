@@ -58,22 +58,25 @@ class _ClientHomePageViewState extends State<ClientHomePageView> {
         create: (context) => HomeCubit(HomeRepository())..fetchServices(),
         child: Scaffold(
             backgroundColor: Colors.white,
-            bottomNavigationBar: Container(
-                padding: EdgeInsets.only(
-                    left: (24 / 852) * width, right: (24 / 852) * width),
+            bottomNavigationBar: ClipRRect(
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(24),
+                topRight: Radius.circular(24),
+              ),
+              child: Container(
                 height: (80 / 852) * height,
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.only(
+                  border: Border.all(color: const Color(0xFF6796FA)),
+                  borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(24),
                     topRight: Radius.circular(24),
                   ),
-                  border: Border.all(color: Color(0xFF6796FA)),
                 ),
                 child: Theme(
                   data: Theme.of(context).copyWith(
-                    splashColor: Color(0x333775FA),
-                    highlightColor: Color(0x333775FA),
+                    splashColor: const Color(0x333775FA),
+                    highlightColor: const Color(0x333775FA),
                   ),
                   child: BottomNavigationBar(
                     backgroundColor: Colors.transparent,
@@ -101,7 +104,9 @@ class _ClientHomePageViewState extends State<ClientHomePageView> {
                     selectedFontSize: 14,
                     unselectedFontSize: 14,
                   ),
-                )),
+                ),
+              ),
+            ),
             body: SingleChildScrollView(
                 child: Container(
               decoration: const BoxDecoration(color: Colors.white),

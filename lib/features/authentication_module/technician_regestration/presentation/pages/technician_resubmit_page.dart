@@ -112,49 +112,55 @@ class TechnicianResubmitView extends StatelessWidget {
               ),
               Align(
                 alignment: Alignment.bottomCenter,
-                child: Container(
-                  height: (629 / 852) * screenHeight,
-                  width: double.infinity,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFFFDFDFD),
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(44),
-                      topRight: Radius.circular(44),
-                    ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular((44) ),
+                    topRight: Radius.circular((44) ),
                   ),
-                  child: SingleChildScrollView(
-                    padding: EdgeInsets.fromLTRB(
-                        (16 / 393) * screenWidth,
-                        (44 / 852) * screenHeight,
-                        (16 / 393) * screenWidth,
-                        (44 / 852) * screenHeight + keyboardPadding),
-                    physics: const ClampingScrollPhysics(),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text.rich(
-                          TextSpan(
-                            style: GoogleFonts.cairo(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w600,
-                              color: const Color(0xFF232222),
-                              height: 1.5,
-                            ),
-                            children: <TextSpan>[
-                              TextSpan(text: "اعاده ارسال البيانات "),
-                              TextSpan(
-                                text: "المرفوضة",
-                                style: const TextStyle(
-                                  color: Colors.blueAccent,
-                                  fontWeight: FontWeight.w600,
-                                ),
+                  child: Container(
+                    height: (629 / 852) * screenHeight,
+                    width: double.infinity,
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFFDFDFD),
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(44),
+                        topRight: Radius.circular(44),
+                      ),
+                    ),
+                    child: SingleChildScrollView(
+                      padding: EdgeInsets.fromLTRB(
+                          (16 / 393) * screenWidth,
+                          (44 / 852) * screenHeight,
+                          (16 / 393) * screenWidth,
+                          (44 / 852) * screenHeight + keyboardPadding),
+                      physics: const ClampingScrollPhysics(),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text.rich(
+                            TextSpan(
+                              style: GoogleFonts.cairo(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w600,
+                                color: const Color(0xFF232222),
+                                height: 1.5,
                               ),
-                            ],
+                              children: <TextSpan>[
+                                TextSpan(text: "اعاده ارسال البيانات "),
+                                TextSpan(
+                                  text: "المرفوضة",
+                                  style: const TextStyle(
+                                    color: Colors.blueAccent,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                        SizedBox(height: (24 / 852) * screenHeight),
-                        const TechnicianResubmitForm(),
-                      ],
+                          SizedBox(height: (24 / 852) * screenHeight),
+                          const TechnicianResubmitForm(),
+                        ],
+                      ),
                     ),
                   ),
                 ),

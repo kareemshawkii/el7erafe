@@ -12,8 +12,13 @@ class ServiceRequestCubit extends Cubit<ServiceRequestState> {
 
   ServiceRequestCubit(this.requestModel) : super(ServiceRequestInitial());
 
-  Future<void> pickImage() async {
-    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+  Future<void> pickImage(ImageSource source) async {
+    if ((requestModel.images?.length ?? 0) >= 4) {
+      emit(ServiceRequestError("عفواً، الحد الأقصى 4 صور فقط"));
+      return;
+    }
+
+    final XFile? image = await _picker.pickImage(source: source);
     if (image != null) {
       requestModel.images ??= [];
       requestModel.images!.add(File(image.path));
@@ -23,6 +28,17 @@ class ServiceRequestCubit extends Cubit<ServiceRequestState> {
 
   void removeImage(int index) {
     requestModel.images?.removeAt(index);
+    emit(ServiceRequestImageUpdated());
+  }
+
+  void setGovernorate(String? governorate) {
+    requestModel.governorate = governorate;
+    requestModel.city = null;
+    emit(ServiceRequestImageUpdated());
+  }
+
+  void setCity(String? city) {
+    requestModel.city = city;
     emit(ServiceRequestImageUpdated());
   }
 

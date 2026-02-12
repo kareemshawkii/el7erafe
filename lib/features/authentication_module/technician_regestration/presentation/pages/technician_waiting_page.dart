@@ -165,108 +165,116 @@ class _TechnicianWaitingViewState extends State<TechnicianWaitingView> {
               ),
               Align(
                 alignment: Alignment.bottomCenter,
-                child: Container(
-                  height: (629 / 852) * screenHeight,
-                  width: double.infinity,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFFFDFDFD),
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(44),
-                      topRight: Radius.circular(44),
-                    ),
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(44),
+                    topRight: Radius.circular(44),
                   ),
-                  child: SingleChildScrollView(
-                    padding: EdgeInsets.fromLTRB(
-                        (16 / 393) * screenWidth,
-                        (44 / 852) * screenHeight,
-                        (16 / 393) * screenWidth,
-                        (44 / 852) * screenHeight + keyboardPadding),
-                    physics: const ClampingScrollPhysics(),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Image.asset('images/technician_waiting.png',
-                            width: (241 / 393) * screenWidth,
-                            height: (361 / 852) * screenHeight),
-                        SizedBox(height: (24 / 852) * screenHeight),
-                        Directionality(
-                            textDirection: TextDirection.rtl,
-                            child: Center(
-                              child: Text(
-                                'شكراً لتسجيلك كحرفي! طلبك بيتراجع دلوقتي ، وهنرد عليك خلال 24 ساعة.',
-                                style: GoogleFonts.cairo(
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.w600,
-                                  color: const Color(0xFF000000),
-                                ),
-                              ),
-                            )),
-                        SizedBox(height: (18 / 852) * screenHeight),
-                        SizedBox(
-                          height: (40 / 852) * screenHeight,
-                          width: (264 / 393) * screenWidth,
-                          child: BlocBuilder<TechnicianStatusCubit,
-                              TechnicianStatusState>(
-                            builder: (context, state) {
-                              final isLoading =
-                                  state is TechnicianStatusLoading;
-                              return Container(
-                                  width: double.infinity,
-                                  height: (40 / 852) * screenHeight,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(12.0),
-                                    border: Border.all(
-                                      color: Color(0xFF3775FA),
-                                      width: 1.0,
-                                    ),
+                  child: Container(
+                    height: (629 / 852) * screenHeight,
+                    width: double.infinity,
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFFDFDFD),
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(44),
+                        topRight: Radius.circular(44),
+                      ),
+                    ),
+                    child: SingleChildScrollView(
+                      padding: EdgeInsets.fromLTRB(
+                          (16 / 393) * screenWidth,
+                          (44 / 852) * screenHeight,
+                          (16 / 393) * screenWidth,
+                          (44 / 852) * screenHeight + keyboardPadding),
+                      physics: const ClampingScrollPhysics(),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Image.asset('images/technician_waiting.png',
+                              width: (241 / 393) * screenWidth,
+                              height: (361 / 852) * screenHeight),
+                          SizedBox(height: (24 / 852) * screenHeight),
+                          Directionality(
+                              textDirection: TextDirection.rtl,
+                              child: Center(
+                                child: Text(
+                                  'شكراً لتسجيلك كحرفي! طلبك بيتراجع دلوقتي ، وهنرد عليك خلال 24 ساعة.',
+                                  style: GoogleFonts.cairo(
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.w600,
+                                    color: const Color(0xFF000000),
                                   ),
-                                  child: ElevatedButton(
-                                    onPressed: isLoading
-                                        ? null
-                                        : () => _onReloadPressed(context),
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: const Color(0xFF3775FA),
-                                      foregroundColor: Colors.white,
-                                      disabledBackgroundColor:
-                                          const Color.fromARGB(
-                                              158, 55, 117, 250),
-                                      shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(12.0),
-                                          side: const BorderSide(
-                                              color: Colors.white, width: 1.0)),
+                                ),
+                              )),
+                          SizedBox(height: (18 / 852) * screenHeight),
+                          SizedBox(
+                            height: (40 / 852) * screenHeight,
+                            width: (264 / 393) * screenWidth,
+                            child: BlocBuilder<TechnicianStatusCubit,
+                                TechnicianStatusState>(
+                              builder: (context, state) {
+                                final isLoading =
+                                    state is TechnicianStatusLoading;
+                                return Container(
+                                    width: double.infinity,
+                                    height: (40 / 852) * screenHeight,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(12.0),
+                                      border: Border.all(
+                                        color: Color(0xFF3775FA),
+                                        width: 1.0,
+                                      ),
                                     ),
-                                    child: isLoading
-                                        ? const SizedBox(
-                                            height: 24,
-                                            width: 24,
-                                            child: CircularProgressIndicator(
-                                                color: Color(0xFF3775FA),
-                                                strokeWidth: 3),
-                                          )
-                                        : Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              Text('اعاده تحميل الصفحه',
-                                                  style: GoogleFonts.cairo(
-                                                      fontSize: 16,
-                                                      fontWeight:
-                                                          FontWeight.w500)),
-                                              SizedBox(
-                                                  width:
-                                                      (8 / 393) * screenWidth),
-                                              Icon(Icons.refresh,
-                                                  color: Colors.white,
-                                                  size:
-                                                      (24 / 393) * screenWidth),
-                                            ],
-                                          ),
-                                  ));
-                            },
+                                    child: ElevatedButton(
+                                      onPressed: isLoading
+                                          ? null
+                                          : () => _onReloadPressed(context),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor:
+                                            const Color(0xFF3775FA),
+                                        foregroundColor: Colors.white,
+                                        disabledBackgroundColor:
+                                            const Color.fromARGB(
+                                                158, 55, 117, 250),
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(12.0),
+                                            side: const BorderSide(
+                                                color: Colors.white,
+                                                width: 1.0)),
+                                      ),
+                                      child: isLoading
+                                          ? const SizedBox(
+                                              height: 24,
+                                              width: 24,
+                                              child: CircularProgressIndicator(
+                                                  color: Color(0xFF3775FA),
+                                                  strokeWidth: 3),
+                                            )
+                                          : Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Text('اعاده تحميل الصفحه',
+                                                    style: GoogleFonts.cairo(
+                                                        fontSize: 16,
+                                                        fontWeight:
+                                                            FontWeight.w500)),
+                                                SizedBox(
+                                                    width: (8 / 393) *
+                                                        screenWidth),
+                                                Icon(Icons.refresh,
+                                                    color: Colors.white,
+                                                    size: (24 / 393) *
+                                                        screenWidth),
+                                              ],
+                                            ),
+                                    ));
+                              },
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),

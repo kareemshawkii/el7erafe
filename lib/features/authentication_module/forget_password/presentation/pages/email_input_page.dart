@@ -94,155 +94,166 @@ class EmailInputView extends StatelessWidget {
               ),
               Align(
                 alignment: Alignment.bottomCenter,
-                child: Container(
-                  height: (629 / 852) * screenHeight,
-                  width: double.infinity,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFFFDFDFD),
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(44),
-                      topRight: Radius.circular(44),
-                    ),
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(44),
+                    topRight: Radius.circular(44),
                   ),
-                  child: SingleChildScrollView(
-                    padding: EdgeInsets.fromLTRB(
-                        (16 / 393) * screenWidth,
-                        (44 / 852) * screenHeight,
-                        (16 / 393) * screenWidth,
-                        (44 / 852) * screenHeight + keyboardPadding),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        SizedBox(
-                          height: (136 / 852) * screenHeight,
-                          width: (147 / 393) * screenWidth,
-                          child: Image.asset('images/email_input.png',
-                              fit: BoxFit.fill),
-                        ),
-                        SizedBox(height: (32 / 852) * screenHeight),
-                        Text(
-                          'نسيت كلمه السر ؟',
-                          textAlign: TextAlign.center,
-                          style: GoogleFonts.cairo(
-                            fontSize: 24,
-                            fontWeight: FontWeight.w600,
-                            color: const Color(0xFF3775FA),
+                  child: Container(
+                    height: (629 / 852) * screenHeight,
+                    width: double.infinity,
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFFDFDFD),
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(44),
+                        topRight: Radius.circular(44),
+                      ),
+                    ),
+                    child: SingleChildScrollView(
+                      padding: EdgeInsets.fromLTRB(
+                          (16 / 393) * screenWidth,
+                          (44 / 852) * screenHeight,
+                          (16 / 393) * screenWidth,
+                          (44 / 852) * screenHeight + keyboardPadding),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          SizedBox(
+                            height: (136 / 852) * screenHeight,
+                            width: (147 / 393) * screenWidth,
+                            child: Image.asset('images/email_input.png',
+                                fit: BoxFit.fill),
                           ),
-                        ),
-                        Text(
-                          'اكتب البريد الالكتروني اللي سجلت بيه',
-                          textAlign: TextAlign.center,
-                          style: GoogleFonts.cairo(
-                            fontSize: 17,
-                            fontWeight: FontWeight.w400,
-                            color: const Color(0xFF000000),
+                          SizedBox(height: (32 / 852) * screenHeight),
+                          Text(
+                            'نسيت كلمه السر ؟',
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.cairo(
+                              fontSize: 24,
+                              fontWeight: FontWeight.w600,
+                              color: const Color(0xFF3775FA),
+                            ),
                           ),
-                        ),
-                        SizedBox(height: (32 / 852) * screenHeight),
-                        Form(
-                          key: _formKey,
-                          autovalidateMode: AutovalidateMode.onUserInteraction,
-                          child: Directionality(
-                            textDirection: TextDirection.rtl,
-                            child: TextFormField(
-                              controller: _emailController,
-                              autovalidateMode:
-                                  AutovalidateMode.onUserInteraction,
-                              textAlign: TextAlign.right,
-                              decoration: InputDecoration(
-                                prefixIcon: Icon(
-                                  Icons.email,
-                                  color: Color(0xFF727070),
-                                  size: 18,
+                          Text(
+                            'اكتب البريد الالكتروني اللي سجلت بيه',
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.cairo(
+                              fontSize: 17,
+                              fontWeight: FontWeight.w400,
+                              color: const Color(0xFF000000),
+                            ),
+                          ),
+                          SizedBox(height: (32 / 852) * screenHeight),
+                          Form(
+                            key: _formKey,
+                            autovalidateMode:
+                                AutovalidateMode.onUserInteraction,
+                            child: Directionality(
+                              textDirection: TextDirection.rtl,
+                              child: TextFormField(
+                                controller: _emailController,
+                                autovalidateMode:
+                                    AutovalidateMode.onUserInteraction,
+                                textAlign: TextAlign.right,
+                                decoration: InputDecoration(
+                                  prefixIcon: Icon(
+                                    Icons.email,
+                                    color: Color(0xFF727070),
+                                    size: 18,
+                                  ),
+                                  hintText: 'name@domain.com',
+                                  hintStyle: GoogleFonts.cairo(
+                                      fontSize: 15,
+                                      color: const Color(0xFF727070),
+                                      fontWeight: FontWeight.w400),
+                                  border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: const BorderSide(
+                                          color: Color(0xFFE2DFDF))),
+                                  focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: const BorderSide(
+                                          color: Color(0xFF3775FA))),
+                                  enabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      borderSide: const BorderSide(
+                                          color: Color(0xFFE2DFDF))),
+                                  contentPadding: EdgeInsets.all(12),
+                                  errorStyle: TextStyle(
+                                    fontSize: 11,
+                                  ),
                                 ),
-                                hintText: 'name@domain.com',
-                                hintStyle: GoogleFonts.cairo(
-                                    fontSize: 15,
-                                    color: const Color(0xFF727070),
-                                    fontWeight: FontWeight.w400),
-                                border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                    borderSide: const BorderSide(
-                                        color: Color(0xFFE2DFDF))),
-                                focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                    borderSide: const BorderSide(
-                                        color: Color(0xFF3775FA))),
-                                enabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                    borderSide: const BorderSide(
-                                        color: Color(0xFFE2DFDF))),
-                                contentPadding: EdgeInsets.all(12),
-                                errorStyle: TextStyle(
-                                  fontSize: 11,
-                                ),
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'من فضلك دخل البريد الإلكتروني';
+                                  }
+                                  if (!RegExp(
+                                          r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+                                      .hasMatch(value)) {
+                                    return 'من فضلك دخل بريد إلكتروني صحيح';
+                                  }
+                                  if (value.length > 50) {
+                                    return 'البريد الإلكتروني لازم يكون أقل من 50 حرف';
+                                  }
+                                  return null;
+                                },
                               ),
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'من فضلك دخل البريد الإلكتروني';
-                                }
-                                if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
-                                    .hasMatch(value)) {
-                                  return 'من فضلك دخل بريد إلكتروني صحيح';
-                                }
-                                if (value.length > 50) {
-                                  return 'البريد الإلكتروني لازم يكون أقل من 50 حرف';
-                                }
-                                return null;
+                            ),
+                          ),
+                          SizedBox(height: (24 / 852) * screenHeight),
+                          SizedBox(
+                            width: double.infinity,
+                            height: (40 / 852) * screenHeight,
+                            child:
+                                BlocBuilder<EmailInputCubit, EmailInputState>(
+                              builder: (context, state) {
+                                final isLoading = state is EmailInputLoading;
+                                return Container(
+                                    width: double.infinity,
+                                    height: (40 / 852) * screenHeight,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(12.0),
+                                      border: Border.all(
+                                        color: Color(0xFF3775FA),
+                                        width: 1.0,
+                                      ),
+                                    ),
+                                    child: ElevatedButton(
+                                      onPressed: isLoading
+                                          ? null
+                                          : () => _onSendPressed(context),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor:
+                                            const Color(0xFF3775FA),
+                                        foregroundColor: Colors.white,
+                                        disabledBackgroundColor:
+                                            const Color.fromARGB(
+                                                158, 55, 117, 250),
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(12.0),
+                                            side: const BorderSide(
+                                                color: Colors.white,
+                                                width: 1.0)),
+                                      ),
+                                      child: isLoading
+                                          ? const SizedBox(
+                                              height: 24,
+                                              width: 24,
+                                              child: CircularProgressIndicator(
+                                                  color: Color(0xFF3775FA),
+                                                  strokeWidth: 3),
+                                            )
+                                          : Text('ارسال',
+                                              style: GoogleFonts.cairo(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.w500)),
+                                    ));
                               },
                             ),
                           ),
-                        ),
-                        SizedBox(height: (24 / 852) * screenHeight),
-                        SizedBox(
-                          width: double.infinity,
-                          height: (40 / 852) * screenHeight,
-                          child: BlocBuilder<EmailInputCubit, EmailInputState>(
-                            builder: (context, state) {
-                              final isLoading = state is EmailInputLoading;
-                              return Container(
-                                  width: double.infinity,
-                                  height: (40 / 852) * screenHeight,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(12.0),
-                                    border: Border.all(
-                                      color: Color(0xFF3775FA),
-                                      width: 1.0,
-                                    ),
-                                  ),
-                                  child: ElevatedButton(
-                                    onPressed: isLoading
-                                        ? null
-                                        : () => _onSendPressed(context),
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: const Color(0xFF3775FA),
-                                      foregroundColor: Colors.white,
-                                      disabledBackgroundColor:
-                                          const Color.fromARGB(
-                                              158, 55, 117, 250),
-                                      shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(12.0),
-                                          side: const BorderSide(
-                                              color: Colors.white, width: 1.0)),
-                                    ),
-                                    child: isLoading
-                                        ? const SizedBox(
-                                            height: 24,
-                                            width: 24,
-                                            child: CircularProgressIndicator(
-                                                color: Color(0xFF3775FA),
-                                                strokeWidth: 3),
-                                          )
-                                        : Text('ارسال',
-                                            style: GoogleFonts.cairo(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.w500)),
-                                  ));
-                            },
-                          ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),

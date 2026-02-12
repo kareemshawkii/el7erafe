@@ -101,7 +101,12 @@ class ClientRegistrationView extends StatelessWidget {
               ),
               Align(
                 alignment: Alignment.bottomCenter,
-                child: Container(
+                child: ClipRRect( 
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(44),
+                    topRight: Radius.circular(44),
+                  ),  
+                  child: Container(
                   height: (629 / 852) * screenHeight,
                   width: double.infinity,
                   decoration: const BoxDecoration(
@@ -147,6 +152,7 @@ class ClientRegistrationView extends StatelessWidget {
                     ),
                   ),
                 ),
+                )
               ),
             ],
           ),

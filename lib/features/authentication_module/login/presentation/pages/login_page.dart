@@ -233,14 +233,19 @@ class LoginView extends StatelessWidget {
               ),
               Align(
                 alignment: Alignment.bottomCenter,
-                child: Container(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular((44 )),
+                    topRight: Radius.circular((44)),
+                  ),
+                  child: Container(
                   height: (629 / 852) * screenHeight,
                   width: double.infinity,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFFFDFDFD),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFDFDFD),
                     borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(44),
-                      topRight: Radius.circular(44),
+                      topLeft: Radius.circular((44 / 852) * screenHeight),
+                      topRight: Radius.circular((44 / 852) * screenHeight),
                     ),
                   ),
                   child: SingleChildScrollView(
@@ -262,6 +267,7 @@ class LoginView extends StatelessWidget {
                       ],
                     ),
                   ),
+                ),
                 ),
               ),
             ],
