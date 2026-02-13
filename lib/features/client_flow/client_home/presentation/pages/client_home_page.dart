@@ -14,6 +14,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:lottie/lottie.dart';
 
 class ClientHomePage extends StatelessWidget {
   const ClientHomePage({super.key});
@@ -241,7 +242,20 @@ class _ClientHomePageViewState extends State<ClientHomePageView> {
                     },
                     builder: (context, state) {
                       if (state is HomeLoading) {
-                        return Center(child: CircularProgressIndicator());
+                        return Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Lottie.asset(
+                                'assets/icon/loading.json',
+                                width: 200,
+                                height: 200,
+                                repeat: true,
+                                animate: true,
+                              ),
+                            ],
+                          ),
+                        );
                       } else if (state is HomeError) {
                         return Center(child: Text(state.message));
                       } else if (state is HomeLoaded) {

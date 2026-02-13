@@ -3,12 +3,14 @@ import 'package:el7erafe/features/authentication_module/technician_regestration/
 import 'package:el7erafe/features/client_flow/client_home/data/models/quick_reservation_request.dart';
 import 'package:el7erafe/features/client_flow/quick_reserve/presentation/cubit/quick_reserve_cubit.dart';
 import 'package:el7erafe/features/client_flow/quick_reserve/presentation/cubit/quick_reserve_state.dart';
+import 'package:el7erafe/features/client_flow/quick_reserve/presentation/pages/quick_reserve_success_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:lottie/lottie.dart';
 
 class QuickReservePage extends StatelessWidget {
   final int serviceId;
@@ -35,7 +37,6 @@ class ServiceRequestPage extends StatefulWidget {
 }
 
 class _ServiceRequestPageState extends State<ServiceRequestPage> {
-  // --- STATE VARIABLES FOR TIME DISPLAY ---
   String? selectedStartTime;
   String? selectedEndTime;
 
@@ -43,8 +44,7 @@ class _ServiceRequestPageState extends State<ServiceRequestPage> {
   Widget build(BuildContext context) {
     final double screenHeight = MediaQuery.of(context).size.height;
     final double screenWidth = MediaQuery.of(context).size.width;
-    
-    // Create the model once
+
     final requestModel = ReservationRequest(
       serviceId: widget.serviceId,
       serviceName: widget.serviceName,
@@ -93,10 +93,56 @@ class _ServiceRequestPageState extends State<ServiceRequestPage> {
           body: BlocConsumer<ServiceRequestCubit, ServiceRequestState>(
             listener: (context, state) {
               if (state is ServiceRequestError) {
-                ScaffoldMessenger.of(context)
-                    .showSnackBar(SnackBar(content: Text(state.message)));
+                showDialog(
+                  context: context,
+                  builder: (context) => Directionality(
+                    textDirection: TextDirection.rtl,
+                    child: AlertDialog(
+                      backgroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16)),
+                      title: Row(
+                        children: [
+                          const Icon(Icons.warning_amber_rounded,
+                              color: Colors.red, size: 28),
+                          const SizedBox(width: 8),
+                          Text(
+                            "تنبيه",
+                            style: GoogleFonts.cairo(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                            ),
+                          ),
+                        ],
+                      ),
+                      content: Text(
+                        state.message,
+                        style: GoogleFonts.cairo(
+                          fontSize: 14,
+                          color: Colors.black87,
+                        ),
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: Text(
+                            "حسناً",
+                            style: GoogleFonts.cairo(
+                              color: const Color(0xFF3775FA),
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
               } else if (state is ServiceRequestSuccess) {
-                // Navigate to Success Page
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (_) => const SuccessPage()),
+                  (route) => false,
+                );
               }
             },
             builder: (context, state) {
@@ -104,9 +150,26 @@ class _ServiceRequestPageState extends State<ServiceRequestPage> {
               var model = cubit.requestModel;
 
               if (state is ServiceRequestLoading) {
-                return const Center(child: CircularProgressIndicator());
+                return Container(
+                  color: Colors.white,
+                  child:  Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Lottie.asset(
+                        'assets/icon/loading.json',
+                        width: 200,
+                        height: 200,
+                        repeat: true,
+                        animate: true,
+                      ),
+                      const SizedBox(height: 16),
+                      
+                    ],
+                  ),
+                  ),
+                );
               }
-
               return SingleChildScrollView(
                 padding: const EdgeInsets.all(16),
                 child: Column(
@@ -335,18 +398,48 @@ class _ServiceRequestPageState extends State<ServiceRequestPage> {
                             child: Row(
                               children: [
                                 Expanded(
-                                    child: _buildTimePickerField(context, "من", selectedStartTime,
-                                        (t) {
-                                  setState(() => selectedStartTime = t);
-                                  model.availableFrom = t;
-                                })),
+                                  child: _buildTimePickerField(
+                                    context,
+                                    "من",
+                                    selectedStartTime,
+                                    (TimeOfDay t) {
+                                      setState(() {
+                                        final localizations =
+                                            MaterialLocalizations.of(context);
+                                        selectedStartTime =
+                                            localizations.formatTimeOfDay(t,
+                                                alwaysUse24HourFormat: false);
+                                        String hour24 =
+                                            t.hour.toString().padLeft(2, '0');
+                                        String minute =
+                                            t.minute.toString().padLeft(2, '0');
+                                        model.availableFrom = "$hour24:$minute";
+                                      });
+                                    },
+                                  ),
+                                ),
                                 const SizedBox(width: 10),
                                 Expanded(
-                                    child: _buildTimePickerField(context, "إلى", selectedEndTime,
-                                        (t) {
-                                  setState(() => selectedEndTime = t);
-                                  model.availableTo = t;
-                                })),
+                                  child: _buildTimePickerField(
+                                    context,
+                                    "إلى",
+                                    selectedEndTime,
+                                    (TimeOfDay t) {
+                                      setState(() {
+                                        final localizations =
+                                            MaterialLocalizations.of(context);
+                                        selectedEndTime =
+                                            localizations.formatTimeOfDay(t,
+                                                alwaysUse24HourFormat: false);
+                                        String hour24 =
+                                            t.hour.toString().padLeft(2, '0');
+                                        String minute =
+                                            t.minute.toString().padLeft(2, '0');
+                                        model.availableTo = "$hour24:$minute";
+                                      });
+                                    },
+                                  ),
+                                ),
                               ],
                             ),
                           ),
@@ -398,8 +491,8 @@ class _ServiceRequestPageState extends State<ServiceRequestPage> {
                               style: OutlinedButton.styleFrom(
                                 padding:
                                     const EdgeInsets.symmetric(vertical: 4),
-                                side: const BorderSide(
-                                    color: Color(0xFF3775FA)),
+                                side:
+                                    const BorderSide(color: Color(0xFF3775FA)),
                                 shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(12)),
                               ),
@@ -433,8 +526,8 @@ class _ServiceRequestPageState extends State<ServiceRequestPage> {
                         SizedBox(
                           width: (170 / 393) * screenWidth,
                           height: (150 / 852) * screenHeight,
-                          child: SvgPicture.asset(
-                              "images/select_technician.svg"),
+                          child:
+                              SvgPicture.asset("images/select_technician.svg"),
                         )
                       ],
                     ),
@@ -448,8 +541,6 @@ class _ServiceRequestPageState extends State<ServiceRequestPage> {
       ),
     );
   }
-
-  // --- HELPER WIDGETS ---
 
   Widget _buildSectionCard(
       {required String title,
@@ -541,9 +632,8 @@ class _ServiceRequestPageState extends State<ServiceRequestPage> {
     );
   }
 
-  // --- FIXED TIME PICKER FIELD ---
-  Widget _buildTimePickerField(
-      BuildContext context, String label, String? currentValue, Function(String) onSave) {
+  Widget _buildTimePickerField(BuildContext context, String label,
+      String? currentValue, Function(TimeOfDay) onSave) {
     return InkWell(
       onTap: () async {
         TimeOfDay? t = await showTimePicker(
@@ -598,12 +688,7 @@ class _ServiceRequestPageState extends State<ServiceRequestPage> {
           },
         );
         if (t != null) {
-          // Force 12-hour format display text
-          if(!context.mounted) return;
-          final localizations = MaterialLocalizations.of(context);
-          final String formattedTime =
-              localizations.formatTimeOfDay(t, alwaysUse24HourFormat: false);
-          onSave(formattedTime);
+          onSave(t);
         }
       },
       child: Container(
@@ -615,13 +700,10 @@ class _ServiceRequestPageState extends State<ServiceRequestPage> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            // Display current value or placeholder
-            Text("$label : ${currentValue ?? '--:--'}", 
-              style: GoogleFonts.cairo(
-                  color: currentValue == null ? Colors.grey : Colors.black,
-                  fontWeight: FontWeight.bold
-              )
-            ),
+            Text("$label : ${currentValue ?? '--:--'}",
+                style: GoogleFonts.cairo(
+                    color: currentValue == null ? Colors.grey : Colors.black,
+                    fontWeight: FontWeight.bold)),
             const Icon(Icons.access_time, size: 16, color: Color(0xFF3775FA)),
           ],
         ),
@@ -630,7 +712,6 @@ class _ServiceRequestPageState extends State<ServiceRequestPage> {
   }
 }
 
-// Global helper method
 void _showImageSourceSheet(BuildContext context, ServiceRequestCubit cubit) {
   showModalBottomSheet(
     context: context,

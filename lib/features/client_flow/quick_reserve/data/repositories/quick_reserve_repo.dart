@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:dartz/dartz.dart';
 import 'package:el7erafe/features/client_flow/client_home/data/models/quick_reservation_request.dart';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:el7erafe/core/services/local_storage/auth_local_storage.dart';
 
@@ -25,10 +26,7 @@ class ServiceRequestRepository {
 
       multipartRequest.fields['ServiceId'] = request.serviceId.toString();
       multipartRequest.fields['Description'] = request.description ?? "";
-      if (request.governorate != null) {
-        multipartRequest.fields['Governorate'] = request.governorate!;
-      }
-      if (request.city != null) multipartRequest.fields['City'] = request.city!;
+      if (request.city != null) multipartRequest.fields['CityName'] = request.city!;
       if (request.street != null) {
         multipartRequest.fields['Street'] = request.street!;
       }
@@ -43,7 +41,7 @@ class ServiceRequestRepository {
       }
 
       multipartRequest.fields['AllDayAvailability'] =
-          request.allDayAvailability ? "1" : "0";
+          request.allDayAvailability ? "true" : "false";
 
       if (!request.allDayAvailability) {
         if (request.availableFrom != null) {
@@ -69,7 +67,8 @@ class ServiceRequestRepository {
       }
       var streamedResponse = await multipartRequest.send();
       var response = await http.Response.fromStream(streamedResponse);
-
+      debugPrint(response.statusCode.toString( ));
+      debugPrint(response.body.toString());
       if (response.statusCode == 200 || response.statusCode == 201) {
         return const Right("تم إرسال الطلب بنجاح");
       } else if (response.statusCode == 401) {
