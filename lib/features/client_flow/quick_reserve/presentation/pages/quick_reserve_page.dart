@@ -497,6 +497,7 @@ class _ServiceRequestPageState extends State<ServiceRequestPage> {
                                         backgroundColor: Colors.red,
                                       ),
                                     );
+                                    return;
                                   }
                                   if (requestModel.day == null) {
                                     ScaffoldMessenger.of(context).showSnackBar(
@@ -507,6 +508,7 @@ class _ServiceRequestPageState extends State<ServiceRequestPage> {
                                         backgroundColor: Colors.red,
                                       ),
                                     );
+                                    return;
                                   }
                                   if (!requestModel.allDayAvailability &&
                                       (requestModel.availableFrom == null ||
@@ -519,6 +521,7 @@ class _ServiceRequestPageState extends State<ServiceRequestPage> {
                                         backgroundColor: Colors.red,
                                       ),
                                     );
+                                    return;
                                   }
                                   cubit.submitQuickRequest();
                                 },
