@@ -196,7 +196,9 @@ class _ServiceRequestPageState extends State<ServiceRequestPage> {
                   ),
                 );
               }
-              return SingleChildScrollView(
+              return GestureDetector(
+                onTap: () => FocusScope.of(context).unfocus(),
+                child: SingleChildScrollView(
                 padding: const EdgeInsets.all(16),
                 child: Column(
                   children: [
@@ -480,6 +482,7 @@ class _ServiceRequestPageState extends State<ServiceRequestPage> {
                             height: (40 / 852) * screenHeight,
                             child: ElevatedButton(
                               onPressed: () {
+                                FocusScope.of(context).unfocus();
                                 cubit.submitQuickRequest();
                               },
                               style: ElevatedButton.styleFrom(
@@ -512,6 +515,7 @@ class _ServiceRequestPageState extends State<ServiceRequestPage> {
                             height: (40 / 852) * screenHeight,
                             child: OutlinedButton(
                               onPressed: () {
+                                FocusScope.of(context).unfocus();
                                 // Navigate to technician selection page
                               },
                               style: OutlinedButton.styleFrom(
@@ -560,6 +564,7 @@ class _ServiceRequestPageState extends State<ServiceRequestPage> {
                     SizedBox(height: (24 / 852) * screenHeight),
                   ],
                 ),
+              ),
               );
             },
           ),
@@ -662,6 +667,7 @@ class _ServiceRequestPageState extends State<ServiceRequestPage> {
       String? currentValue, Function(TimeOfDay) onSave) {
     return InkWell(
       onTap: () async {
+        FocusScope.of(context).unfocus();
         TimeOfDay? t = await showTimePicker(
           context: context,
           initialTime: TimeOfDay.now(),
