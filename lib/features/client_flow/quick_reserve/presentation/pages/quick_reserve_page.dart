@@ -199,372 +199,409 @@ class _ServiceRequestPageState extends State<ServiceRequestPage> {
               return GestureDetector(
                 onTap: () => FocusScope.of(context).unfocus(),
                 child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  children: [
-                    _buildSectionCard(
-                      title: "تفاصيل الطلب",
-                      icon: Iconsax.document_text,
-                      children: [
-                        _buildLabel("وصف المشكلة"),
-                        TextField(
-                          maxLines: 4,
-                          onChanged: (val) => model.description = val,
-                          decoration: _inputDecoration(
-                              "اكتب تفاصيل المشكلة اللي محتاج الفني يجي يصلحها"),
-                        ),
-                        SizedBox(height: (16 / 852) * screenHeight),
-                        _buildLabel("صور للمشكله ان وجد"),
-                        Container(
-                          height: 120,
-                          width: double.infinity,
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFF8FAFE),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: const Color(0xFF3775FA),
-                              style: BorderStyle.solid,
-                            ),
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    children: [
+                      _buildSectionCard(
+                        title: "تفاصيل الطلب",
+                        icon: Iconsax.document_text,
+                        children: [
+                          _buildLabel("وصف المشكلة"),
+                          TextField(
+                            maxLines: 4,
+                            onChanged: (val) => model.description = val,
+                            decoration: _inputDecoration(
+                                "اكتب تفاصيل المشكلة اللي محتاج الفني يجي يصلحها"),
                           ),
-                          child: ListView.builder(
-                            scrollDirection: Axis.horizontal,
-                            itemCount: (model.images?.length ?? 0) +
-                                ((model.images?.length ?? 0) < 4 ? 1 : 0),
-                            itemBuilder: (context, index) {
-                              if (index == (model.images?.length ?? 0)) {
-                                return GestureDetector(
-                                  onTap: () =>
-                                      _showImageSourceSheet(context, cubit),
-                                  child: Container(
-                                    width: 100,
-                                    margin: const EdgeInsets.only(right: 8),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(12),
-                                      border: Border.all(
-                                          color: const Color(0xFF3775FA),
-                                          width: 1),
-                                    ),
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: const [
-                                        Icon(Iconsax.gallery_add,
-                                            color: Color(0xFF3775FA), size: 28),
-                                        SizedBox(height: 4),
-                                        Text("أضف صورة",
-                                            style: TextStyle(
-                                                fontSize: 12,
-                                                color: Color(0xFF3775FA),
-                                                fontWeight: FontWeight.bold)),
-                                      ],
-                                    ),
-                                  ),
-                                );
-                              }
-                              return Padding(
-                                padding: const EdgeInsets.only(right: 8.0),
-                                child: Stack(
-                                  children: [
-                                    ClipRRect(
-                                      borderRadius: BorderRadius.circular(8),
-                                      child: Image.file(
-                                        model.images![index],
-                                        height: 104,
-                                        width: 100,
-                                        fit: BoxFit.cover,
+                          SizedBox(height: (16 / 852) * screenHeight),
+                          _buildLabel("صور للمشكله ان وجد"),
+                          Container(
+                            height: 120,
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFF8FAFE),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: const Color(0xFF3775FA),
+                                style: BorderStyle.solid,
+                              ),
+                            ),
+                            child: ListView.builder(
+                              scrollDirection: Axis.horizontal,
+                              itemCount: (model.images?.length ?? 0) +
+                                  ((model.images?.length ?? 0) < 4 ? 1 : 0),
+                              itemBuilder: (context, index) {
+                                if (index == (model.images?.length ?? 0)) {
+                                  return GestureDetector(
+                                    onTap: () =>
+                                        _showImageSourceSheet(context, cubit),
+                                    child: Container(
+                                      width: 100,
+                                      margin: const EdgeInsets.only(right: 8),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(12),
+                                        border: Border.all(
+                                            color: const Color(0xFF3775FA),
+                                            width: 1),
+                                      ),
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: const [
+                                          Icon(Iconsax.gallery_add,
+                                              color: Color(0xFF3775FA),
+                                              size: 28),
+                                          SizedBox(height: 4),
+                                          Text("أضف صورة",
+                                              style: TextStyle(
+                                                  fontSize: 12,
+                                                  color: Color(0xFF3775FA),
+                                                  fontWeight: FontWeight.bold)),
+                                        ],
                                       ),
                                     ),
-                                    Positioned(
-                                      top: 4,
-                                      right: 4,
-                                      child: InkWell(
-                                        onTap: () => cubit.removeImage(index),
-                                        child: Container(
-                                          padding: const EdgeInsets.all(4),
-                                          decoration: const BoxDecoration(
-                                            color: Colors.white,
-                                            shape: BoxShape.circle,
-                                            boxShadow: [
-                                              BoxShadow(
-                                                  color: Colors.black12,
-                                                  blurRadius: 2)
-                                            ],
-                                          ),
-                                          child: const Icon(Icons.close,
-                                              color: Colors.red, size: 16),
+                                  );
+                                }
+                                return Padding(
+                                  padding: const EdgeInsets.only(right: 8.0),
+                                  child: Stack(
+                                    children: [
+                                      ClipRRect(
+                                        borderRadius: BorderRadius.circular(8),
+                                        child: Image.file(
+                                          model.images![index],
+                                          height: 104,
+                                          width: 100,
+                                          fit: BoxFit.cover,
                                         ),
                                       ),
-                                    )
-                                  ],
-                                ),
-                              );
+                                      Positioned(
+                                        top: 4,
+                                        right: 4,
+                                        child: InkWell(
+                                          onTap: () => cubit.removeImage(index),
+                                          child: Container(
+                                            padding: const EdgeInsets.all(4),
+                                            decoration: const BoxDecoration(
+                                              color: Colors.white,
+                                              shape: BoxShape.circle,
+                                              boxShadow: [
+                                                BoxShadow(
+                                                    color: Colors.black12,
+                                                    blurRadius: 2)
+                                              ],
+                                            ),
+                                            child: const Icon(Icons.close,
+                                                color: Colors.red, size: 16),
+                                          ),
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: (16 / 852) * screenHeight),
+                      _buildSectionCard(
+                        title: "تفاصيل العنوان",
+                        icon: Iconsax.location,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Text("المحافظة",
+                                  style: GoogleFonts.cairo(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.black)),
+                              SizedBox(width: (105 / 393) * screenWidth),
+                              Text("المدينة",
+                                  style: GoogleFonts.cairo(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.black)),
+                            ],
+                          ),
+                          SizedBox(height: (8 / 852) * screenHeight),
+                          EgyptGovernoratePicker(
+                            language: Language.arabic,
+                            layout: Layout.horizontal,
+                            showCities: true,
+                            governorateDropdownLabel: "المحافظة",
+                            cityDropdownLabel: "المدينة",
+                            assetDataPath: "assets/data/egypt_data.json",
+                            onGovernorateChanged: (String? newGov) {
+                              cubit.setGovernorate(newGov);
+                            },
+                            onCityChanged: (String? newCity) {
+                              cubit.setCity(newCity);
                             },
                           ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: (16 / 852) * screenHeight),
-                    _buildSectionCard(
-                      title: "تفاصيل العنوان",
-                      icon: Iconsax.location,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Text("المحافظة",
+                          SizedBox(height: (12 / 852) * screenHeight),
+                          _buildLabel("الشارع"),
+                          TextField(
+                            onChanged: (val) => model.street = val,
+                            decoration: _inputDecoration(
+                                "اكتب اسم الشارع ورقم البيت أو العمارة"),
+                          ),
+                          SizedBox(height: (12 / 852) * screenHeight),
+                          _buildLabel("علامة مميزة"),
+                          TextField(
+                            onChanged: (val) => model.specialSign = val,
+                            decoration: _inputDecoration(
+                                "مثلا: جنب مسجد النور - أو أمام السوبر ماركت الكبير"),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: (16 / 852) * screenHeight),
+                      _buildSectionCard(
+                        title: "تحديد الوقت",
+                        icon: Iconsax.clock,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                "اختار اليوم :",
                                 style: GoogleFonts.cairo(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.black)),
-                            SizedBox(width: (105 / 393) * screenWidth),
-                            Text("المدينة",
-                                style: GoogleFonts.cairo(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.black)),
-                          ],
-                        ),
-                        SizedBox(height: (8 / 852) * screenHeight),
-                        EgyptGovernoratePicker(
-                          language: Language.arabic,
-                          layout: Layout.horizontal,
-                          showCities: true,
-                          governorateDropdownLabel: "المحافظة",
-                          cityDropdownLabel: "المدينة",
-                          assetDataPath: "assets/data/egypt_data.json",
-                          onGovernorateChanged: (String? newGov) {
-                            cubit.setGovernorate(newGov);
-                          },
-                          onCityChanged: (String? newCity) {
-                            cubit.setCity(newCity);
-                          },
-                        ),
-                        SizedBox(height: (12 / 852) * screenHeight),
-                        _buildLabel("الشارع"),
-                        TextField(
-                          onChanged: (val) => model.street = val,
-                          decoration: _inputDecoration(
-                              "اكتب اسم الشارع ورقم البيت أو العمارة"),
-                        ),
-                        SizedBox(height: (12 / 852) * screenHeight),
-                        _buildLabel("علامة مميزة"),
-                        TextField(
-                          onChanged: (val) => model.specialSign = val,
-                          decoration: _inputDecoration(
-                              "مثلا: جنب مسجد النور - أو أمام السوبر ماركت الكبير"),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: (16 / 852) * screenHeight),
-                    _buildSectionCard(
-                      title: "تحديد الوقت",
-                      icon: Iconsax.clock,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              "اختار اليوم :",
+                                    fontSize: 16,
+                                    color: const Color(0xFF3775FA),
+                                    fontWeight: FontWeight.w400),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: (8 / 852) * screenHeight),
+                          SizedBox(
+                              height: 300,
+                              child: Directionality(
+                                textDirection: TextDirection.ltr,
+                                child: CalendarDatePicker2(
+                                  config: CalendarDatePicker2Config(
+                                    calendarType:
+                                        CalendarDatePicker2Type.single,
+                                    selectedDayHighlightColor:
+                                        const Color(0xFF3775FA),
+                                    selectedDayTextStyle: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  value: [model.day],
+                                  onValueChanged: (dates) {
+                                    model.day =
+                                        dates.isNotEmpty ? dates.first : null;
+                                  },
+                                ),
+                              )),
+                          Text("اختار الوقت :",
                               style: GoogleFonts.cairo(
                                   fontSize: 16,
                                   color: const Color(0xFF3775FA),
-                                  fontWeight: FontWeight.w400),
+                                  fontWeight: FontWeight.w500)),
+                          SizedBox(height: (8 / 852) * screenHeight),
+                          Container(
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.grey.shade300),
+                              borderRadius: BorderRadius.circular(20),
                             ),
-                          ],
-                        ),
-                        SizedBox(height: (8 / 852) * screenHeight),
-                        SizedBox(
-                            height: 300,
-                            child: Directionality(
-                              textDirection: TextDirection.ltr,
-                              child: CalendarDatePicker2(
-                                config: CalendarDatePicker2Config(
-                                  calendarType: CalendarDatePicker2Type.single,
-                                  selectedDayHighlightColor:
-                                      const Color(0xFF3775FA),
-                                  selectedDayTextStyle: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                value: [model.day],
-                                onValueChanged: (dates) {
-                                  model.day =
-                                      dates.isNotEmpty ? dates.first : null;
-                                },
-                              ),
-                            )),
-                        Text("اختار الوقت :",
-                            style: GoogleFonts.cairo(
-                                fontSize: 16,
-                                color: const Color(0xFF3775FA),
-                                fontWeight: FontWeight.w500)),
-                        SizedBox(height: (8 / 852) * screenHeight),
-                        Container(
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey.shade300),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Row(
-                            children: [
-                              _buildToggleOption(
-                                  text: "طول اليوم",
-                                  isSelected: model.allDayAvailability,
-                                  onTap: () => cubit.toggleAllDay(true)),
-                              _buildToggleOption(
-                                  text: "من إلى (وقت محدد)",
-                                  isSelected: !model.allDayAvailability,
-                                  onTap: () => cubit.toggleAllDay(false)),
-                            ],
-                          ),
-                        ),
-                        if (!model.allDayAvailability)
-                          Padding(
-                            padding: const EdgeInsets.only(top: 16.0),
                             child: Row(
                               children: [
-                                Expanded(
-                                  child: _buildTimePickerField(
-                                    context,
-                                    "من",
-                                    selectedStartTime,
-                                    (TimeOfDay t) {
-                                      setState(() {
-                                        final localizations =
-                                            MaterialLocalizations.of(context);
-                                        selectedStartTime =
-                                            localizations.formatTimeOfDay(t,
-                                                alwaysUse24HourFormat: false);
-                                        String hour24 =
-                                            t.hour.toString().padLeft(2, '0');
-                                        String minute =
-                                            t.minute.toString().padLeft(2, '0');
-                                        model.availableFrom = "$hour24:$minute";
-                                      });
-                                    },
-                                  ),
-                                ),
-                                const SizedBox(width: 10),
-                                Expanded(
-                                  child: _buildTimePickerField(
-                                    context,
-                                    "إلى",
-                                    selectedEndTime,
-                                    (TimeOfDay t) {
-                                      setState(() {
-                                        final localizations =
-                                            MaterialLocalizations.of(context);
-                                        selectedEndTime =
-                                            localizations.formatTimeOfDay(t,
-                                                alwaysUse24HourFormat: false);
-                                        String hour24 =
-                                            t.hour.toString().padLeft(2, '0');
-                                        String minute =
-                                            t.minute.toString().padLeft(2, '0');
-                                        model.availableTo = "$hour24:$minute";
-                                      });
-                                    },
-                                  ),
-                                ),
+                                _buildToggleOption(
+                                    text: "طول اليوم",
+                                    isSelected: model.allDayAvailability,
+                                    onTap: () => cubit.toggleAllDay(true)),
+                                _buildToggleOption(
+                                    text: "من إلى (وقت محدد)",
+                                    isSelected: !model.allDayAvailability,
+                                    onTap: () => cubit.toggleAllDay(false)),
                               ],
                             ),
                           ),
-                      ],
-                    ),
-                    SizedBox(height: (24 / 852) * screenHeight),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        SizedBox(
-                            width: (170 / 393) * screenWidth,
-                            height: (40 / 852) * screenHeight,
-                            child: ElevatedButton(
-                              onPressed: () {
-                                FocusScope.of(context).unfocus();
-                                cubit.submitQuickRequest();
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFF3775FA),
-                                foregroundColor: Colors.white,
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 4),
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12)),
-                                elevation: 0,
-                              ),
+                          if (!model.allDayAvailability)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 16.0),
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Text(
-                                    "طلب فني سريع",
-                                    style: GoogleFonts.cairo(
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.w600),
+                                  Expanded(
+                                    child: _buildTimePickerField(
+                                      context,
+                                      "من",
+                                      selectedStartTime,
+                                      (TimeOfDay t) {
+                                        setState(() {
+                                          final localizations =
+                                              MaterialLocalizations.of(context);
+                                          selectedStartTime =
+                                              localizations.formatTimeOfDay(t,
+                                                  alwaysUse24HourFormat: false);
+                                          String hour24 =
+                                              t.hour.toString().padLeft(2, '0');
+                                          String minute = t.minute
+                                              .toString()
+                                              .padLeft(2, '0');
+                                          model.availableFrom =
+                                              "$hour24:$minute";
+                                        });
+                                      },
+                                    ),
                                   ),
-                                  const SizedBox(width: 8),
-                                  const Icon(Iconsax.clock,
-                                      color: Colors.white),
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    child: _buildTimePickerField(
+                                      context,
+                                      "إلى",
+                                      selectedEndTime,
+                                      (TimeOfDay t) {
+                                        setState(() {
+                                          final localizations =
+                                              MaterialLocalizations.of(context);
+                                          selectedEndTime =
+                                              localizations.formatTimeOfDay(t,
+                                                  alwaysUse24HourFormat: false);
+                                          String hour24 =
+                                              t.hour.toString().padLeft(2, '0');
+                                          String minute = t.minute
+                                              .toString()
+                                              .padLeft(2, '0');
+                                          model.availableTo = "$hour24:$minute";
+                                        });
+                                      },
+                                    ),
+                                  ),
                                 ],
                               ),
-                            )),
-                        const SizedBox(width: 10),
-                        SizedBox(
+                            ),
+                        ],
+                      ),
+                      SizedBox(height: (24 / 852) * screenHeight),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          SizedBox(
+                              width: (170 / 393) * screenWidth,
+                              height: (40 / 852) * screenHeight,
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  FocusScope.of(context).unfocus();
+                                  if (requestModel.description == null ||
+                                      requestModel.description!.isEmpty) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text("برجاء كتابه وصف المشكله",
+                                            textDirection: TextDirection.rtl),
+                                        backgroundColor: Colors.red,
+                                      ),
+                                    );
+                                  }
+                                  if (requestModel.day == null) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                            "برجاء اختيار اليوم المطلوب فيه الخدمة",
+                                            textDirection: TextDirection.rtl),
+                                        backgroundColor: Colors.red,
+                                      ),
+                                    );
+                                  }
+                                  if (!requestModel.allDayAvailability &&
+                                      (requestModel.availableFrom == null ||
+                                          requestModel.availableTo == null)) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                            "برجاء تحديد الوقت المناسب",
+                                            textDirection: TextDirection.rtl),
+                                        backgroundColor: Colors.red,
+                                      ),
+                                    );
+                                  }
+                                  cubit.submitQuickRequest();
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFF3775FA),
+                                  foregroundColor: Colors.white,
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 4),
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12)),
+                                  elevation: 0,
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      "طلب فني سريع",
+                                      style: GoogleFonts.cairo(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w600),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    const Icon(Iconsax.clock,
+                                        color: Colors.white),
+                                  ],
+                                ),
+                              )),
+                          const SizedBox(width: 10),
+                          SizedBox(
+                              width: (170 / 393) * screenWidth,
+                              height: (40 / 852) * screenHeight,
+                              child: OutlinedButton(
+                                onPressed: () {
+                                  FocusScope.of(context).unfocus();
+                                  // Navigate to technician selection page
+                                },
+                                style: OutlinedButton.styleFrom(
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 4),
+                                  side: const BorderSide(
+                                      color: Color(0xFF3775FA)),
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12)),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      "اختيار الفني المناسب",
+                                      style: GoogleFonts.cairo(
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.black,
+                                          fontSize: 13),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    const Icon(Iconsax.search_normal,
+                                        color: Colors.black),
+                                  ],
+                                ),
+                              )),
+                        ],
+                      ),
+                      SizedBox(height: (16 / 852) * screenHeight),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          SizedBox(
                             width: (170 / 393) * screenWidth,
-                            height: (40 / 852) * screenHeight,
-                            child: OutlinedButton(
-                              onPressed: () {
-                                FocusScope.of(context).unfocus();
-                                // Navigate to technician selection page
-                              },
-                              style: OutlinedButton.styleFrom(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 4),
-                                side:
-                                    const BorderSide(color: Color(0xFF3775FA)),
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12)),
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    "اختيار الفني المناسب",
-                                    style: GoogleFonts.cairo(
-                                        fontWeight: FontWeight.w600,
-                                        color: Colors.black,
-                                        fontSize: 13),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  const Icon(Iconsax.search_normal,
-                                      color: Colors.black),
-                                ],
-                              ),
-                            )),
-                      ],
-                    ),
-                    SizedBox(height: (16 / 852) * screenHeight),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        SizedBox(
-                          width: (170 / 393) * screenWidth,
-                          height: (150 / 852) * screenHeight,
-                          child: SvgPicture.asset("images/quick_reserve.svg"),
-                        ),
-                        SizedBox(
-                          width: (170 / 393) * screenWidth,
-                          height: (150 / 852) * screenHeight,
-                          child:
-                              SvgPicture.asset("images/select_technician.svg"),
-                        )
-                      ],
-                    ),
-                    SizedBox(height: (24 / 852) * screenHeight),
-                  ],
+                            height: (150 / 852) * screenHeight,
+                            child: SvgPicture.asset("images/quick_reserve.svg"),
+                          ),
+                          SizedBox(
+                            width: (170 / 393) * screenWidth,
+                            height: (150 / 852) * screenHeight,
+                            child: SvgPicture.asset(
+                                "images/select_technician.svg"),
+                          )
+                        ],
+                      ),
+                      SizedBox(height: (24 / 852) * screenHeight),
+                    ],
+                  ),
                 ),
-              ),
               );
             },
           ),
