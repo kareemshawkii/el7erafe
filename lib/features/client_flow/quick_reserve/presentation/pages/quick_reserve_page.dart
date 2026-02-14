@@ -1,4 +1,7 @@
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
+import 'package:el7erafe/features/authentication_module/login/data/repositories/auth_repository.dart';
+import 'package:el7erafe/features/authentication_module/login/presentation/cubit/login_cubit.dart';
+import 'package:el7erafe/features/authentication_module/login/presentation/pages/login_page.dart';
 import 'package:el7erafe/features/authentication_module/technician_regestration/presentation/widgets/location_picker.dart';
 import 'package:el7erafe/features/client_flow/client_home/data/models/quick_reservation_request.dart';
 import 'package:el7erafe/features/client_flow/quick_reserve/presentation/cubit/quick_reserve_cubit.dart';
@@ -39,17 +42,22 @@ class ServiceRequestPage extends StatefulWidget {
 class _ServiceRequestPageState extends State<ServiceRequestPage> {
   String? selectedStartTime;
   String? selectedEndTime;
+  late ReservationRequest requestModel;
+
+  @override
+  void initState() {
+    super.initState();
+    requestModel = ReservationRequest(
+      serviceId: widget.serviceId,
+      serviceName: widget.serviceName,
+      day: DateTime.now(),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     final double screenHeight = MediaQuery.of(context).size.height;
     final double screenWidth = MediaQuery.of(context).size.width;
-
-    final requestModel = ReservationRequest(
-      serviceId: widget.serviceId,
-      serviceName: widget.serviceName,
-      day: DateTime.now(),
-    );
 
     return BlocProvider(
       create: (context) => ServiceRequestCubit(requestModel),
@@ -137,6 +145,25 @@ class _ServiceRequestPageState extends State<ServiceRequestPage> {
                     ),
                   ),
                 );
+              } else if (state is ServiceRequestUnauthorized) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(state.unauthMessage,
+                        textDirection: TextDirection.rtl),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => BlocProvider(
+                      create: (context) =>
+                          LoginCubit(authRepository: AuthRepository()),
+                      child: const LoginPage(),
+                    ),
+                  ),
+                  (route) => false,
+                );
               } else if (state is ServiceRequestSuccess) {
                 Navigator.pushAndRemoveUntil(
                   context,
@@ -152,21 +179,20 @@ class _ServiceRequestPageState extends State<ServiceRequestPage> {
               if (state is ServiceRequestLoading) {
                 return Container(
                   color: Colors.white,
-                  child:  Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Lottie.asset(
-                        'assets/icon/loading.json',
-                        width: 200,
-                        height: 200,
-                        repeat: true,
-                        animate: true,
-                      ),
-                      const SizedBox(height: 16),
-                      
-                    ],
-                  ),
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Lottie.asset(
+                          'assets/icon/loading.json',
+                          width: 200,
+                          height: 200,
+                          repeat: true,
+                          animate: true,
+                        ),
+                        const SizedBox(height: 16),
+                      ],
+                    ),
                   ),
                 );
               }

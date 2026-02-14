@@ -1,14 +1,12 @@
 import 'package:el7erafe/core/services/local_storage/auth_local_storage.dart';
-import 'package:el7erafe/core/utils/animated_navigation.dart';
 import 'package:el7erafe/features/authentication_module/login/data/repositories/auth_repository.dart';
 import 'package:el7erafe/features/authentication_module/login/presentation/cubit/login_cubit.dart';
 import 'package:el7erafe/features/authentication_module/login/presentation/pages/login_page.dart';
-//import 'package:el7erafe/features/client_flow/client_home/data/models/quick_reservation_request.dart';
-import 'package:el7erafe/features/client_flow/client_home/data/models/service_item.dart';
 import 'package:el7erafe/features/client_flow/client_home/data/repositories/home_repository.dart';
 import 'package:el7erafe/features/client_flow/client_home/presentation/cubit/client_home_cubit.dart';
 import 'package:el7erafe/features/client_flow/client_home/presentation/cubit/client_home_state.dart';
-import 'package:el7erafe/features/client_flow/quick_reserve/presentation/pages/quick_reserve_page.dart';
+import 'package:el7erafe/features/client_flow/client_home/presentation/pages/service_items.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
@@ -27,6 +25,7 @@ class ClientHomePage extends StatelessWidget {
 
 class ClientHomePageView extends StatefulWidget {
   const ClientHomePageView({super.key});
+
   @override
   State<ClientHomePageView> createState() => _ClientHomePageViewState();
 }
@@ -34,10 +33,12 @@ class ClientHomePageView extends StatefulWidget {
 class _ClientHomePageViewState extends State<ClientHomePageView> {
   String userName = "كريم";
   String token = "";
+  late final HomeCubit _homeCubit;
 
   @override
   void initState() {
     super.initState();
+    _homeCubit = HomeCubit(HomeRepository())..fetchServices();
     _loadUserData();
   }
 
@@ -56,8 +57,8 @@ class _ClientHomePageViewState extends State<ClientHomePageView> {
     double height = mediaQuery.size.height;
     double width = mediaQuery.size.width;
 
-    return BlocProvider(
-        create: (context) => HomeCubit(HomeRepository())..fetchServices(),
+    return BlocProvider.value(
+        value: _homeCubit,
         child: Scaffold(
             backgroundColor: Colors.white,
             bottomNavigationBar: ClipRRect(
@@ -276,8 +277,7 @@ class _ClientHomePageViewState extends State<ClientHomePageView> {
                                   ),
                                   itemCount: state.services.length,
                                   itemBuilder: (context, index) {
-                                    return _buildServiceCard(
-                                        context, state.services[index]);
+                                    return ServiceItemCard(service: state.services[index]);
                                   },
                                 )));
                       }
@@ -290,48 +290,3 @@ class _ClientHomePageViewState extends State<ClientHomePageView> {
   }
 }
 
-Widget _buildServiceCard(BuildContext context, ServiceItem service) {
-  return InkWell(
-    onTap: () {
-      Navigator.push(
-        context,
-        SlideRightRoute(
-          page: QuickReservePage(
-            serviceId: service.id,
-            serviceName: service.name,
-          ),
-        ),
-      );
-    },
-    child: Card(
-      color: Colors.white,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: Color(0xFF6796FA), width: 1),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Image.network(service.imageUrl,
-              width: 60,
-              height: 60,
-              errorBuilder: (_, __, ___) => Icon(Icons.error)),
-          SizedBox(height: 8),
-          Directionality(
-            textDirection: TextDirection.rtl,
-            child: Text(service.name,
-                style: GoogleFonts.cairo(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.black,
-                  height: 1.5,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                textAlign: TextAlign.center),
-          )
-        ],
-      ),
-    ),
-  );
-}

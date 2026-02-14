@@ -37,7 +37,7 @@ class ServiceRequestRepository {
         multipartRequest.fields['ServiceDate'] = request.day!
             .toIso8601String()
             .split('T')
-            .first; // Format YYYY-MM-DD
+            .first; 
       }
 
       multipartRequest.fields['AllDayAvailability'] =
@@ -72,6 +72,9 @@ class ServiceRequestRepository {
       if (response.statusCode == 200 || response.statusCode == 201) {
         return const Right("تم إرسال الطلب بنجاح");
       } else if (response.statusCode == 401) {
+        return const Left("401 unauthorized");
+      }
+      else if (response.statusCode == 401) {
         return const Left("غير مصرح لك، برجاء تسجيل الدخول");
       } else {
         try {

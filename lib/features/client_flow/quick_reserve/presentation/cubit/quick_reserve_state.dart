@@ -12,3 +12,8 @@ class ServiceRequestError extends ServiceRequestState {
 }
 
 class ServiceRequestImageUpdated extends ServiceRequestState {}
+
+class ServiceRequestUnauthorized extends ServiceRequestState {
+  String unauthMessage;
+  ServiceRequestUnauthorized(this.unauthMessage);
+}
