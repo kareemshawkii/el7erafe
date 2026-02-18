@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 class HomeCubit extends Cubit<HomeState> {
   final HomeRepository _repository;
-
+  
   HomeCubit(this._repository) : super(HomeInitial());
 
   void fetchServices() async {

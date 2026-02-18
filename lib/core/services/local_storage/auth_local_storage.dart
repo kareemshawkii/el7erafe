@@ -11,8 +11,11 @@ class AuthLocalStorage {
   static const String _tempTokenKey = "tempToken";
   static const String _typeKey = "type";
   static const String _emailKey = "email";
+  static const String _userProfileImage = "userImage";
+  static const String _phoneNumberKey = "phoneNumber";
   static const String _resetTempToken = "tempToken";
   static const String _technicianEmail = "technicianEmail";
+  
 
   Future<void> saveUserSession(User user) async {
     if (user.token != null) {
@@ -39,6 +42,23 @@ class AuthLocalStorage {
       await _storage.delete(key: _typeKey);
     }
   }
+
+  Future<void> savePhoneNumber(String phoneNumber) async {
+    await _storage.write(key: _phoneNumberKey, value: phoneNumber);
+  }
+
+  Future<String?> getPhoneNumber() async {
+    return await _storage.read(key: _phoneNumberKey);
+  }
+
+  Future<void> saveUserProfileImage(String image) async {
+    await _storage.write(key: _userProfileImage, value: image);
+  }
+
+  Future<String?> getUserProfileImage() async {
+    return await _storage.read(key: _userProfileImage);
+  }
+
 
   Future<void> saveTempToken(TempTechnician temptech) async {
     if (temptech.tempToken != null) {
@@ -115,5 +135,7 @@ class AuthLocalStorage {
     await _storage.delete(key: _tempTokenKey);
     await _storage.delete(key: _typeKey);
     await _storage.delete(key: _emailKey);
+    await _storage.delete(key: _phoneNumberKey);
+    await _storage.delete(key: _userProfileImage);
   }
 }
