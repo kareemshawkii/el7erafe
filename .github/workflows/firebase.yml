@@ -4,7 +4,7 @@ name: Distribute Flutter App to Firebase
 on:
   push:
     branches:
-      - main
+      - firebase
   workflow_dispatch: 
     inputs:
       releaseNotes:
