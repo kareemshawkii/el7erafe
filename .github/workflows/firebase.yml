@@ -1,0 +1,53 @@
+name: Distribute Flutter App to Firebase
+
+# 1. The Trigger: Runs automatically on pushes to main, or manually via a button
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch: 
+    inputs:
+      releaseNotes:
+        description: 'Release notes for the technicians and clients testing the app'
+        required: false
+        default: 'New build deployed via CI/CD pipeline'
+
+jobs:
+  build-and-distribute:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 2. Checkout the code from your repository
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # 3. Setup Java (Required for the Android build process)
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      # 4. Setup the Flutter environment
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+
+      # 5. Install Flutter dependencies
+      - name: Install Dependencies
+        run: flutter pub get
+
+      # 6. Compile the application into an APK
+      - name: Build Android APK
+        run: flutter build apk --release
+
+      # 7. Upload the compiled APK to Firebase App Distribution
+      - name: Upload to Firebase
+        uses: wzieba/Firebase-Distribution-Github-Action@v1
+        with:
+          appId: ${{ secrets.FIREBASE_APP_ID }}
+          serviceCredentialsFileContent: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+          groups: 'testers' # The alias of your testing group in Firebase
+          file: build/app/outputs/flutter-apk/app-release.apk
+          releaseNotes: ${{ github.event.inputs.releaseNotes || 'Automated CI/CD release' }}
