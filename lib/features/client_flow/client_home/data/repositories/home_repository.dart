@@ -33,6 +33,7 @@ class HomeRepository {
           return const Right([]);
         }
       } else if (response.statusCode == 401) {
+        await authLocalStorage.clearSession();
         return const Left("401 Unauthorized");
       } else {
         return const Left("فشل تحميل الخدمات الرجاء المحاولة مرة اخرى.");

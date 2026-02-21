@@ -43,6 +43,18 @@ class AuthLocalStorage {
     }
   }
 
+  Future<void> saveUserName(String name) async {
+    await _storage.write(key: _userNameKey, value: name);
+  }
+
+  Future<void> saveToken(String token) async {
+    await _storage.write(key: _tokenKey, value: token);
+  }
+
+  Future<void> deleteToken() async {
+    await _storage.delete(key: _tokenKey);
+  }
+
   Future<void> savePhoneNumber(String phoneNumber) async {
     await _storage.write(key: _phoneNumberKey, value: phoneNumber);
   }
@@ -59,6 +71,9 @@ class AuthLocalStorage {
     return await _storage.read(key: _userProfileImage);
   }
 
+  Future<void> deleteUserProfileImage() async {
+    await _storage.delete(key: _userProfileImage);
+  }
 
   Future<void> saveTempToken(TempTechnician temptech) async {
     if (temptech.tempToken != null) {
@@ -122,6 +137,10 @@ class AuthLocalStorage {
 
   Future<void> deleteEmail() async {
     await _storage.delete(key: _emailKey);
+  }
+
+  Future<void> deleteUserName() async {
+    await _storage.delete(key: _userNameKey);
   }
 
   Future<void> deleteTechnicianEmail() async {
