@@ -55,6 +55,15 @@ class _ClientHomePageViewState extends State<ClientHomePageView> {
     }
   }
 
+  Future<void> _refreshHomeData() async {
+  String? updatedName = await AuthLocalStorage().getUserName();
+  if (updatedName != null && updatedName.isNotEmpty && mounted) {
+    setState(() {
+      userName = updatedName;
+    });
+  }
+}
+
   @override
   Widget build(BuildContext context) {
     MediaQueryData mediaQuery = MediaQuery.of(context);
@@ -294,7 +303,11 @@ class _ClientHomePageViewState extends State<ClientHomePageView> {
                 onTap: (index) {
                   setState(() {
                     _selectedIndex = index;
+                    
                   });
+                  if (index == 0 || index == 2) {
+                    _refreshHomeData();
+                  }
                 },
                 items: [
                   BottomNavigationBarItem(

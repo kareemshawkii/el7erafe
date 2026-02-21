@@ -7,6 +7,7 @@ import 'package:el7erafe/features/authentication_module/otp_page/data/Repository
 import 'package:el7erafe/features/authentication_module/splash/splash_control.dart';
 import 'package:el7erafe/features/authentication_module/technician_regestration/data/repositories/technician_registration_repo.dart';
 import 'package:el7erafe/features/client_flow/client_home/data/repositories/home_repository.dart';
+import 'package:el7erafe/features/client_flow/client_profile/data/repositories/client_profile_repo.dart';
 import 'package:el7erafe/features/client_flow/quick_reserve/data/repositories/quick_reserve_repo.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -58,6 +59,9 @@ class MyApp extends StatelessWidget {
           ),
           RepositoryProvider(
             create: (context) => ServiceRequestRepository(),
+          ),
+          RepositoryProvider(
+            create: (context) => ProfileRepository(),
           ),
         ],
         child: MaterialApp(

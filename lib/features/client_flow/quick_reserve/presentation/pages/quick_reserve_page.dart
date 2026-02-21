@@ -7,6 +7,7 @@ import 'package:el7erafe/features/client_flow/client_home/data/models/quick_rese
 import 'package:el7erafe/features/client_flow/quick_reserve/presentation/cubit/quick_reserve_cubit.dart';
 import 'package:el7erafe/features/client_flow/quick_reserve/presentation/cubit/quick_reserve_state.dart';
 import 'package:el7erafe/features/client_flow/quick_reserve/presentation/pages/quick_reserve_success_page.dart';
+import 'package:el7erafe/features/client_flow/quick_reserve/presentation/pages/time_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
@@ -58,6 +59,8 @@ class _ServiceRequestPageState extends State<ServiceRequestPage> {
   Widget build(BuildContext context) {
     final double screenHeight = MediaQuery.of(context).size.height;
     final double screenWidth = MediaQuery.of(context).size.width;
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
 
     return BlocProvider(
       create: (context) => ServiceRequestCubit(requestModel),
@@ -382,6 +385,7 @@ class _ServiceRequestPageState extends State<ServiceRequestPage> {
                                 textDirection: TextDirection.ltr,
                                 child: CalendarDatePicker2(
                                   config: CalendarDatePicker2Config(
+                                    firstDate: today,
                                     calendarType:
                                         CalendarDatePicker2Type.single,
                                     selectedDayHighlightColor:
@@ -433,19 +437,83 @@ class _ServiceRequestPageState extends State<ServiceRequestPage> {
                                       "من",
                                       selectedStartTime,
                                       (TimeOfDay t) {
+                                        final now = DateTime.now();
+                                        bool isToday = false;
+                                        if (model.day != null) {
+                                          isToday = (model.day!.year ==
+                                                  now.year &&
+                                              model.day!.month == now.month &&
+                                              model.day!.day == now.day);
+                                        }
+
+                                        if (isToday && t.hour < now.hour) {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            const SnackBar(
+                                              content: Text(
+                                                  "لا يمكن اختيار وقت بداية في الماضي",
+                                                  textDirection:
+                                                      TextDirection.rtl),
+                                              backgroundColor: Colors.red,
+                                            ),
+                                          );
+                                          return;
+                                        }
+
+                                        if (isToday && t.hour == now.hour) {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            const SnackBar(
+                                              content: Text(
+                                                  "يجب اخيار ساعه تكون بعد الساعه الحالية",
+                                                  textDirection:
+                                                      TextDirection.rtl),
+                                              backgroundColor: Colors.red,
+                                            ),
+                                          );
+                                          return;
+                                        }
+
+                                        if (model.availableTo != null &&
+                                            model.availableTo!.isNotEmpty) {
+                                          int endHour = int.parse(
+                                              model.availableTo!.split(":")[0]);
+
+                                          if (t.hour >= endHour) {
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              const SnackBar(
+                                                content: Text(
+                                                    "وقت البداية يجب أن يكون قبل وقت النهاية",
+                                                    textDirection:
+                                                        TextDirection.rtl),
+                                                backgroundColor: Colors.red,
+                                              ),
+                                            );
+                                            return;
+                                          }
+                                        }
+
                                         setState(() {
                                           final localizations =
                                               MaterialLocalizations.of(context);
+
+                                          TimeOfDay timeWithZeroMinutes =
+                                              TimeOfDay(
+                                                  hour: t.hour, minute: 0);
+
                                           selectedStartTime =
-                                              localizations.formatTimeOfDay(t,
-                                                  alwaysUse24HourFormat: false);
-                                          String hour24 =
-                                              t.hour.toString().padLeft(2, '0');
-                                          String minute = t.minute
+                                              localizations.formatTimeOfDay(
+                                            timeWithZeroMinutes,
+                                            alwaysUse24HourFormat: false,
+                                          );
+
+                                          String hour24 = timeWithZeroMinutes
+                                              .hour
                                               .toString()
                                               .padLeft(2, '0');
-                                          model.availableFrom =
-                                              "$hour24:$minute";
+
+                                          model.availableFrom = "$hour24:00";
                                         });
                                       },
                                     ),
@@ -457,18 +525,83 @@ class _ServiceRequestPageState extends State<ServiceRequestPage> {
                                       "إلى",
                                       selectedEndTime,
                                       (TimeOfDay t) {
+                                        final now = DateTime.now();
+
+                                        bool isToday = false;
+                                        if (model.day != null) {
+                                          isToday = (model.day!.year ==
+                                                  now.year &&
+                                              model.day!.month == now.month &&
+                                              model.day!.day == now.day);
+                                        }
+
+                                        if (model.availableFrom != null &&
+                                            model.availableFrom!.isNotEmpty) {
+                                          int startHour = int.parse(model
+                                              .availableFrom!
+                                              .split(":")[0]);
+
+                                          if (t.hour <= startHour) {
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              const SnackBar(
+                                                content: Text(
+                                                    "وقت النهاية يجب أن يكون بعد وقت البداية",
+                                                    textDirection:
+                                                        TextDirection.rtl),
+                                                backgroundColor: Colors.red,
+                                              ),
+                                            );
+                                            return;
+                                          }
+                                        }
+
+                                        if (isToday && t.hour < now.hour) {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            const SnackBar(
+                                              content: Text(
+                                                  "لا يمكن اختيار وقت نهاية في الماضي",
+                                                  textDirection:
+                                                      TextDirection.rtl),
+                                              backgroundColor: Colors.red,
+                                            ),
+                                          );
+                                          return;
+                                        }
+
+                                        if (isToday && t.hour == now.hour) {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            const SnackBar(
+                                              content: Text(
+                                                  "يجب اخيار ساعه تكون بعد الساعه الحالية",
+                                                  textDirection:
+                                                      TextDirection.rtl),
+                                              backgroundColor: Colors.red,
+                                            ),
+                                          );
+                                          return;
+                                        }
+
                                         setState(() {
                                           final localizations =
                                               MaterialLocalizations.of(context);
+                                          TimeOfDay timeWithZeroMinutes =
+                                              TimeOfDay(
+                                                  hour: t.hour, minute: 0);
+
                                           selectedEndTime =
-                                              localizations.formatTimeOfDay(t,
-                                                  alwaysUse24HourFormat: false);
-                                          String hour24 =
-                                              t.hour.toString().padLeft(2, '0');
-                                          String minute = t.minute
+                                              localizations.formatTimeOfDay(
+                                            timeWithZeroMinutes,
+                                            alwaysUse24HourFormat: false,
+                                          );
+
+                                          String hour24 = timeWithZeroMinutes
+                                              .hour
                                               .toString()
                                               .padLeft(2, '0');
-                                          model.availableTo = "$hour24:$minute";
+                                          model.availableTo = "$hour24:00";
                                         });
                                       },
                                     ),
@@ -708,7 +841,7 @@ class _ServiceRequestPageState extends State<ServiceRequestPage> {
     return InkWell(
       onTap: () async {
         FocusScope.of(context).unfocus();
-        TimeOfDay? t = await showTimePicker(
+        TimeOfDay? t = await showTimePickerModified(
           context: context,
           initialTime: TimeOfDay.now(),
           helpText: "اختار الوقت",
