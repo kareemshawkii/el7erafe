@@ -381,98 +381,112 @@ class _TechnicianRequestPageState extends State<TechnicianRequestPage> {
                                 ),
                               );
                             }
-                            return GridView.builder(
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
+                            return Padding(
                               padding: EdgeInsets.only(
                                   left: 16.w,
                                   right: 16.w,
                                   top: 0,
                                   bottom: 50.h),
-                              gridDelegate:
-                                  SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 2,
-                                mainAxisExtent: 250.h,
-                                crossAxisSpacing: 10.w,
-                                mainAxisSpacing: 10.h,
-                              ),
-                              itemCount: techniciansList.length,
-                              itemBuilder: (context, index) {
-                                final technician = techniciansList[index];
+                              child: Wrap(
+                                spacing: 10.w, 
+                                runSpacing: 10.h,
+                                children: List.generate(
+                                  techniciansList.length,
+                                  (index) {
+                                    final technician = techniciansList[index];
+                                    final requestCubit =
+                                        context.read<TechnicianRequestCubit>();
+                                    return SizedBox(
+                                      width:
+                                          (MediaQuery.of(context).size.width -32.w -
+                                                  10.w) /
+                                              2,
+                                      child: TechnicianCard(
+                                        technician: technician,
+                                        onCardTap: () {
+                                          Navigator.push(
+                                            context,
+                                            SlideRightRouteWithBuild(
+                                              builder: (newContext) =>
+                                                  BlocProvider.value(
+                                                value: requestCubit,
+                                                child: TechnicianDetailsPage(
+                                                  technician: technician,
+                                                  onReserveTap: () {
+                                                    final fullRequest =
+                                                        TechnicianReservationRequest(
+                                                      serviceId: widget
+                                                          .requestModel
+                                                          .serviceId,
+                                                      description: widget
+                                                          .requestModel
+                                                          .description,
+                                                      city: widget
+                                                          .requestModel.city,
+                                                      street: widget
+                                                          .requestModel.street,
+                                                      specialSign: widget
+                                                          .requestModel
+                                                          .specialSign,
+                                                      day: widget
+                                                          .requestModel.day,
+                                                      allDayAvailability: widget
+                                                          .requestModel
+                                                          .allDayAvailability,
+                                                      availableFrom: widget
+                                                          .requestModel
+                                                          .availableFrom,
+                                                      availableTo: widget
+                                                          .requestModel
+                                                          .availableTo,
+                                                      images: widget
+                                                          .requestModel.images,
+                                                      technicianId: technician
+                                                          .id
+                                                          .toString(),
+                                                    );
 
-                                final requestCubit =
-                                    context.read<TechnicianRequestCubit>();
+                                                    requestCubit
+                                                        .submitReservation(
+                                                            fullRequest);
+                                                  },
+                                                ),
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                        onReserveTap: () {
+                                          final fullRequest =
+                                              TechnicianReservationRequest(
+                                            serviceId:
+                                                widget.requestModel.serviceId,
+                                            description:
+                                                widget.requestModel.description,
+                                            city: widget.requestModel.city,
+                                            street: widget.requestModel.street,
+                                            specialSign:
+                                                widget.requestModel.specialSign,
+                                            day: widget.requestModel.day,
+                                            allDayAvailability: widget
+                                                .requestModel
+                                                .allDayAvailability,
+                                            availableFrom: widget
+                                                .requestModel.availableFrom,
+                                            availableTo:
+                                                widget.requestModel.availableTo,
+                                            images: widget.requestModel.images,
+                                            technicianId:
+                                                technician.id.toString(),
+                                          );
 
-                                return TechnicianCard(
-                                  technician: technician,
-                                  onCardTap: () {
-                                    Navigator.push(
-                                      context,
-                                      SlideRightRouteWithBuild(
-                                        builder: (newContext) =>
-                                            BlocProvider.value(
-                                          value: requestCubit,
-                                          child: TechnicianDetailsPage(
-                                            technician: technician,
-                                            onReserveTap: () {
-                                              final fullRequest =
-                                                  TechnicianReservationRequest(
-                                                serviceId: widget
-                                                    .requestModel.serviceId,
-                                                description: widget
-                                                    .requestModel.description,
-                                                city: widget.requestModel.city,
-                                                street:
-                                                    widget.requestModel.street,
-                                                specialSign: widget
-                                                    .requestModel.specialSign,
-                                                day: widget.requestModel.day,
-                                                allDayAvailability: widget
-                                                    .requestModel
-                                                    .allDayAvailability,
-                                                availableFrom: widget
-                                                    .requestModel.availableFrom,
-                                                availableTo: widget
-                                                    .requestModel.availableTo,
-                                                images:
-                                                    widget.requestModel.images,
-                                                technicianId:
-                                                    technician.id.toString(),
-                                              );
-
-                                              requestCubit.submitReservation(
-                                                  fullRequest);
-                                            },
-                                          ),
-                                        ),
+                                          requestCubit
+                                              .submitReservation(fullRequest);
+                                        },
                                       ),
                                     );
                                   },
-                                  onReserveTap: () {
-                                    final fullRequest =
-                                        TechnicianReservationRequest(
-                                      serviceId: widget.requestModel.serviceId,
-                                      description:
-                                          widget.requestModel.description,
-                                      city: widget.requestModel.city,
-                                      street: widget.requestModel.street,
-                                      specialSign:
-                                          widget.requestModel.specialSign,
-                                      day: widget.requestModel.day,
-                                      allDayAvailability: widget
-                                          .requestModel.allDayAvailability,
-                                      availableFrom:
-                                          widget.requestModel.availableFrom,
-                                      availableTo:
-                                          widget.requestModel.availableTo,
-                                      images: widget.requestModel.images,
-                                      technicianId: technician.id.toString(),
-                                    );
-
-                                    requestCubit.submitReservation(fullRequest);
-                                  },
-                                );
-                              },
+                                ),
+                              ),
                             );
                           }
                           if (state is FetchTechniciansError) {
