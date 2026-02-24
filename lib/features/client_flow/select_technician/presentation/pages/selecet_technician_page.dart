@@ -48,10 +48,6 @@ class _TechnicianRequestPageState extends State<TechnicianRequestPage> {
 
   @override
   Widget build(BuildContext context) {
-    final double cardWidth = (1.sw - 32.w - 10.w) / 2;
-     double cardHeight = 255.h;
-    final double dynamicAspectRatio = cardWidth / cardHeight;
-
     return BlocProvider(
       create: (context) => TechnicianRequestCubit(TechnicianRequestRepository())
         ..fetchTechnicians(
@@ -126,8 +122,8 @@ class _TechnicianRequestPageState extends State<TechnicianRequestPage> {
                                   },
                                   decoration: InputDecoration(
                                     hintText: "ابحث عن اسم حرفي",
-                                    hintStyle:
-                                        GoogleFonts.cairo(color: Colors.grey, fontSize: 18.sp),
+                                    hintStyle: GoogleFonts.cairo(
+                                        color: Colors.grey, fontSize: 18.sp),
                                     border: InputBorder.none,
                                     enabledBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(12.r),
@@ -396,7 +392,7 @@ class _TechnicianRequestPageState extends State<TechnicianRequestPage> {
                               gridDelegate:
                                   SliverGridDelegateWithFixedCrossAxisCount(
                                 crossAxisCount: 2,
-                                childAspectRatio: dynamicAspectRatio,
+                                mainAxisExtent: 250.h,
                                 crossAxisSpacing: 10.w,
                                 mainAxisSpacing: 10.h,
                               ),
