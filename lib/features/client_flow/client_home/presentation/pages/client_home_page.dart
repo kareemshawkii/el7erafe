@@ -265,94 +265,94 @@ class _ClientHomePageViewState extends State<ClientHomePageView> {
     return BlocProvider.value(
       value: _homeCubit,
       child: Scaffold(
-        backgroundColor: Colors.white,
-        body: pages[_selectedIndex],
-        bottomNavigationBar: ClipRRect(
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(24.r),
-            topRight: Radius.circular(24.r),
-          ),
-          child: Container(
-            height: 90.h,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border.all(color: const Color(0xFF6796FA)),
+          backgroundColor: Colors.white,
+          body: pages[_selectedIndex],
+          bottomNavigationBar: SafeArea( 
+            child: ClipRRect(
               borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(24.r),
                 topRight: Radius.circular(24.r),
               ),
-            ),
-            child: Theme(
-              data: Theme.of(context).copyWith(
-                splashColor: const Color(0xFF3775FA).withOpacity(0.1),
-                highlightColor: const Color(0xFF3775FA).withOpacity(0.1),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  border: Border.all(color: const Color(0xFF6796FA)),
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(24.r),
+                    topRight: Radius.circular(24.r),
+                  ),
+                ),
+                child: Theme(
+                  data: Theme.of(context).copyWith(
+                    splashColor: const Color(0xFF3775FA).withOpacity(0.1),
+                    highlightColor: const Color(0xFF3775FA).withOpacity(0.1),
+                  ),
+                  child: BottomNavigationBar(
+                    backgroundColor: Colors.transparent,
+                    elevation: 0,
+                    selectedItemColor: const Color(0xFF3775FA),
+                    unselectedItemColor: Colors.black,
+                    showUnselectedLabels: true,
+                    showSelectedLabels: true,
+                    type: BottomNavigationBarType.fixed,
+                    iconSize: 20.r,
+                    selectedFontSize: 14.sp,
+                    unselectedFontSize: 14.sp,
+                    currentIndex: _selectedIndex,
+                    onTap: (index) {
+                      setState(() {
+                        _selectedIndex = index;
+                      });
+                      if (index == 0 || index == 2) {
+                        _refreshHomeData();
+                      }
+                    },
+                    items: [
+                      BottomNavigationBarItem(
+                        icon: const Icon(Icons.home_outlined),
+                        activeIcon: Container(
+                          padding: EdgeInsets.symmetric(
+                              vertical: 6.h, horizontal: 20.w),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF3775FA).withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(12.r),
+                          ),
+                          child: const Icon(Icons.home),
+                        ),
+                        label: 'الرئيسيه',
+                      ),
+                      BottomNavigationBarItem(
+                        icon: const Icon(Icons.history_outlined),
+                        activeIcon: Container(
+                          padding: EdgeInsets.symmetric(
+                              vertical: 6.h, horizontal: 20.w),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF3775FA).withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(12.r),
+                          ),
+                          child: const Icon(Icons.history),
+                        ),
+                        label: 'سجل الحجوزات ',
+                      ),
+                      BottomNavigationBarItem(
+                        icon: const Icon(Icons.person_2_outlined),
+                        activeIcon: Container(
+                          padding: EdgeInsets.symmetric(
+                              vertical: 6.h, horizontal: 20.w),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF3775FA).withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(12.r),
+                          ),
+                          child: const Icon(Icons.person),
+                        ),
+                        label: 'الاعدادات',
+                      ),
+                    ],
+                  ),
+                ),
               ),
-              child: BottomNavigationBar(
-                backgroundColor: Colors.transparent,
-                elevation: 0,
-                selectedItemColor: const Color(0xFF3775FA),
-                unselectedItemColor: Colors.black,
-                showUnselectedLabels: true,
-                showSelectedLabels: true,
-                type: BottomNavigationBarType.fixed,
-                iconSize: 20.r,
-                selectedFontSize: 14.sp,
-                unselectedFontSize: 14.sp,
-                currentIndex: _selectedIndex,
-                onTap: (index) {
-                  setState(() {
-                    _selectedIndex = index;
-                  });
-                  if (index == 0 || index == 2) {
-                    _refreshHomeData();
-                  }
-                },
-                items: [
-                  BottomNavigationBarItem(
-                    icon: const Icon(Icons.home_outlined),
-                    activeIcon: Container(
-                      padding:
-                          EdgeInsets.symmetric(vertical: 6.h, horizontal: 20.w),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF3775FA).withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(12.r),
-                      ),
-                      child: const Icon(Icons.home),
-                    ),
-                    label: 'الرئيسيه',
-                  ),
-                  BottomNavigationBarItem(
-                    icon: const Icon(Icons.history_outlined),
-                    activeIcon: Container(
-                      padding:
-                          EdgeInsets.symmetric(vertical: 6.h, horizontal: 20.w),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF3775FA).withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(12.r),
-                      ),
-                      child: const Icon(Icons.history),
-                    ),
-                    label: 'سجل الحجوزات ',
-                  ),
-                  BottomNavigationBarItem(
-                    icon: const Icon(Icons.person_2_outlined),
-                    activeIcon: Container(
-                      padding:
-                          EdgeInsets.symmetric(vertical: 6.h, horizontal: 20.w),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF3775FA).withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(12.r),
-                      ),
-                      child: const Icon(Icons.person),
-                    ),
-                    label: 'الاعدادات',
-                  ),
-                ],
-              ),
             ),
-          ),
-        ),
-      ),
+          )),
     );
   }
 }
