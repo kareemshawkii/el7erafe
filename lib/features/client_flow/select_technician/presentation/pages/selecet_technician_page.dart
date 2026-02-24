@@ -387,7 +387,12 @@ class _TechnicianRequestPageState extends State<TechnicianRequestPage> {
                                   right: 16.w,
                                   top: 0,
                                   bottom: 50.h),
-                              child: Wrap(
+                              child: SizedBox(
+                                width: double.infinity,
+                                child: Wrap(
+                                alignment: WrapAlignment.start,
+                                crossAxisAlignment: WrapCrossAlignment.start,
+                                runAlignment: WrapAlignment.start,
                                 spacing: 10.w, 
                                 runSpacing: 10.h,
                                 children: List.generate(
@@ -487,6 +492,7 @@ class _TechnicianRequestPageState extends State<TechnicianRequestPage> {
                                   },
                                 ),
                               ),
+                              )
                             );
                           }
                           if (state is FetchTechniciansError) {
