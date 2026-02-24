@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -104,6 +105,7 @@ class _ImagePickerButtonState extends State<ImagePickerButton> {
                     _checkPermissionAndPickImage(ImageSource.camera);
                   },
                 ),
+                Divider(height: 1.h),
                 ListTile(
                   leading: const Icon(Icons.photo_library),
                   title: const Text('المعرض'),

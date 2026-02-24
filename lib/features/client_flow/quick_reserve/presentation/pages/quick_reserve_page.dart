@@ -158,7 +158,7 @@ class _ServiceRequestPageState extends State<ServiceRequestPage> {
                     ),
                   ),
                 );
-              } else if (state is ServiceRequestConflict){
+              } else if (state is ServiceRequestConflict) {
                 showDialog(
                   context: context,
                   builder: (context) => Directionality(
@@ -212,8 +212,7 @@ class _ServiceRequestPageState extends State<ServiceRequestPage> {
                     ),
                   ),
                 );
-              }
-              else if (state is ServiceRequestUnauthorized) {
+              } else if (state is ServiceRequestUnauthorized) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(state.unauthMessage,
@@ -390,7 +389,7 @@ class _ServiceRequestPageState extends State<ServiceRequestPage> {
                                       fontSize: 15.sp,
                                       fontWeight: FontWeight.w600,
                                       color: Colors.black)),
-                              SizedBox(width: 105.w),
+                              SizedBox(width: 120.w),
                               Text("المدينة",
                                   style: GoogleFonts.cairo(
                                       fontSize: 15.sp,
@@ -1156,6 +1155,7 @@ void _showImageSourceSheet(BuildContext context, ServiceRequestCubit cubit) {
                 Navigator.of(context).pop();
               },
             ),
+            Divider(height: 1.h),
             ListTile(
               leading:
                   Icon(Icons.photo_library, color: Colors.black, size: 24.r),
