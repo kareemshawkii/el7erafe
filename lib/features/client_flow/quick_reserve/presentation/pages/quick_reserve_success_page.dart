@@ -1,5 +1,6 @@
 import 'package:el7erafe/features/client_flow/client_home/presentation/pages/client_home_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class SuccessPage extends StatelessWidget {
@@ -7,25 +8,20 @@ class SuccessPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double screenHeight = MediaQuery.of(context).size.height;
-    final double screenWidth = MediaQuery.of(context).size.width;
-
     return Stack(
       children: [
         Align(
           alignment: Alignment.topCenter,
           child: Container(
-              padding: EdgeInsets.only(
-                  top: (68 / 852) * screenHeight,
-                  bottom: (68 / 852) * screenHeight),
+              padding: EdgeInsets.only(top: 68.h, bottom: 68.h),
               color: const Color(0xFF3775FA),
-              width: screenWidth,
-              height: (267 / 852) * screenHeight,
+              width: double.infinity,
+              height: 267.h,
               child: Align(
                 alignment: Alignment.topCenter,
                 child: SizedBox(
-                  height: (131 / 852) * screenHeight,
-                  width: (131 / 393) * screenWidth,
+                  height: 131.h,
+                  width: 131.w,
                   child: Image.asset('images/Logo.png', fit: BoxFit.fill),
                 ),
               )),
@@ -34,17 +30,17 @@ class SuccessPage extends StatelessWidget {
           alignment: Alignment.bottomCenter,
           child: ClipRRect(
             borderRadius: BorderRadius.only(
-              topLeft: Radius.circular((44)),
-              topRight: Radius.circular((44)),
+              topLeft: Radius.circular(44.r),
+              topRight: Radius.circular(44.r),
             ),
             child: Container(
-              height: (629 / 852) * screenHeight,
+              height: 629.h,
               width: double.infinity,
               decoration: BoxDecoration(
                 color: const Color(0xFFFDFDFD),
                 borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular((44 / 852) * screenHeight),
-                  topRight: Radius.circular((44 / 852) * screenHeight),
+                  topLeft: Radius.circular(44.r),
+                  topRight: Radius.circular(44.r),
                 ),
               ),
               child: Directionality(
@@ -53,45 +49,47 @@ class SuccessPage extends StatelessWidget {
                   backgroundColor: Colors.white,
                   body: Container(
                     padding: EdgeInsets.only(
-                      left: (16 / 393) * screenWidth,
-                      right: (16 / 393) * screenWidth,
-                      bottom: (24 / 852) * screenHeight,
+                      left: 16.w,
+                      right: 16.w,
+                      bottom: 24.h,
                     ),
                     child: Center(
                       child: Column(
                         children: [
-                          SizedBox(height: (24 / 852) * screenHeight),
+                          SizedBox(height: 24.h),
                           SizedBox(
-                            height: (250 / 852) * screenHeight,
-                            width: (250 / 393) * screenWidth,
+                            height: 250.h,
+                            width: 250.w,
                             child: Image.asset("images/success.png"),
                           ),
-                          SizedBox(height: (12 / 852) * screenHeight),
+                          SizedBox(height: 12.h),
                           Text(
                             "طلبك استلمناه بنجاح",
                             style: GoogleFonts.cairo(
-                              fontSize: 24,
+                              fontSize: 24.sp,
                               fontWeight: FontWeight.bold,
                               color: Color(0xFF3775FA),
                             ),
                             textAlign: TextAlign.center,
                           ),
-                          SizedBox(height: (12 / 852) * screenHeight),
+                          SizedBox(height: 12.h),
                           Text(
                             "دلوقتي فريقنا بيشوف أقرب فني متاح علشان يخدمك في أسرع وقت.هيوصلك إشعار أول ما نأكد الحجز",
                             style: GoogleFonts.cairo(
-                                fontSize: 15, color: Colors.black, height: 1.5),
+                                fontSize: 15.sp,
+                                color: Colors.black,
+                                height: 1.5),
                             textAlign: TextAlign.center,
                           ),
-                          SizedBox(height: (24 / 852) * screenHeight),
+                          SizedBox(height: 24.h),
                           Container(
                             width: double.infinity,
-                            height: (40 / 852) * screenHeight,
+                            height: 40.h,
                             decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(12.0),
+                              borderRadius: BorderRadius.circular(12.r),
                               border: Border.all(
                                 color: Color(0xFF3775FA),
-                                width: 1.0,
+                                width: 1.w,
                               ),
                             ),
                             child: ElevatedButton(
@@ -109,7 +107,7 @@ class SuccessPage extends StatelessWidget {
                                 disabledBackgroundColor:
                                     const Color.fromARGB(158, 55, 117, 250),
                                 shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12.0),
+                                    borderRadius: BorderRadius.circular(12.r),
                                     side: const BorderSide(
                                         color: Colors.white, width: 1.0)),
                               ),
@@ -119,14 +117,14 @@ class SuccessPage extends StatelessWidget {
                                   Text(
                                     "الصفحة الرئيسية",
                                     style: GoogleFonts.cairo(
-                                      fontSize: 16,
+                                      fontSize: 16.sp,
                                       fontWeight: FontWeight.w600,
                                       color: Colors.white,
                                     ),
                                   ),
-                                  const SizedBox(width: 8),
-                                  const Icon(Icons.home,
-                                      color: Colors.white, size: 16),
+                                  SizedBox(width: 8.w),
+                                  Icon(Icons.home,
+                                      color: Colors.white, size: 16.r),
                                 ],
                               ),
                             ),

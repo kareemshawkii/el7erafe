@@ -8,6 +8,7 @@ import 'package:el7erafe/features/authentication_module/login/presentation/cubit
 import 'package:el7erafe/features/authentication_module/login/presentation/pages/login_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconsax/iconsax.dart';
 
@@ -56,8 +57,6 @@ class _ResetPasswordPageState extends State<ResetPasswordView> {
 
   @override
   Widget build(BuildContext context) {
-    final double screenWidth = MediaQuery.of(context).size.width;
-    final double screenHeight = MediaQuery.of(context).size.height;
     final double keyboardPadding = MediaQuery.of(context).viewInsets.bottom;
 
     return Scaffold(
@@ -103,17 +102,15 @@ class _ResetPasswordPageState extends State<ResetPasswordView> {
               Align(
                 alignment: Alignment.topCenter,
                 child: Container(
-                    padding: EdgeInsets.only(
-                        top: (68 / 852) * screenHeight,
-                        bottom: (68 / 852) * screenHeight),
+                    padding: EdgeInsets.only(top: 68.h, bottom: 68.h),
                     color: const Color(0xFF3775FA),
-                    width: screenWidth,
-                    height: (267 / 852) * screenHeight,
+                    width: double.infinity,
+                    height: 267.h,
                     child: Align(
                       alignment: Alignment.topCenter,
                       child: SizedBox(
-                        height: (131 / 852) * screenHeight,
-                        width: (131 / 393) * screenWidth,
+                        height: 131.h,
+                        width: 131.w,
                         child: Image.asset('images/Logo.png', fit: BoxFit.fill),
                       ),
                     )),
@@ -121,46 +118,43 @@ class _ResetPasswordPageState extends State<ResetPasswordView> {
               Align(
                 alignment: Alignment.bottomCenter,
                 child: ClipRRect(
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(44),
-                    topRight: Radius.circular(44),
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(44.r),
+                    topRight: Radius.circular(44.r),
                   ),
                   child: Container(
-                    height: (629 / 852) * screenHeight,
+                    height: 629.h,
                     width: double.infinity,
-                    decoration: const BoxDecoration(
-                      color: Color(0xFFFDFDFD),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFDFDFD),
                       borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(44),
-                        topRight: Radius.circular(44),
+                        topLeft: Radius.circular(44.r),
+                        topRight: Radius.circular(44.r),
                       ),
                     ),
                     child: SingleChildScrollView(
                       padding: EdgeInsets.fromLTRB(
-                          (16 / 393) * screenWidth,
-                          (44 / 852) * screenHeight,
-                          (16 / 393) * screenWidth,
-                          (44 / 852) * screenHeight + keyboardPadding),
+                          16.w, 44.h, 16.w, 44.h + keyboardPadding),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           SizedBox(
-                            height: (136 / 852) * screenHeight,
-                            width: (147 / 393) * screenWidth,
+                            height: 136.h,
+                            width: 147.w,
                             child: Image.asset('images/email_input.png',
                                 fit: BoxFit.fill),
                           ),
-                          SizedBox(height: (32 / 852) * screenHeight),
+                          SizedBox(height: 32.h),
                           Text(
                             'اكتب كلمه السر الجديده',
                             textAlign: TextAlign.center,
                             style: GoogleFonts.cairo(
-                              fontSize: 24,
+                              fontSize: 24.sp,
                               fontWeight: FontWeight.w600,
                               color: const Color(0xFF3775FA),
                             ),
                           ),
-                          SizedBox(height: (32 / 852) * screenHeight),
+                          SizedBox(height: 32.h),
                           Form(
                             key: _formKey,
                             autovalidateMode:
@@ -178,7 +172,7 @@ class _ResetPasswordPageState extends State<ResetPasswordView> {
                                       decoration: InputDecoration(
                                         hintText: 'من فضلك دخل كلمه السر',
                                         hintStyle: GoogleFonts.cairo(
-                                            fontSize: 13,
+                                            fontSize: 13.sp,
                                             color: const Color(0xFF727070),
                                             fontWeight: FontWeight.w400),
                                         prefixIcon: const Icon(
@@ -192,7 +186,7 @@ class _ResetPasswordPageState extends State<ResetPasswordView> {
                                                 ? Icons.visibility
                                                 : Icons.visibility_off,
                                             color: const Color(0xFF727070),
-                                            size: 18,
+                                            size: 18.r,
                                           ),
                                           onPressed: () => setState(() =>
                                               _isPasswordObscured =
@@ -200,22 +194,22 @@ class _ResetPasswordPageState extends State<ResetPasswordView> {
                                         ),
                                         border: OutlineInputBorder(
                                             borderRadius:
-                                                BorderRadius.circular(12),
+                                                BorderRadius.circular(12.r),
                                             borderSide: const BorderSide(
                                                 color: Color(0xFFE2DFDF))),
                                         focusedBorder: OutlineInputBorder(
                                             borderRadius:
-                                                BorderRadius.circular(12),
+                                                BorderRadius.circular(12.r),
                                             borderSide: const BorderSide(
                                                 color: Color(0xFF3775FA))),
                                         enabledBorder: OutlineInputBorder(
                                             borderRadius:
-                                                BorderRadius.circular(12),
+                                                BorderRadius.circular(12.r),
                                             borderSide: const BorderSide(
                                                 color: Color(0xFFE2DFDF))),
-                                        contentPadding: EdgeInsets.all(12),
+                                        contentPadding: EdgeInsets.all(12.r),
                                         errorStyle: TextStyle(
-                                          fontSize: 11,
+                                          fontSize: 11.sp,
                                         ),
                                       ),
                                       validator: (value) {
@@ -240,7 +234,7 @@ class _ResetPasswordPageState extends State<ResetPasswordView> {
                                       },
                                     ),
                                   ),
-                                  SizedBox(height: (12 / 852) * screenHeight),
+                                  SizedBox(height: 12.h),
                                   Directionality(
                                       textDirection: TextDirection.rtl,
                                       child: Align(
@@ -248,13 +242,13 @@ class _ResetPasswordPageState extends State<ResetPasswordView> {
                                         child: Text(
                                           'كلمه السر لازم تحتوي على التالي:',
                                           style: GoogleFonts.cairo(
-                                            fontSize: 12,
+                                            fontSize: 12.sp,
                                             fontWeight: FontWeight.w500,
                                             color: Colors.grey.shade600,
                                           ),
                                         ),
                                       )),
-                                  SizedBox(height: (12 / 852) * screenHeight),
+                                  SizedBox(height: 12.h),
                                   BlocBuilder<PasswordStrengthCubit,
                                       PasswordStrengthState>(
                                     builder: (context, state) {
@@ -264,21 +258,18 @@ class _ResetPasswordPageState extends State<ResetPasswordView> {
                                             text: '١٠ حروف أو أكثر',
                                             isValid: state.hasMinLength,
                                           ),
-                                          SizedBox(
-                                              height: (8 / 852) * screenHeight),
+                                          SizedBox(height: 8.h),
                                           _buildValidationCheckItem(
                                             text:
                                                 '(A-Z) حرف كابيتال واحد على الأقل ',
                                             isValid: state.hasCapitalLetter,
                                           ),
-                                          SizedBox(
-                                              height: (8 / 852) * screenHeight),
+                                          SizedBox(height: 8.h),
                                           _buildValidationCheckItem(
                                             text: 'رقم واحد على الأقل (0-9)',
                                             isValid: state.hasNumber,
                                           ),
-                                          SizedBox(
-                                              height: (8 / 852) * screenHeight),
+                                          SizedBox(height: 8.h),
                                           _buildValidationCheckItem(
                                             text:
                                                 '(!@#) رمز خاص واحد على الأقل ',
@@ -288,7 +279,7 @@ class _ResetPasswordPageState extends State<ResetPasswordView> {
                                       );
                                     },
                                   ),
-                                  SizedBox(height: (16 / 852) * screenHeight),
+                                  SizedBox(height: 16.h),
                                   Directionality(
                                     textDirection: TextDirection.rtl,
                                     child: TextFormField(
@@ -301,7 +292,7 @@ class _ResetPasswordPageState extends State<ResetPasswordView> {
                                         hintText:
                                             'من فضلك دخل كلمه السر مره تانيه للتأكيد',
                                         hintStyle: GoogleFonts.cairo(
-                                            fontSize: 13,
+                                            fontSize: 13.sp,
                                             color: const Color(0xFF727070),
                                             fontWeight: FontWeight.w400),
                                         prefixIcon: const Icon(
@@ -315,7 +306,7 @@ class _ResetPasswordPageState extends State<ResetPasswordView> {
                                                 ? Icons.visibility
                                                 : Icons.visibility_off,
                                             color: const Color(0xFF727070),
-                                            size: 18,
+                                            size: 18.r,
                                           ),
                                           onPressed: () => setState(() =>
                                               _isConfirmPasswordObscured =
@@ -323,22 +314,22 @@ class _ResetPasswordPageState extends State<ResetPasswordView> {
                                         ),
                                         border: OutlineInputBorder(
                                             borderRadius:
-                                                BorderRadius.circular(12),
+                                                BorderRadius.circular(12.r),
                                             borderSide: const BorderSide(
                                                 color: Color(0xFFE2DFDF))),
                                         focusedBorder: OutlineInputBorder(
                                             borderRadius:
-                                                BorderRadius.circular(12),
+                                                BorderRadius.circular(12.r),
                                             borderSide: const BorderSide(
                                                 color: Color(0xFF3775FA))),
                                         enabledBorder: OutlineInputBorder(
                                             borderRadius:
-                                                BorderRadius.circular(12),
+                                                BorderRadius.circular(12.r),
                                             borderSide: const BorderSide(
                                                 color: Color(0xFFE2DFDF))),
-                                        contentPadding: EdgeInsets.all(12),
+                                        contentPadding: EdgeInsets.all(12.r),
                                         errorStyle: TextStyle(
-                                          fontSize: 11,
+                                          fontSize: 11.sp,
                                         ),
                                       ),
                                       validator: (value) {
@@ -362,22 +353,22 @@ class _ResetPasswordPageState extends State<ResetPasswordView> {
                                   ),
                                 ])),
                           ),
-                          SizedBox(height: (24 / 852) * screenHeight),
+                          SizedBox(height: 24.h),
                           SizedBox(
                             width: double.infinity,
-                            height: (40 / 852) * screenHeight,
+                            height: 40.h,
                             child: BlocBuilder<ResetPasswordCubit,
                                 ResetPasswordState>(
                               builder: (context, state) {
                                 final isLoading = state is ResetPasswordLoading;
                                 return Container(
                                     width: double.infinity,
-                                    height: (40 / 852) * screenHeight,
+                                    height: 40.h,
                                     decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(12.0),
+                                      borderRadius: BorderRadius.circular(12.r),
                                       border: Border.all(
                                         color: Color(0xFF3775FA),
-                                        width: 1.0,
+                                        width: 1.w,
                                       ),
                                     ),
                                     child: ElevatedButton(
@@ -393,22 +384,23 @@ class _ResetPasswordPageState extends State<ResetPasswordView> {
                                                 158, 55, 117, 250),
                                         shape: RoundedRectangleBorder(
                                             borderRadius:
-                                                BorderRadius.circular(12.0),
+                                                BorderRadius.circular(12.r),
                                             side: const BorderSide(
                                                 color: Colors.white,
                                                 width: 1.0)),
                                       ),
                                       child: isLoading
-                                          ? const SizedBox(
-                                              height: 24,
-                                              width: 24,
-                                              child: CircularProgressIndicator(
-                                                  color: Color(0xFF3775FA),
-                                                  strokeWidth: 3),
+                                          ? SizedBox(
+                                              height: 24.r,
+                                              width: 24.r,
+                                              child:
+                                                  const CircularProgressIndicator(
+                                                      color: Color(0xFF3775FA),
+                                                      strokeWidth: 3),
                                             )
                                           : Text('تأكيد كلمه السر الجديده',
                                               style: GoogleFonts.cairo(
-                                                  fontSize: 16,
+                                                  fontSize: 16.sp,
                                                   fontWeight: FontWeight.w500)),
                                     ));
                               },
@@ -437,14 +429,14 @@ Widget _buildValidationCheckItem(
       Icon(
         isValid ? Icons.check_circle : Icons.error_outline,
         color: color,
-        size: 12,
+        size: 12.r,
       ),
-      const SizedBox(width: 8),
+      SizedBox(width: 8.w),
       Text(
         text,
         style: GoogleFonts.cairo(
           color: color,
-          fontSize: 12,
+          fontSize: 12.sp,
           fontWeight: FontWeight.w400,
         ),
       ),

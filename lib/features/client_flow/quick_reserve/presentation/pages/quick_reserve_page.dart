@@ -1,15 +1,21 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
+import 'package:el7erafe/core/utils/animated_navigation.dart';
 import 'package:el7erafe/features/authentication_module/login/data/repositories/auth_repository.dart';
 import 'package:el7erafe/features/authentication_module/login/presentation/cubit/login_cubit.dart';
 import 'package:el7erafe/features/authentication_module/login/presentation/pages/login_page.dart';
 import 'package:el7erafe/features/authentication_module/technician_regestration/presentation/widgets/location_picker.dart';
 import 'package:el7erafe/features/client_flow/client_home/data/models/quick_reservation_request.dart';
+import 'package:el7erafe/features/client_flow/client_home/presentation/pages/client_home_page.dart';
 import 'package:el7erafe/features/client_flow/quick_reserve/presentation/cubit/quick_reserve_cubit.dart';
 import 'package:el7erafe/features/client_flow/quick_reserve/presentation/cubit/quick_reserve_state.dart';
 import 'package:el7erafe/features/client_flow/quick_reserve/presentation/pages/quick_reserve_success_page.dart';
 import 'package:el7erafe/features/client_flow/quick_reserve/presentation/pages/time_picker.dart';
+import 'package:el7erafe/features/client_flow/select_technician/presentation/pages/selecet_technician_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconsax/iconsax.dart';
@@ -57,8 +63,6 @@ class _ServiceRequestPageState extends State<ServiceRequestPage> {
 
   @override
   Widget build(BuildContext context) {
-    final double screenHeight = MediaQuery.of(context).size.height;
-    final double screenWidth = MediaQuery.of(context).size.width;
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
 
@@ -69,7 +73,11 @@ class _ServiceRequestPageState extends State<ServiceRequestPage> {
         child: Scaffold(
           backgroundColor: Colors.white,
           appBar: AppBar(
-            toolbarHeight: (50 / 852) * screenHeight,
+            leading: IconButton(
+              icon: Icon(Icons.arrow_back_ios, color: Colors.black, size: 20.r),
+              onPressed: () => Navigator.pop(context),
+            ),
+            toolbarHeight: 50.h,
             backgroundColor: Colors.white,
             elevation: 0,
             shadowColor: Colors.blueAccent,
@@ -78,7 +86,7 @@ class _ServiceRequestPageState extends State<ServiceRequestPage> {
             title: Text.rich(
               TextSpan(
                 style: GoogleFonts.cairo(
-                  fontSize: 20,
+                  fontSize: 20.sp,
                   fontWeight: FontWeight.w600,
                   color: Colors.black,
                   height: 1.5,
@@ -111,17 +119,17 @@ class _ServiceRequestPageState extends State<ServiceRequestPage> {
                     child: AlertDialog(
                       backgroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16)),
+                          borderRadius: BorderRadius.circular(16.r)),
                       title: Row(
                         children: [
-                          const Icon(Icons.warning_amber_rounded,
-                              color: Colors.red, size: 28),
-                          const SizedBox(width: 8),
+                          Icon(Icons.warning_amber_rounded,
+                              color: Colors.red, size: 28.r),
+                          SizedBox(width: 8.w),
                           Text(
                             "تنبيه",
                             style: GoogleFonts.cairo(
                               fontWeight: FontWeight.bold,
-                              fontSize: 18,
+                              fontSize: 18.sp,
                             ),
                           ),
                         ],
@@ -129,13 +137,15 @@ class _ServiceRequestPageState extends State<ServiceRequestPage> {
                       content: Text(
                         state.message,
                         style: GoogleFonts.cairo(
-                          fontSize: 14,
+                          fontSize: 15.sp,
                           color: Colors.black87,
                         ),
                       ),
                       actions: [
                         TextButton(
-                          onPressed: () => Navigator.pop(context),
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
                           child: Text(
                             "حسناً",
                             style: GoogleFonts.cairo(
@@ -148,7 +158,62 @@ class _ServiceRequestPageState extends State<ServiceRequestPage> {
                     ),
                   ),
                 );
-              } else if (state is ServiceRequestUnauthorized) {
+              } else if (state is ServiceRequestConflict){
+                showDialog(
+                  context: context,
+                  builder: (context) => Directionality(
+                    textDirection: TextDirection.rtl,
+                    child: AlertDialog(
+                      backgroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16.r)),
+                      title: Row(
+                        children: [
+                          Icon(Icons.warning_amber_rounded,
+                              color: Colors.red, size: 28.r),
+                          SizedBox(width: 8.w),
+                          Text(
+                            "تنبيه",
+                            style: GoogleFonts.cairo(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18.sp,
+                            ),
+                          ),
+                        ],
+                      ),
+                      content: Text(
+                        state.message,
+                        style: GoogleFonts.cairo(
+                          fontSize: 15.sp,
+                          color: Colors.black87,
+                        ),
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                            Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ClientHomePage(),
+                              ),
+                              (route) => false,
+                            );
+                          },
+                          child: Text(
+                            "حسناً",
+                            style: GoogleFonts.cairo(
+                              color: const Color(0xFF3775FA),
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }
+              else if (state is ServiceRequestUnauthorized) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(state.unauthMessage,
@@ -188,12 +253,12 @@ class _ServiceRequestPageState extends State<ServiceRequestPage> {
                       children: [
                         Lottie.asset(
                           'assets/icon/loading.json',
-                          width: 200,
-                          height: 200,
+                          width: 200.w,
+                          height: 200.h,
                           repeat: true,
                           animate: true,
                         ),
-                        const SizedBox(height: 16),
+                        SizedBox(height: 16.h),
                       ],
                     ),
                   ),
@@ -202,7 +267,7 @@ class _ServiceRequestPageState extends State<ServiceRequestPage> {
               return GestureDetector(
                 onTap: () => FocusScope.of(context).unfocus(),
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(16),
+                  padding: EdgeInsets.all(16.r),
                   child: Column(
                     children: [
                       _buildSectionCard(
@@ -216,15 +281,15 @@ class _ServiceRequestPageState extends State<ServiceRequestPage> {
                             decoration: _inputDecoration(
                                 "اكتب تفاصيل المشكلة اللي محتاج الفني يجي يصلحها"),
                           ),
-                          SizedBox(height: (16 / 852) * screenHeight),
+                          SizedBox(height: 16.h),
                           _buildLabel("صور للمشكله ان وجد"),
                           Container(
-                            height: 120,
+                            height: 120.h,
                             width: double.infinity,
-                            padding: const EdgeInsets.all(8),
+                            padding: EdgeInsets.all(8.r),
                             decoration: BoxDecoration(
                               color: const Color(0xFFF8FAFE),
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: BorderRadius.circular(12.r),
                               border: Border.all(
                                 color: const Color(0xFF3775FA),
                                 style: BorderStyle.solid,
@@ -240,27 +305,29 @@ class _ServiceRequestPageState extends State<ServiceRequestPage> {
                                     onTap: () =>
                                         _showImageSourceSheet(context, cubit),
                                     child: Container(
-                                      width: 100,
-                                      margin: const EdgeInsets.only(right: 8),
+                                      width: 100.w,
+                                      margin: EdgeInsets.only(right: 8.w),
                                       decoration: BoxDecoration(
                                         color: Colors.white,
-                                        borderRadius: BorderRadius.circular(12),
+                                        borderRadius:
+                                            BorderRadius.circular(12.r),
                                         border: Border.all(
                                             color: const Color(0xFF3775FA),
-                                            width: 1),
+                                            width: 1.w),
                                       ),
                                       child: Column(
                                         mainAxisAlignment:
                                             MainAxisAlignment.center,
-                                        children: const [
+                                        children: [
                                           Icon(Iconsax.gallery_add,
-                                              color: Color(0xFF3775FA),
-                                              size: 28),
-                                          SizedBox(height: 4),
+                                              color: const Color(0xFF3775FA),
+                                              size: 28.r),
+                                          SizedBox(height: 4.h),
                                           Text("أضف صورة",
                                               style: TextStyle(
-                                                  fontSize: 12,
-                                                  color: Color(0xFF3775FA),
+                                                  fontSize: 12.sp,
+                                                  color:
+                                                      const Color(0xFF3775FA),
                                                   fontWeight: FontWeight.bold)),
                                         ],
                                       ),
@@ -268,25 +335,26 @@ class _ServiceRequestPageState extends State<ServiceRequestPage> {
                                   );
                                 }
                                 return Padding(
-                                  padding: const EdgeInsets.only(right: 8.0),
+                                  padding: EdgeInsets.only(right: 8.w),
                                   child: Stack(
                                     children: [
                                       ClipRRect(
-                                        borderRadius: BorderRadius.circular(8),
+                                        borderRadius:
+                                            BorderRadius.circular(8.r),
                                         child: Image.file(
                                           model.images![index],
-                                          height: 104,
-                                          width: 100,
+                                          height: 104.h,
+                                          width: 100.w,
                                           fit: BoxFit.cover,
                                         ),
                                       ),
                                       Positioned(
-                                        top: 4,
-                                        right: 4,
+                                        top: 4.h,
+                                        right: 4.w,
                                         child: InkWell(
                                           onTap: () => cubit.removeImage(index),
                                           child: Container(
-                                            padding: const EdgeInsets.all(4),
+                                            padding: EdgeInsets.all(4.r),
                                             decoration: const BoxDecoration(
                                               color: Colors.white,
                                               shape: BoxShape.circle,
@@ -296,8 +364,8 @@ class _ServiceRequestPageState extends State<ServiceRequestPage> {
                                                     blurRadius: 2)
                                               ],
                                             ),
-                                            child: const Icon(Icons.close,
-                                                color: Colors.red, size: 16),
+                                            child: Icon(Icons.close,
+                                                color: Colors.red, size: 16.r),
                                           ),
                                         ),
                                       )
@@ -309,7 +377,7 @@ class _ServiceRequestPageState extends State<ServiceRequestPage> {
                           ),
                         ],
                       ),
-                      SizedBox(height: (16 / 852) * screenHeight),
+                      SizedBox(height: 16.h),
                       _buildSectionCard(
                         title: "تفاصيل العنوان",
                         icon: Iconsax.location,
@@ -319,18 +387,18 @@ class _ServiceRequestPageState extends State<ServiceRequestPage> {
                             children: [
                               Text("المحافظة",
                                   style: GoogleFonts.cairo(
-                                      fontSize: 15,
+                                      fontSize: 15.sp,
                                       fontWeight: FontWeight.w600,
                                       color: Colors.black)),
-                              SizedBox(width: (105 / 393) * screenWidth),
+                              SizedBox(width: 105.w),
                               Text("المدينة",
                                   style: GoogleFonts.cairo(
-                                      fontSize: 15,
+                                      fontSize: 15.sp,
                                       fontWeight: FontWeight.w600,
                                       color: Colors.black)),
                             ],
                           ),
-                          SizedBox(height: (8 / 852) * screenHeight),
+                          SizedBox(height: 8.h),
                           EgyptGovernoratePicker(
                             language: Language.arabic,
                             layout: Layout.horizontal,
@@ -345,14 +413,14 @@ class _ServiceRequestPageState extends State<ServiceRequestPage> {
                               cubit.setCity(newCity);
                             },
                           ),
-                          SizedBox(height: (12 / 852) * screenHeight),
+                          SizedBox(height: 12.h),
                           _buildLabel("الشارع"),
                           TextField(
                             onChanged: (val) => model.street = val,
                             decoration: _inputDecoration(
                                 "اكتب اسم الشارع ورقم البيت أو العمارة"),
                           ),
-                          SizedBox(height: (12 / 852) * screenHeight),
+                          SizedBox(height: 12.h),
                           _buildLabel("علامة مميزة"),
                           TextField(
                             onChanged: (val) => model.specialSign = val,
@@ -361,7 +429,7 @@ class _ServiceRequestPageState extends State<ServiceRequestPage> {
                           ),
                         ],
                       ),
-                      SizedBox(height: (16 / 852) * screenHeight),
+                      SizedBox(height: 16.h),
                       _buildSectionCard(
                         title: "تحديد الوقت",
                         icon: Iconsax.clock,
@@ -372,28 +440,49 @@ class _ServiceRequestPageState extends State<ServiceRequestPage> {
                               Text(
                                 "اختار اليوم :",
                                 style: GoogleFonts.cairo(
-                                    fontSize: 16,
+                                    fontSize: 16.sp,
                                     color: const Color(0xFF3775FA),
                                     fontWeight: FontWeight.w400),
                               ),
                             ],
                           ),
-                          SizedBox(height: (8 / 852) * screenHeight),
+                          SizedBox(height: 8.h),
                           SizedBox(
-                              height: 300,
+                              height: 300.h,
                               child: Directionality(
                                 textDirection: TextDirection.ltr,
                                 child: CalendarDatePicker2(
                                   config: CalendarDatePicker2Config(
+                                    monthTextStyle: GoogleFonts.cairo(
+                                        fontSize: 14.sp,
+                                        fontWeight: FontWeight.w600),
+                                    firstDayOfWeek: 6,
+                                    weekdayLabelTextStyle:
+                                        GoogleFonts.cairo(fontSize: 14.sp),
+                                    lastMonthIcon: Icon(Icons.arrow_back_ios,
+                                        size: 15.r, color: Colors.black54),
+                                    nextMonthIcon: Icon(Icons.arrow_forward_ios,
+                                        size: 15.r, color: Colors.black54),
+                                    controlsTextStyle: TextStyle(
+                                      fontSize: 11.sp,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                    yearTextStyle: GoogleFonts.cairo(
+                                        fontSize: 14.sp,
+                                        fontWeight: FontWeight.w600),
                                     firstDate: today,
                                     calendarType:
                                         CalendarDatePicker2Type.single,
                                     selectedDayHighlightColor:
                                         const Color(0xFF3775FA),
-                                    selectedDayTextStyle: const TextStyle(
+                                    selectedDayTextStyle: TextStyle(
                                       color: Colors.white,
                                       fontWeight: FontWeight.bold,
+                                      fontSize: 14.sp,
                                     ),
+                                    dayTextStyle: GoogleFonts.cairo(
+                                        fontSize: 14.sp,
+                                        fontWeight: FontWeight.w500),
                                   ),
                                   value: [model.day],
                                   onValueChanged: (dates) {
@@ -404,14 +493,14 @@ class _ServiceRequestPageState extends State<ServiceRequestPage> {
                               )),
                           Text("اختار الوقت :",
                               style: GoogleFonts.cairo(
-                                  fontSize: 16,
+                                  fontSize: 16.sp,
                                   color: const Color(0xFF3775FA),
                                   fontWeight: FontWeight.w500)),
-                          SizedBox(height: (8 / 852) * screenHeight),
+                          SizedBox(height: 8.h),
                           Container(
                             decoration: BoxDecoration(
                               border: Border.all(color: Colors.grey.shade300),
-                              borderRadius: BorderRadius.circular(20),
+                              borderRadius: BorderRadius.circular(20.r),
                             ),
                             child: Row(
                               children: [
@@ -428,7 +517,7 @@ class _ServiceRequestPageState extends State<ServiceRequestPage> {
                           ),
                           if (!model.allDayAvailability)
                             Padding(
-                              padding: const EdgeInsets.only(top: 16.0),
+                              padding: EdgeInsets.only(top: 16.h),
                               child: Row(
                                 children: [
                                   Expanded(
@@ -445,7 +534,6 @@ class _ServiceRequestPageState extends State<ServiceRequestPage> {
                                               model.day!.month == now.month &&
                                               model.day!.day == now.day);
                                         }
-
                                         if (isToday && t.hour < now.hour) {
                                           ScaffoldMessenger.of(context)
                                               .showSnackBar(
@@ -502,11 +590,17 @@ class _ServiceRequestPageState extends State<ServiceRequestPage> {
                                               TimeOfDay(
                                                   hour: t.hour, minute: 0);
 
-                                          selectedStartTime =
+                                          String formattedTime =
                                               localizations.formatTimeOfDay(
                                             timeWithZeroMinutes,
                                             alwaysUse24HourFormat: false,
                                           );
+
+                                          selectedStartTime = formattedTime
+                                              .replaceAll('AM', 'صباحاً')
+                                              .replaceAll('am', 'صباحاً')
+                                              .replaceAll('PM', 'مساءً')
+                                              .replaceAll('pm', 'مساءً');
 
                                           String hour24 = timeWithZeroMinutes
                                               .hour
@@ -518,7 +612,7 @@ class _ServiceRequestPageState extends State<ServiceRequestPage> {
                                       },
                                     ),
                                   ),
-                                  const SizedBox(width: 10),
+                                  SizedBox(width: 10.w),
                                   Expanded(
                                     child: _buildTimePickerField(
                                       context,
@@ -591,11 +685,17 @@ class _ServiceRequestPageState extends State<ServiceRequestPage> {
                                               TimeOfDay(
                                                   hour: t.hour, minute: 0);
 
-                                          selectedEndTime =
+                                          String formattedTime =
                                               localizations.formatTimeOfDay(
                                             timeWithZeroMinutes,
                                             alwaysUse24HourFormat: false,
                                           );
+
+                                          selectedEndTime = formattedTime
+                                              .replaceAll('AM', 'صباحاً')
+                                              .replaceAll('am', 'صباحاً')
+                                              .replaceAll('PM', 'مساءً')
+                                              .replaceAll('pm', 'مساءً');
 
                                           String hour24 = timeWithZeroMinutes
                                               .hour
@@ -611,13 +711,13 @@ class _ServiceRequestPageState extends State<ServiceRequestPage> {
                             ),
                         ],
                       ),
-                      SizedBox(height: (24 / 852) * screenHeight),
+                      SizedBox(height: 24.h),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           SizedBox(
-                              width: (170 / 393) * screenWidth,
-                              height: (40 / 852) * screenHeight,
+                              width: 170.w,
+                              height: 40.h,
                               child: ElevatedButton(
                                 onPressed: () {
                                   FocusScope.of(context).unfocus();
@@ -643,6 +743,43 @@ class _ServiceRequestPageState extends State<ServiceRequestPage> {
                                     );
                                     return;
                                   }
+                                  if (requestModel.street == null ||
+                                      requestModel.city == null ||
+                                      requestModel.governorate == null) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                            "برجاء تحديد العنوان بالكامل",
+                                            textDirection: TextDirection.rtl),
+                                        backgroundColor: Colors.red,
+                                      ),
+                                    );
+                                    return;
+                                  }
+                                  if (requestModel.street!.length < 10 ||
+                                      requestModel.street!.length > 200) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                            "برجاء كتابة عنوان أكثر تفصيلاً اسم الشارع لا يقل عن 10 حروف ولا يتجاوز 200 حرف",
+                                            textDirection: TextDirection.rtl),
+                                        backgroundColor: Colors.red,
+                                      ),
+                                    );
+                                    return;
+                                  }
+                                  if (requestModel.description!.length < 10 ||
+                                      requestModel.description!.length > 200) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                            "برجاء كتابة وصف أكثر تفصيلاً لا يقل عن 10 حروف ولا يتجاوز 200 حرف",
+                                            textDirection: TextDirection.rtl),
+                                        backgroundColor: Colors.red,
+                                      ),
+                                    );
+                                    return;
+                                  }
                                   if (!requestModel.allDayAvailability &&
                                       (requestModel.availableFrom == null ||
                                           requestModel.availableTo == null)) {
@@ -661,10 +798,10 @@ class _ServiceRequestPageState extends State<ServiceRequestPage> {
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: const Color(0xFF3775FA),
                                   foregroundColor: Colors.white,
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 4),
+                                  padding: EdgeInsets.symmetric(vertical: 4.h),
                                   shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12)),
+                                      borderRadius:
+                                          BorderRadius.circular(12.r)),
                                   elevation: 0,
                                 ),
                                 child: Row(
@@ -673,31 +810,111 @@ class _ServiceRequestPageState extends State<ServiceRequestPage> {
                                     Text(
                                       "طلب فني سريع",
                                       style: GoogleFonts.cairo(
-                                          fontSize: 13,
+                                          fontSize: 13.sp,
                                           fontWeight: FontWeight.w600),
                                     ),
-                                    const SizedBox(width: 8),
-                                    const Icon(Iconsax.clock,
-                                        color: Colors.white),
+                                    SizedBox(width: 8.w),
+                                    Icon(Iconsax.clock,
+                                        color: Colors.white, size: 20.r),
                                   ],
                                 ),
                               )),
-                          const SizedBox(width: 10),
+                          SizedBox(width: 10.w),
                           SizedBox(
-                              width: (170 / 393) * screenWidth,
-                              height: (40 / 852) * screenHeight,
+                              width: 170.w,
+                              height: 40.h,
                               child: OutlinedButton(
                                 onPressed: () {
                                   FocusScope.of(context).unfocus();
-                                  // Navigate to technician selection page
+                                  if (requestModel.description == null ||
+                                      requestModel.description!.isEmpty) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text("برجاء كتابه وصف المشكله",
+                                            textDirection: TextDirection.rtl),
+                                        backgroundColor: Colors.red,
+                                      ),
+                                    );
+                                    return;
+                                  }
+                                  if (requestModel.day == null) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                            "برجاء اختيار اليوم المطلوب فيه الخدمة",
+                                            textDirection: TextDirection.rtl),
+                                        backgroundColor: Colors.red,
+                                      ),
+                                    );
+                                    return;
+                                  }
+                                  if (requestModel.street == null ||
+                                      requestModel.city == null ||
+                                      requestModel.governorate == null) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                            "برجاء اختيار المحافظه والمدينة وكتابة اسم الشارع بالتفصيل",
+                                            textDirection: TextDirection.rtl),
+                                        backgroundColor: Colors.red,
+                                      ),
+                                    );
+                                    return;
+                                  }
+                                  if (!requestModel.allDayAvailability &&
+                                      (requestModel.availableFrom == null ||
+                                          requestModel.availableTo == null)) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                            "برجاء تحديد الوقت المناسب",
+                                            textDirection: TextDirection.rtl),
+                                        backgroundColor: Colors.red,
+                                      ),
+                                    );
+                                    return;
+                                  }
+                                  if (requestModel.street!.length < 10 ||
+                                      requestModel.street!.length > 200) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                            "برجاء كتابة عنوان أكثر تفصيلاً اسم الشارع لا يقل عن 10 حروف ولا يتجاوز 200 حرف",
+                                            textDirection: TextDirection.rtl),
+                                        backgroundColor: Colors.red,
+                                      ),
+                                    );
+                                    return;
+                                  }
+                                  if (requestModel.description!.length < 10 ||
+                                      requestModel.description!.length > 200) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                            "برجاء كتابة وصف أكثر تفصيلاً لا يقل عن 10 حروف ولا يتجاوز 200 حرف",
+                                            textDirection: TextDirection.rtl),
+                                        backgroundColor: Colors.red,
+                                      ),
+                                    );
+                                    return;
+                                  }
+
+                                  Navigator.push(
+                                    context,
+                                    SlideRightRoute(
+                                      page: TechnicianReservePage(
+                                        requestModel: requestModel,
+                                      ),
+                                    ),
+                                  );
                                 },
                                 style: OutlinedButton.styleFrom(
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 4),
+                                  padding: EdgeInsets.symmetric(vertical: 4.h),
                                   side: const BorderSide(
                                       color: Color(0xFF3775FA)),
                                   shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12)),
+                                      borderRadius:
+                                          BorderRadius.circular(12.r)),
                                 ),
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
@@ -707,34 +924,34 @@ class _ServiceRequestPageState extends State<ServiceRequestPage> {
                                       style: GoogleFonts.cairo(
                                           fontWeight: FontWeight.w600,
                                           color: Colors.black,
-                                          fontSize: 13),
+                                          fontSize: 13.sp),
                                     ),
-                                    const SizedBox(width: 8),
-                                    const Icon(Iconsax.search_normal,
-                                        color: Colors.black),
+                                    SizedBox(width: 8.w),
+                                    Icon(Iconsax.search_normal,
+                                        color: Colors.black, size: 20.r),
                                   ],
                                 ),
                               )),
                         ],
                       ),
-                      SizedBox(height: (16 / 852) * screenHeight),
+                      SizedBox(height: 16.h),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           SizedBox(
-                            width: (170 / 393) * screenWidth,
-                            height: (150 / 852) * screenHeight,
+                            width: 170.w,
+                            height: 150.h,
                             child: SvgPicture.asset("images/quick_reserve.svg"),
                           ),
                           SizedBox(
-                            width: (170 / 393) * screenWidth,
-                            height: (150 / 852) * screenHeight,
+                            width: 170.w,
+                            height: 150.h,
                             child: SvgPicture.asset(
                                 "images/select_technician.svg"),
                           )
                         ],
                       ),
-                      SizedBox(height: (24 / 852) * screenHeight),
+                      SizedBox(height: 24.h),
                     ],
                   ),
                 ),
@@ -753,28 +970,28 @@ class _ServiceRequestPageState extends State<ServiceRequestPage> {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(12.r),
         border: Border.all(color: const Color(0xFF3775FA)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+            padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
             decoration: const BoxDecoration(
                 border: Border(bottom: BorderSide(color: Color(0xFF3775FA)))),
             child: Row(
               children: [
-                Icon(icon, color: const Color(0xFF3775FA), size: 16),
-                const SizedBox(width: 8),
+                Icon(icon, color: const Color(0xFF3775FA), size: 16.r),
+                SizedBox(width: 8.w),
                 Text(title,
                     style: GoogleFonts.cairo(
-                        fontWeight: FontWeight.bold, fontSize: 16)),
+                        fontWeight: FontWeight.bold, fontSize: 16.sp)),
               ],
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(12.0),
+            padding: EdgeInsets.all(12.r),
             child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: children),
@@ -786,27 +1003,29 @@ class _ServiceRequestPageState extends State<ServiceRequestPage> {
 
   Widget _buildLabel(String text) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8.0),
+      padding: EdgeInsets.only(bottom: 8.h),
       child: Text(text,
           style: GoogleFonts.cairo(
-              fontWeight: FontWeight.w600, fontSize: 15, color: Colors.black)),
+              fontWeight: FontWeight.w600,
+              fontSize: 15.sp,
+              color: Colors.black)),
     );
   }
 
   InputDecoration _inputDecoration(String hint) {
     return InputDecoration(
       hintText: hint,
-      hintStyle: GoogleFonts.cairo(fontSize: 12, color: Colors.grey),
+      hintStyle: GoogleFonts.cairo(fontSize: 12.sp, color: Colors.grey),
       border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(12.r),
           borderSide: BorderSide(color: Colors.grey.shade300)),
       enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(12.r),
           borderSide: BorderSide(color: Colors.grey.shade300)),
       focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(12.r),
           borderSide: const BorderSide(color: Color(0xFF3775FA))),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+      contentPadding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
     );
   }
 
@@ -818,16 +1037,16 @@ class _ServiceRequestPageState extends State<ServiceRequestPage> {
       child: GestureDetector(
         onTap: onTap,
         child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 12),
+          padding: EdgeInsets.symmetric(vertical: 12.h),
           decoration: BoxDecoration(
             color: isSelected ? const Color(0xFF3775FA) : Colors.transparent,
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(20.r),
           ),
           child: Text(
             text,
             textAlign: TextAlign.center,
             style: GoogleFonts.cairo(
-                fontSize: 13,
+                fontSize: 13.sp,
                 color: isSelected ? Colors.white : Colors.grey,
                 fontWeight: FontWeight.w600),
           ),
@@ -864,9 +1083,8 @@ class _ServiceRequestPageState extends State<ServiceRequestPage> {
                       states.contains(WidgetState.selected)
                           ? const Color(0xFF3775FA)
                           : Colors.black),
-                  hourMinuteColor: WidgetStateColor.resolveWith(
-                      (states) => states.contains(WidgetState.selected)
-                          // ignore: deprecated_member_use
+                  hourMinuteColor: WidgetStateColor.resolveWith((states) =>
+                      states.contains(WidgetState.selected)
                           ? const Color(0xFF3775FA).withOpacity(0.1)
                           : Colors.grey.shade100),
                   dayPeriodTextColor: WidgetStateColor.resolveWith((states) =>
@@ -897,10 +1115,10 @@ class _ServiceRequestPageState extends State<ServiceRequestPage> {
         }
       },
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
         decoration: BoxDecoration(
           border: Border.all(color: Colors.grey.shade300),
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(12.r),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -908,8 +1126,9 @@ class _ServiceRequestPageState extends State<ServiceRequestPage> {
             Text("$label : ${currentValue ?? '--:--'}",
                 style: GoogleFonts.cairo(
                     color: currentValue == null ? Colors.grey : Colors.black,
-                    fontWeight: FontWeight.bold)),
-            const Icon(Icons.access_time, size: 16, color: Color(0xFF3775FA)),
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13.sp)),
+            Icon(Icons.access_time, size: 16.r, color: const Color(0xFF3775FA)),
           ],
         ),
       ),
@@ -928,18 +1147,20 @@ void _showImageSourceSheet(BuildContext context, ServiceRequestCubit cubit) {
         child: Wrap(
           children: <Widget>[
             ListTile(
-              leading: const Icon(Icons.photo_camera, color: Colors.black),
-              title: const Text('الكاميرا ',
-                  style: TextStyle(color: Colors.black)),
+              leading:
+                  Icon(Icons.photo_camera, color: Colors.black, size: 24.r),
+              title: Text('الكاميرا ',
+                  style: TextStyle(color: Colors.black, fontSize: 14.sp)),
               onTap: () {
                 cubit.pickImage(ImageSource.camera);
                 Navigator.of(context).pop();
               },
             ),
             ListTile(
-              leading: const Icon(Icons.photo_library, color: Colors.black),
-              title:
-                  const Text('المعرض ', style: TextStyle(color: Colors.black)),
+              leading:
+                  Icon(Icons.photo_library, color: Colors.black, size: 24.r),
+              title: Text('المعرض ',
+                  style: TextStyle(color: Colors.black, fontSize: 14.sp)),
               onTap: () {
                 cubit.pickImage(ImageSource.gallery);
                 Navigator.of(context).pop();

@@ -7,6 +7,7 @@ import 'package:el7erafe/features/authentication_module/technician_regestration/
 import 'package:el7erafe/features/authentication_module/technician_regestration/presentation/pages/technician_registration_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class SelectTypePage extends StatelessWidget {
@@ -26,8 +27,6 @@ class SelectTypeView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double screenWidth = MediaQuery.of(context).size.width;
-    final double screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: Stack(
@@ -35,17 +34,15 @@ class SelectTypeView extends StatelessWidget {
           Align(
             alignment: Alignment.topCenter,
             child: Container(
-                padding: EdgeInsets.only(
-                    top: (68 / 852) * screenHeight,
-                    bottom: (68 / 852) * screenHeight),
+                padding: EdgeInsets.only(top: 68.h, bottom: 68.h),
                 color: const Color(0xFF3775FA),
-                width: screenWidth,
-                height: (267 / 852) * screenHeight,
+                width: double.infinity,
+                height: 267.h,
                 child: Align(
                   alignment: Alignment.topCenter,
                   child: SizedBox(
-                    height: (131 / 852) * screenHeight,
-                    width: (131 / 393) * screenWidth,
+                    height: 131.h,
+                    width: 131.w,
                     child: Image.asset('images/Logo.png', fit: BoxFit.fill),
                   ),
                 )),
@@ -54,25 +51,21 @@ class SelectTypeView extends StatelessWidget {
             alignment: Alignment.bottomCenter,
             child: ClipRRect(
               borderRadius: BorderRadius.only(
-                topLeft: Radius.circular((44)),
-                topRight: Radius.circular((44)),
+                topLeft: Radius.circular(44.r),
+                topRight: Radius.circular(44.r),
               ),
               child: Container(
-                height: (629 / 852) * screenHeight,
+                height: 629.h,
                 width: double.infinity,
-                decoration: const BoxDecoration(
-                  color: Color(0xFFFDFDFD),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFDFDFD),
                   borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(44),
-                    topRight: Radius.circular(44),
+                    topLeft: Radius.circular(44.r),
+                    topRight: Radius.circular(44.r),
                   ),
                 ),
                 child: SingleChildScrollView(
-                  padding: EdgeInsets.fromLTRB(
-                      (16 / 393) * screenWidth,
-                      (44 / 852) * screenHeight,
-                      (16 / 393) * screenWidth,
-                      (44 / 852) * screenHeight),
+                  padding: EdgeInsets.fromLTRB(16.w, 44.h, 16.w, 44.h),
                   child: Directionality(
                     textDirection: TextDirection.rtl,
                     child: Column(
@@ -80,16 +73,16 @@ class SelectTypeView extends StatelessWidget {
                       children: [
                         Text('قولنا انت حرفي ولا مستخدم',
                             style: GoogleFonts.cairo(
-                                fontSize: 24,
+                                fontSize: 24.sp,
                                 fontWeight: FontWeight.w600,
                                 color: Colors.black)),
-                        SizedBox(height: (32 / 852) * screenHeight),
+                        SizedBox(height: 32.h),
                         Text('التصنيف',
                             style: GoogleFonts.cairo(
-                                fontSize: 16,
+                                fontSize: 16.sp,
                                 fontWeight: FontWeight.w400,
                                 color: Colors.black)),
-                        SizedBox(height: (8 / 852) * screenHeight),
+                        SizedBox(height: 8.h),
                         BlocBuilder<SelectTypeCubit, UserType>(
                           builder: (context, selection) {
                             return Column(
@@ -98,12 +91,12 @@ class SelectTypeView extends StatelessWidget {
                                   color: Colors.white,
                                   elevation: 0,
                                   shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
+                                    borderRadius: BorderRadius.circular(12.r),
                                     side: BorderSide(
                                       color: selection == UserType.user
                                           ? const Color(0xFF3775FA)
                                           : Color(0xFFE2DFDF),
-                                      width: 1,
+                                      width: 1.w,
                                     ),
                                   ),
                                   child: ListTile(
@@ -114,24 +107,24 @@ class SelectTypeView extends StatelessWidget {
                                     title: Text('مستخدم',
                                         style: GoogleFonts.cairo(
                                             color: const Color(0xFF727070),
-                                            fontSize: 14,
+                                            fontSize: 14.sp,
                                             fontWeight: FontWeight.w400)),
                                     leading: _CustomRadioIcon(
                                       isSelected: selection == UserType.user,
                                     ),
                                   ),
                                 ),
-                                SizedBox(height: (8 / 852) * screenHeight),
+                                SizedBox(height: 8.h),
                                 Card(
                                   color: Colors.white,
                                   elevation: 0,
                                   shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
+                                    borderRadius: BorderRadius.circular(12.r),
                                     side: BorderSide(
                                       color: selection == UserType.technician
                                           ? const Color(0xFF3775FA)
                                           : Color(0xFFE2DFDF),
-                                      width: 1,
+                                      width: 1.w,
                                     ),
                                   ),
                                   child: ListTile(
@@ -142,7 +135,7 @@ class SelectTypeView extends StatelessWidget {
                                     title: Text('حرفي',
                                         style: GoogleFonts.cairo(
                                             color: const Color(0xFF727070),
-                                            fontSize: 14,
+                                            fontSize: 14.sp,
                                             fontWeight: FontWeight.w400)),
                                     leading: _CustomRadioIcon(
                                       isSelected:
@@ -154,19 +147,19 @@ class SelectTypeView extends StatelessWidget {
                             );
                           },
                         ),
-                        SizedBox(height: (24 / 852) * screenHeight),
+                        SizedBox(height: 24.h),
                         Container(
                             width: double.infinity,
-                            height: (40 / 852) * screenHeight,
+                            height: 40.h,
                             decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(12.0),
+                              borderRadius: BorderRadius.circular(12.r),
                               border: Border.all(
                                 color: Color(0xFF3775FA),
-                                width: 1.0,
+                                width: 1.w,
                               ),
                             ),
                             child: Padding(
-                              padding: EdgeInsetsGeometry.all(1),
+                              padding: EdgeInsets.all(1.r),
                               child: ElevatedButton(
                                 onPressed: () {
                                   if (context.read<SelectTypeCubit>().state ==
@@ -209,13 +202,13 @@ class SelectTypeView extends StatelessWidget {
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: const Color(0xFF3775FA),
                                   shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
+                                    borderRadius: BorderRadius.circular(12.r),
                                   ),
                                 ),
                                 child: Text(
                                   'يلا نبدأ',
                                   style: GoogleFonts.cairo(
-                                    fontSize: 16,
+                                    fontSize: 16.sp,
                                     fontWeight: FontWeight.w500,
                                     color: Colors.white,
                                   ),
@@ -245,7 +238,7 @@ class _CustomRadioIcon extends StatelessWidget {
     return Icon(
       isSelected ? Icons.radio_button_checked : Icons.radio_button_unchecked,
       color: isSelected ? const Color(0xFF3775FA) : Color(0xFFE2DFDF),
-      size: 30,
+      size: 30.r,
     );
   }
 }

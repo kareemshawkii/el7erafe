@@ -64,19 +64,23 @@ class ServiceRequestCubit extends Cubit<ServiceRequestState> {
       return;
     }
     try {
-    final result = await _repository.submitQuickReservation(requestModel);
-    result.fold(
-      (failure) {
-        if (failure.contains("unauthorized") || failure.contains("401")) {
-          emit(ServiceRequestUnauthorized("انتهت صلاحية الجلسة، يرجى تسجيل الدخول مرة أخرى"));
-        } else {
-          emit(ServiceRequestError(failure));
-        }
-      },
-      (success) => emit(ServiceRequestSuccess()),
-    );
-  } catch (e) {
-    emit(ServiceRequestError("حدث خطأ غير متوقع: ${e.toString()}"));
-  }
+      final result = await _repository.submitQuickReservation(requestModel);
+      result.fold(
+        (failure) {
+          if (failure.contains("unauthorized") || failure.contains("401")) {
+            emit(ServiceRequestUnauthorized(
+                "انتهت صلاحية الجلسة، يرجى تسجيل الدخول مرة أخرى"));
+          } else if (failure.startsWith("409 ")) {
+            final String cleanMessage = failure.replaceFirst("409 ", "");
+            emit(ServiceRequestConflict(cleanMessage));
+          } else {
+            emit(ServiceRequestError(failure));
+          }
+        },
+        (success) => emit(ServiceRequestSuccess()),
+      );
+    } catch (e) {
+      emit(ServiceRequestError("حدث خطأ غير متوقع: ${e.toString()}"));
+    }
   }
 }

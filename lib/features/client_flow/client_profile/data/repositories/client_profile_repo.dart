@@ -8,7 +8,8 @@ class ProfileRepository {
   final String _baseUrl =
       'https://el7rafe-gma4hrg0e9epfsc0.uaenorth-01.azurewebsites.net';
 
-  Future<Either<String, Map<String, dynamic>>> getProfileData(String token) async {
+  Future<Either<String, Map<String, dynamic>>> getProfileData(
+      String token) async {
     try {
       final response = await http.get(
         Uri.parse('$_baseUrl/api/cf/profile'),
@@ -92,8 +93,9 @@ class ProfileRepository {
           "يوجد خطأ في الاتصال بالإنترنت الرجاء التحقق من اتصالك والمحاولة مرة اخرى.");
     }
   }
-  
-  Future<Either<String,String>> updateBasicProfile(String token, String name, File? imageFile) async {
+
+  Future<Either<String, String>> updateBasicProfile(
+      String token, String name, File? imageFile) async {
     try {
       final Uri url = Uri.parse('$_baseUrl/api/cf/profile_update');
       var request = http.MultipartRequest('PATCH', url);
@@ -103,11 +105,11 @@ class ProfileRepository {
         request.fields['Name'] = name;
       }
 
-    if (imageFile != null) {
-      request.files.add(
-        await http.MultipartFile.fromPath('Image', imageFile.path),
-      );
-    }
+      if (imageFile != null) {
+        request.files.add(
+          await http.MultipartFile.fromPath('Image', imageFile.path),
+        );
+      }
 
       var streamedResponse = await request.send();
       var response = await http.Response.fromStream(streamedResponse);
@@ -118,21 +120,24 @@ class ProfileRepository {
         }
         if (imageFile != null) {
           await AuthLocalStorage().deleteUserProfileImage();
+          await AuthLocalStorage().incrementImageVersion();
         }
-        return Right("تم تحديث البيانات بنجاح"); 
+        return Right("تم تحديث البيانات بنجاح");
       } else if (response.statusCode == 401) {
         AuthLocalStorage authLocalStorage = AuthLocalStorage();
         await authLocalStorage.clearSession();
-        return const Left("401"); 
+        return const Left("401");
       } else {
         return const Left("فشل تحديث البيانات، الرجاء المحاولة مرة أخرى.");
       }
     } catch (e) {
-      return const Left("يوجد خطأ في الاتصال بالإنترنت الرجاء التحقق من اتصالك والمحاولة مرة اخرى.");
+      return const Left(
+          "يوجد خطأ في الاتصال بالإنترنت الرجاء التحقق من اتصالك والمحاولة مرة اخرى.");
     }
   }
 
-  Future<Either<String, String>> sendSensitiveChangeOtp(String token, String email) async {
+  Future<Either<String, String>> sendFirstOtp(
+      String token, String email) async {
     final Uri resendUrl = Uri.parse('$_baseUrl/api/auth/resend-otp');
     try {
       final response = await http.post(
@@ -144,7 +149,6 @@ class ProfileRepository {
           'email': email,
         }),
       );
-      
       if (response.statusCode == 200) {
         return const Right('تم إرسال كود التحقق بنجاح.');
       } else if (response.statusCode == 400) {
@@ -153,18 +157,17 @@ class ProfileRepository {
         AuthLocalStorage authLocalStorage = AuthLocalStorage();
         await authLocalStorage.clearSession();
         return const Left("401");
-      }
-      else {
+      } else {
         return Left(jsonDecode(response.body)['errorMessage']);
       }
     } catch (e) {
-      return const Left(
-          "حصل خطأ غير متوقع. يرجى التأكد من اتصالك بالإنترنت.");
+      return const Left("حصل خطأ غير متوقع. يرجى التأكد من اتصالك بالإنترنت.");
     }
   }
 
-  Future<Either<String, String>> verifySensitiveChangeOtp(String token, String email, String otpCode) async {
-    final Uri verifyUrl = Uri.parse('$_baseUrl/api/auth/verify-reset-otp');
+  Future<Either<String, String>> verifyFirstOtp(
+      String token, String email, String otpCode) async {
+    final Uri verifyUrl = Uri.parse('$_baseUrl/api/auth/verify-otp');
     try {
       final response = await http.post(
         verifyUrl,
@@ -176,7 +179,6 @@ class ProfileRepository {
           'otpCode': otpCode,
         }),
       );
-
       if (response.statusCode == 200 || response.statusCode == 201) {
         return Right('تم التحقق من الكود بنجاح');
       } else if (response.statusCode == 400) {
@@ -185,53 +187,17 @@ class ProfileRepository {
         AuthLocalStorage authLocalStorage = AuthLocalStorage();
         await authLocalStorage.clearSession();
         return const Left("401");
-      }
-      else {
-        return  Left(
-            ("حصل خطأ غير متوقع. يرجى المحاولة مرة أخرى لاحقًا."));
+      } else {
+        return Left(("حصل خطأ غير متوقع. يرجى المحاولة مرة أخرى لاحقًا."));
       }
     } catch (e) {
-      return  Left(
-          ("حصل خطأ غير متوقع. يرجى التأكد من اتصالك بالإنترنت."));
+      return Left(("حصل خطأ غير متوقع. يرجى التأكد من اتصالك بالإنترنت."));
     }
   }
 
-  Future<Either<String, String>> confirmNewEmail(String token, String email, String newOtpCode) async {
-    final Uri verifyUrl = Uri.parse('$_baseUrl/api/auth/confirm-email');
-    try {
-      final response = await http.post(
-        verifyUrl,
-        headers: {
-          'Content-Type': 'application/json; charset=UTF-8',
-          'Authorization': 'Bearer $token',
-        },
-        body: jsonEncode({
-          'email': email,
-          'otpCode': newOtpCode,
-        }),
-      );
-
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        return Right('تم التحقق من الكود بنجاح');
-      } else if (response.statusCode == 400) {
-        return Left((jsonDecode(response.body)['errorMessage']));
-      } else if (response.statusCode == 401) {
-        AuthLocalStorage authLocalStorage = AuthLocalStorage();
-        await authLocalStorage.clearSession();
-        return const Left("401");
-      }
-      else {
-        return  Left(
-            ("حصل خطأ غير متوقع. يرجى المحاولة مرة أخرى لاحقًا."));
-      }
-    } catch (e) {
-      return  Left(
-          ("حصل خطأ غير متوقع. يرجى التأكد من اتصالك بالإنترنت."));
-    }
-  }
-
-  Future<Either<String, String>> finalizeEmailChange(String token, String newEmail) async {
-    final Uri resendUrl = Uri.parse('$_baseUrl/api/cf/update_email');
+  Future<Either<String, String>> sendOtpToNewEmail(
+      String token, String newEmail) async {
+    final Uri resendUrl = Uri.parse('$_baseUrl/api/cf/update-pending-email');
     try {
       final response = await http.post(
         resendUrl,
@@ -251,18 +217,49 @@ class ProfileRepository {
         AuthLocalStorage authLocalStorage = AuthLocalStorage();
         await authLocalStorage.clearSession();
         return const Left("401");
-      }
-      else {
+      } else {
         return Left(jsonDecode(response.body)['errorMessage']);
       }
     } catch (e) {
-      return const Left(
-          "حصل خطأ غير متوقع. يرجى التأكد من اتصالك بالإنترنت.");
+      return const Left("حصل خطأ غير متوقع. يرجى التأكد من اتصالك بالإنترنت.");
     }
   }
 
-  Future<Either<String, String>> finalizePhoneChange(String token, String newPhone) async {
-      final Uri resendUrl = Uri.parse('$_baseUrl/api/cf/phone_update');
+  Future<Either<String, String>> verifyNewEmail(
+      String token, String email, String newOtpCode) async {
+    final Uri verifyUrl = Uri.parse('$_baseUrl/api/cf/update-email');
+    try {
+      final response = await http.post(
+        verifyUrl,
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer $token',
+        },
+        body: jsonEncode({
+          'otpCode': newOtpCode,
+        }),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return Right('تم التحقق من الكود بنجاح');
+      } else if (response.statusCode == 400) {
+        return Left((jsonDecode(response.body)['errorMessage']));
+      } else if (response.statusCode == 401) {
+        AuthLocalStorage authLocalStorage = AuthLocalStorage();
+        await authLocalStorage.clearSession();
+        return const Left("401");
+      } else {
+        return Left(("حصل خطأ غير متوقع. يرجى المحاولة مرة أخرى لاحقًا."));
+      }
+    } catch (e) {
+      return Left(("حصل خطأ غير متوقع. يرجى التأكد من اتصالك بالإنترنت."));
+    }
+  }
+  
+
+  Future<Either<String, String>> finalizePhoneChange(
+      String token, String newPhone) async {
+    final Uri resendUrl = Uri.parse('$_baseUrl/api/cf/phone_update');
     try {
       final response = await http.patch(
         resendUrl,
@@ -280,15 +277,13 @@ class ProfileRepository {
         return Left(jsonDecode(response.body)['errorMessage']);
       } else if (response.statusCode == 401) {
         AuthLocalStorage authLocalStorage = AuthLocalStorage();
-        await authLocalStorage.clearSession(); 
+        await authLocalStorage.clearSession();
         return const Left("401");
-      }
-      else {
+      } else {
         return Left(jsonDecode(response.body)['errorMessage']);
       }
     } catch (e) {
-      return const Left(
-          "حصل خطأ غير متوقع. يرجى التأكد من اتصالك بالإنترنت.");
+      return const Left("حصل خطأ غير متوقع. يرجى التأكد من اتصالك بالإنترنت.");
     }
   }
 }

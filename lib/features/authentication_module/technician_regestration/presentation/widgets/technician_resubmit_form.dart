@@ -6,6 +6,7 @@ import 'package:el7erafe/features/authentication_module/technician_regestration/
 import 'package:el7erafe/features/authentication_module/technician_regestration/presentation/cubit/technician_resubmit_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:el7erafe/features/authentication_module/technician_regestration/presentation/widgets/image_picker.dart';
@@ -92,24 +93,18 @@ class _TechnicianResubmitFormState extends State<TechnicianResubmitForm> {
 
   @override
   Widget build(BuildContext context) {
-    final double screenHeight = MediaQuery.of(context).size.height;
-    final double screenWidth = MediaQuery.of(context).size.width;
     return Form(
       key: _formKey,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           Container(
-            height: (90 / 852) * screenHeight,
-            width: (361 / 393) * screenWidth,
-            padding: EdgeInsets.fromLTRB(
-                (12 / 393) * screenWidth,
-                (12 / 852) * screenHeight,
-                (8 / 393) * screenWidth,
-                (12 / 852) * screenHeight),
+            height: 90.h,
+            width: 361.w,
+            padding: EdgeInsets.fromLTRB(12.w, 12.h, 8.w, 12.h),
             decoration: BoxDecoration(
-              border: Border.all(color: Color(0xFFE2DFDF), width: 1.0),
-              borderRadius: BorderRadius.circular(16.0),
+              border: Border.all(color: Color(0xFFE2DFDF), width: 1.w),
+              borderRadius: BorderRadius.circular(16.r),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -118,22 +113,22 @@ class _TechnicianResubmitFormState extends State<TechnicianResubmitForm> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     SizedBox(
-                      width: (24 / 393) * screenWidth,
-                      height: (24 / 852) * screenHeight,
+                      width: 24.w,
+                      height: 24.h,
                       child: SvgPicture.asset('images/warning-2.svg'),
                     ),
-                    SizedBox(width: (8 / 393) * screenWidth),
+                    SizedBox(width: 8.w),
                     Text(
                       'سبب الرفض',
                       style: GoogleFonts.cairo(
-                          fontSize: 17,
+                          fontSize: 17.sp,
                           fontWeight: FontWeight.w700,
                           color: Color(0xFF971313)),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
-                SizedBox(height: (8 / 852) * screenHeight),
+                SizedBox(height: 8.h),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
@@ -141,55 +136,47 @@ class _TechnicianResubmitFormState extends State<TechnicianResubmitForm> {
                       rejectedTechnician?.rejectionReason ??
                           'جارٍ تحميل سبب الرفض...',
                       style: GoogleFonts.cairo(
-                          fontSize: 14,
+                          fontSize: 14.sp,
                           fontWeight: FontWeight.w400,
                           color: Color(0xFF000000)),
                       textAlign: TextAlign.right,
                     ),
-                    SizedBox(width: (32 / 393) * screenWidth),
+                    SizedBox(width: 32.w),
                   ],
                 ),
               ],
             ),
           ),
-          SizedBox(height: (14 / 852) * screenHeight),
+          SizedBox(height: 14.h),
           Container(
-              padding: EdgeInsets.fromLTRB(
-                  (8 / 393) * screenWidth,
-                  (12 / 852) * screenHeight,
-                  (8 / 393) * screenWidth,
-                  (12 / 852) * screenHeight),
+              padding: EdgeInsets.fromLTRB(8.w, 12.h, 8.w, 12.h),
               decoration: BoxDecoration(
-                border: Border.all(color: Color(0xFFE2DFDF), width: 1.0),
-                borderRadius: BorderRadius.circular(16.0),
+                border: Border.all(color: Color(0xFFE2DFDF), width: 1.w),
+                borderRadius: BorderRadius.circular(16.r),
               ),
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text('البيانات الاساسيه',
                         style: GoogleFonts.cairo(
-                            fontSize: 15,
+                            fontSize: 15.sp,
                             fontWeight: FontWeight.w500,
                             color: Color(0xFF3775FA))),
-                    SizedBox(height: (16 / 852) * screenHeight),
+                    SizedBox(height: 16.h),
                     Text('الاسم',
                         style: GoogleFonts.cairo(
-                            fontSize: 16,
+                            fontSize: 16.sp,
                             fontWeight: FontWeight.w400,
                             color: Colors.black)),
-                    SizedBox(height: (8 / 852) * screenHeight),
+                    SizedBox(height: 8.h),
                     Container(
-                      height: (40 / 852) * screenHeight,
-                      width: (345 / 393) * screenWidth,
-                      padding: EdgeInsets.fromLTRB(
-                          (8 / 393) * screenWidth,
-                          (8 / 852) * screenHeight,
-                          (8 / 393) * screenWidth,
-                          (8 / 852) * screenHeight),
+                      height: 40.h,
+                      width: 345.w,
+                      padding: EdgeInsets.fromLTRB(8.w, 8.h, 8.w, 8.h),
                       decoration: BoxDecoration(
                           border:
-                              Border.all(color: Color(0xFFE2DFDF), width: 1.0),
-                          borderRadius: BorderRadius.circular(12.0),
+                              Border.all(color: Color(0xFFE2DFDF), width: 1.w),
+                          borderRadius: BorderRadius.circular(12.r),
                           color: Color.fromARGB(255, 238, 238, 238)),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.start,
@@ -197,39 +184,35 @@ class _TechnicianResubmitFormState extends State<TechnicianResubmitForm> {
                           Text(
                             rejectedTechnician?.name ?? 'جارٍ تحميل الاسم...',
                             style: GoogleFonts.cairo(
-                                fontSize: 13,
+                                fontSize: 13.sp,
                                 fontWeight: FontWeight.w400,
                                 color: Color(0xFF727070)),
                             textAlign: TextAlign.right,
                           ),
-                          SizedBox(width: (8 / 393) * screenWidth),
+                          SizedBox(width: 8.w),
                           Icon(
                             Icons.person_2_outlined,
                             color: Color(0xFF727070),
-                            size: 18,
+                            size: 18.r,
                           ),
                         ],
                       ),
                     ),
-                    SizedBox(height: (16 / 852) * screenHeight),
+                    SizedBox(height: 16.h),
                     Text('رقم التليفون',
                         style: GoogleFonts.cairo(
-                            fontSize: 16,
+                            fontSize: 16.sp,
                             fontWeight: FontWeight.w400,
                             color: Colors.black)),
-                    SizedBox(height: (8 / 852) * screenHeight),
+                    SizedBox(height: 8.h),
                     Container(
-                      height: (40 / 852) * screenHeight,
-                      width: (345 / 393) * screenWidth,
-                      padding: EdgeInsets.fromLTRB(
-                          (8 / 393) * screenWidth,
-                          (8 / 852) * screenHeight,
-                          (8 / 393) * screenWidth,
-                          (8 / 852) * screenHeight),
+                      height: 40.h,
+                      width: 345.w,
+                      padding: EdgeInsets.fromLTRB(8.w, 8.h, 8.w, 8.h),
                       decoration: BoxDecoration(
                           border:
-                              Border.all(color: Color(0xFFE2DFDF), width: 1.0),
-                          borderRadius: BorderRadius.circular(12.0),
+                              Border.all(color: Color(0xFFE2DFDF), width: 1.w),
+                          borderRadius: BorderRadius.circular(12.r),
                           color: Color.fromARGB(255, 238, 238, 238)),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.end,
@@ -238,53 +221,49 @@ class _TechnicianResubmitFormState extends State<TechnicianResubmitForm> {
                             rejectedTechnician?.phone ??
                                 'جارٍ تحميل رقم التليفون...',
                             style: GoogleFonts.cairo(
-                                fontSize: 13,
+                                fontSize: 13.sp,
                                 fontWeight: FontWeight.w400,
                                 color: Color(0xFF727070)),
                             textAlign: TextAlign.right,
                           ),
-                          SizedBox(width: (8 / 393) * screenWidth),
+                          SizedBox(width: 8.w),
                           Icon(
                             Icons.call,
                             color: Color(0xFF727070),
-                            size: 18,
+                            size: 18.r,
                           ),
                         ],
                       ),
                     ),
-                    SizedBox(height: (16 / 852) * screenHeight),
+                    SizedBox(height: 16.h),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Text("المحافظة",
                             style: GoogleFonts.cairo(
-                                fontSize: 16,
+                                fontSize: 16.sp,
                                 fontWeight: FontWeight.w400,
                                 color: Colors.black)),
-                        SizedBox(width: (123 / 393) * screenWidth),
+                        SizedBox(width: 123.w),
                         Text("المدينة",
                             style: GoogleFonts.cairo(
-                                fontSize: 16,
+                                fontSize: 16.sp,
                                 fontWeight: FontWeight.w400,
                                 color: Colors.black)),
                       ],
                     ),
-                    SizedBox(height: (8 / 852) * screenHeight),
+                    SizedBox(height: 8.h),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Container(
-                          height: (40 / 852) * screenHeight,
-                          width: (166 / 393) * screenWidth,
-                          padding: EdgeInsets.fromLTRB(
-                              (12 / 393) * screenWidth,
-                              (8 / 852) * screenHeight,
-                              (12 / 393) * screenWidth,
-                              (8 / 852) * screenHeight),
+                          height: 40.h,
+                          width: 166.w,
+                          padding: EdgeInsets.fromLTRB(12.w, 8.h, 12.w, 8.h),
                           decoration: BoxDecoration(
                               border: Border.all(
-                                  color: Color(0xFFE2DFDF), width: 1.0),
-                              borderRadius: BorderRadius.circular(12.0),
+                                  color: Color(0xFFE2DFDF), width: 1.w),
+                              borderRadius: BorderRadius.circular(12.r),
                               color: Color.fromARGB(255, 238, 238, 238)),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -292,13 +271,13 @@ class _TechnicianResubmitFormState extends State<TechnicianResubmitForm> {
                               Icon(
                                 Icons.arrow_drop_down,
                                 color: Color(0xFF727070),
-                                size: 15,
+                                size: 15.r,
                               ),
                               Text(
                                 rejectedTechnician?.city ??
                                     'جارٍ تحميل المدينة...',
                                 style: GoogleFonts.cairo(
-                                    fontSize: 13,
+                                    fontSize: 13.sp,
                                     fontWeight: FontWeight.w400,
                                     color: Color(0xFF727070)),
                                 textAlign: TextAlign.right,
@@ -306,19 +285,15 @@ class _TechnicianResubmitFormState extends State<TechnicianResubmitForm> {
                             ],
                           ),
                         ),
-                        SizedBox(width: (8 / 393) * screenWidth),
+                        SizedBox(width: 8.w),
                         Container(
-                          height: (40 / 852) * screenHeight,
-                          width: (166 / 393) * screenWidth,
-                          padding: EdgeInsets.fromLTRB(
-                              (12 / 393) * screenWidth,
-                              (8 / 852) * screenHeight,
-                              (12 / 393) * screenWidth,
-                              (8 / 852) * screenHeight),
+                          height: 40.h,
+                          width: 166.w,
+                          padding: EdgeInsets.fromLTRB(12.w, 8.h, 12.w, 8.h),
                           decoration: BoxDecoration(
                               border: Border.all(
-                                  color: Color(0xFFE2DFDF), width: 1.0),
-                              borderRadius: BorderRadius.circular(12.0),
+                                  color: Color(0xFFE2DFDF), width: 1.w),
+                              borderRadius: BorderRadius.circular(12.r),
                               color: Color.fromARGB(255, 238, 238, 238)),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -326,13 +301,13 @@ class _TechnicianResubmitFormState extends State<TechnicianResubmitForm> {
                               Icon(
                                 Icons.arrow_drop_down,
                                 color: Color(0xFF727070),
-                                size: 15,
+                                size: 15.r,
                               ),
                               Text(
                                 rejectedTechnician?.governorate ??
                                     'جارٍ تحميل المحافظه...',
                                 style: GoogleFonts.cairo(
-                                    fontSize: 13,
+                                    fontSize: 13.sp,
                                     fontWeight: FontWeight.w400,
                                     color: Color(0xFF727070)),
                                 textAlign: TextAlign.right,
@@ -342,25 +317,21 @@ class _TechnicianResubmitFormState extends State<TechnicianResubmitForm> {
                         ),
                       ],
                     ),
-                    SizedBox(height: (16 / 852) * screenHeight),
+                    SizedBox(height: 16.h),
                     Text('الحرفة',
                         style: GoogleFonts.cairo(
-                            fontSize: 16,
+                            fontSize: 16.sp,
                             fontWeight: FontWeight.w400,
                             color: Colors.black)),
-                    SizedBox(height: (8 / 852) * screenHeight),
+                    SizedBox(height: 8.h),
                     Container(
-                      height: (40 / 852) * screenHeight,
-                      width: (166 / 393) * screenWidth,
-                      padding: EdgeInsets.fromLTRB(
-                          (12 / 393) * screenWidth,
-                          (8 / 852) * screenHeight,
-                          (12 / 393) * screenWidth,
-                          (8 / 852) * screenHeight),
+                      height: 40.h,
+                      width: 166.w,
+                      padding: EdgeInsets.fromLTRB(12.w, 8.h, 12.w, 8.h),
                       decoration: BoxDecoration(
                           border:
-                              Border.all(color: Color(0xFFE2DFDF), width: 1.0),
-                          borderRadius: BorderRadius.circular(12.0),
+                              Border.all(color: Color(0xFFE2DFDF), width: 1.w),
+                          borderRadius: BorderRadius.circular(12.r),
                           color: Color.fromARGB(255, 238, 238, 238)),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -368,13 +339,13 @@ class _TechnicianResubmitFormState extends State<TechnicianResubmitForm> {
                           Icon(
                             Icons.arrow_drop_down,
                             color: Color(0xFF727070),
-                            size: 15,
+                            size: 15.r,
                           ),
                           Text(
                             rejectedTechnician?.serviceType ??
                                 'جارٍ تحميل الحرف...',
                             style: GoogleFonts.cairo(
-                                fontSize: 13,
+                                fontSize: 13.sp,
                                 fontWeight: FontWeight.w400,
                                 color: Color(0xFF727070)),
                             textAlign: TextAlign.right,
@@ -383,32 +354,28 @@ class _TechnicianResubmitFormState extends State<TechnicianResubmitForm> {
                       ),
                     ),
                   ])),
-          SizedBox(height: (14 / 852) * screenHeight),
+          SizedBox(height: 14.h),
           Container(
-              padding: EdgeInsets.fromLTRB(
-                  (8 / 393) * screenWidth,
-                  (12 / 852) * screenHeight,
-                  (8 / 393) * screenWidth,
-                  (12 / 852) * screenHeight),
+              padding: EdgeInsets.fromLTRB(8.w, 12.h, 8.w, 12.h),
               decoration: BoxDecoration(
-                border: Border.all(color: Color(0xFFE2DFDF), width: 1.0),
-                borderRadius: BorderRadius.circular(16.0),
+                border: Border.all(color: Color(0xFFE2DFDF), width: 1.w),
+                borderRadius: BorderRadius.circular(16.r),
               ),
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text('توثيق حسابك',
                         style: GoogleFonts.cairo(
-                            fontSize: 16,
+                            fontSize: 16.sp,
                             fontWeight: FontWeight.w400,
                             color: Color(0xFF3775FA))),
-                    SizedBox(height: (16 / 852) * screenHeight),
+                    SizedBox(height: 16.h),
                     Text('بطاقتك الشخصية',
                         style: GoogleFonts.cairo(
-                            fontSize: 17,
+                            fontSize: 17.sp,
                             fontWeight: FontWeight.w600,
                             color: Color(0xFF000000))),
-                    SizedBox(height: (16 / 852) * screenHeight),
+                    SizedBox(height: 16.h),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -417,15 +384,15 @@ class _TechnicianResubmitFormState extends State<TechnicianResubmitForm> {
                           children: [
                             Text('صورة البطاقة من الوش',
                                 style: GoogleFonts.cairo(
-                                    fontSize: 13,
+                                    fontSize: 13.sp,
                                     fontWeight: FontWeight.w400,
                                     color: Colors.black)),
-                            const SizedBox(height: 8),
+                            SizedBox(height: 8.h),
                             ImagePickerButton(
                               enabled: rejectedTechnician?.frontId ?? false,
                               disabledImage: 'images/uploaded.svg',
-                              width: (345 / 393) * screenWidth,
-                              height: (94 / 852) * screenHeight,
+                              width: 345.w,
+                              height: 94.h,
                               defaultImage: 'images/id_front_placeholder.svg',
                               onImagePicked: (file) {
                                 setState(() {
@@ -435,18 +402,18 @@ class _TechnicianResubmitFormState extends State<TechnicianResubmitForm> {
                             ),
                           ],
                         ),
-                        SizedBox(height: (12 / 852) * screenHeight),
+                        SizedBox(height: 12.h),
                         Text('صورة البطاقة من الظهر',
                             style: GoogleFonts.cairo(
-                                fontSize: 13,
+                                fontSize: 13.sp,
                                 fontWeight: FontWeight.w400,
                                 color: Colors.black)),
-                        const SizedBox(height: 8),
+                        SizedBox(height: 8.h),
                         ImagePickerButton(
                           enabled: rejectedTechnician?.backId ?? false,
                           disabledImage: 'images/uploaded.svg',
-                          width: (345 / 393) * screenWidth,
-                          height: (94 / 852) * screenHeight,
+                          width: 345.w,
+                          height: 94.h,
                           defaultImage: 'images/id_back_placeholder.svg',
                           onImagePicked: (file) {
                             setState(() {
@@ -456,13 +423,13 @@ class _TechnicianResubmitFormState extends State<TechnicianResubmitForm> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 16),
+                    SizedBox(height: 16.h),
                     Text('الفيش الجنائي',
                         style: GoogleFonts.cairo(
-                            fontSize: 17,
+                            fontSize: 17.sp,
                             fontWeight: FontWeight.w600,
                             color: Color(0xFF000000))),
-                    SizedBox(height: (16 / 852) * screenHeight),
+                    SizedBox(height: 16.h),
                     Column(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
@@ -470,16 +437,16 @@ class _TechnicianResubmitFormState extends State<TechnicianResubmitForm> {
                           alignment: Alignment.centerRight,
                           child: Text('ارفع نسخة واضحة من الفيش الجنائي',
                               style: GoogleFonts.cairo(
-                                  fontSize: 13,
+                                  fontSize: 13.sp,
                                   fontWeight: FontWeight.w400,
                                   color: Colors.black)),
                         ),
-                        SizedBox(height: (16 / 852) * screenHeight),
+                        SizedBox(height: 16.h),
                         ImagePickerButton(
                           enabled: rejectedTechnician?.criminalRecord ?? false,
                           disabledImage: 'images/uploaded.svg',
-                          width: (345 / 393) * screenWidth,
-                          height: (94 / 852) * screenHeight,
+                          width: 345.w,
+                          height: 94.h,
                           defaultImage:
                               'images/criminal_record_placeholder.svg',
                           onImagePicked: (file) {
@@ -491,22 +458,22 @@ class _TechnicianResubmitFormState extends State<TechnicianResubmitForm> {
                       ],
                     ),
                   ])),
-          SizedBox(height: (24 / 852) * screenHeight),
+          SizedBox(height: 24.h),
           SizedBox(
             width: double.infinity,
-            height: (40 / 852) * screenHeight,
+            height: 40.h,
             child:
                 BlocBuilder<TechnicianResubmitCubit, TechnicianResubmitState>(
               builder: (context, state) {
                 final isLoading = state is TechnicianResubmitLoading;
                 return Container(
                     width: double.infinity,
-                    height: (40 / 852) * screenHeight,
+                    height: 40.h,
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12.0),
+                      borderRadius: BorderRadius.circular(12.r),
                       border: Border.all(
                         color: Color(0xFF3775FA),
-                        width: 1.0,
+                        width: 1.w,
                       ),
                     ),
                     child: ElevatedButton(
@@ -517,20 +484,21 @@ class _TechnicianResubmitFormState extends State<TechnicianResubmitForm> {
                         disabledBackgroundColor:
                             const Color.fromARGB(158, 55, 117, 250),
                         shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12.0),
+                            borderRadius: BorderRadius.circular(12.r),
                             side: const BorderSide(
                                 color: Colors.white, width: 1.0)),
                       ),
                       child: isLoading
-                          ? const SizedBox(
-                              height: 24,
-                              width: 24,
-                              child: CircularProgressIndicator(
+                          ? SizedBox(
+                              height: 24.r,
+                              width: 24.r,
+                              child: const CircularProgressIndicator(
                                   color: Color(0xFF3775FA), strokeWidth: 3),
                             )
                           : Text('اعادة الارسال',
                               style: GoogleFonts.cairo(
-                                  fontSize: 16, fontWeight: FontWeight.w500)),
+                                  fontSize: 16.sp,
+                                  fontWeight: FontWeight.w500)),
                     ));
               },
             ),

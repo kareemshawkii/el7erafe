@@ -29,6 +29,7 @@ dependencies:
   cached_network_image: ^3.3.0
   shimmer: ^3.0.0
   google_nav_bar: ^5.0.6
+  flutter_screenutil: ^5.9.3
 
 cupertino_icons: ^1.0.8
 
@@ -77,7 +78,11 @@ flutter:
     - images/warning-2.svg
     - images/profileImage.svg
     - images/home_image.svg 
+    - images/notech.png
+    - images/noservices.png
+    - images/notechfound.png 
     - images/quick_reserve.svg
     - images/select_technician.svg
     - images/success.png
+    - images/successtech.png
     - assets/icon/loading.json

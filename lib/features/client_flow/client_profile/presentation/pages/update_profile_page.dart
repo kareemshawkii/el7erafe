@@ -1,7 +1,10 @@
+// ignore_for_file: deprecated_member_use
+
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:image_picker/image_picker.dart';
@@ -48,10 +51,8 @@ class _ClientUpdateProfilePageState extends State<ClientUpdateProfilePage> {
   }
 
   Future<void> _loadStoredContactData() async {
-    final email = await AuthLocalStorage().getEmail() ??
-        ""; 
-    final phone = await AuthLocalStorage().getPhoneNumber() ??
-        "";
+    final email = await AuthLocalStorage().getEmail() ?? "";
+    final phone = await AuthLocalStorage().getPhoneNumber() ?? "";
     if (mounted) {
       setState(() {
         _emailDisplayController.text = email;
@@ -110,8 +111,6 @@ class _ClientUpdateProfilePageState extends State<ClientUpdateProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    final screenHeight = MediaQuery.of(context).size.height;
-
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
@@ -120,13 +119,15 @@ class _ClientUpdateProfilePageState extends State<ClientUpdateProfilePage> {
           backgroundColor: _primaryBlue,
           elevation: 0,
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+            icon: Icon(Icons.arrow_back_ios, color: Colors.white, size: 20.r),
             onPressed: () => Navigator.pop(context),
           ),
           title: Text(
             "تعديل الملف الشخصي",
             style: GoogleFonts.cairo(
-                color: Colors.white, fontWeight: FontWeight.bold),
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 22.sp),
           ),
           centerTitle: true,
         ),
@@ -143,18 +144,15 @@ class _ClientUpdateProfilePageState extends State<ClientUpdateProfilePage> {
               if (state.newName != null) _nameController.text = state.newName!;
               if (state.newPhone != null) {
                 _phoneDisplayController.text = state.newPhone!;
-                AuthLocalStorage()
-                    .savePhoneNumber(state.newPhone!); // Update local storage
+                AuthLocalStorage().savePhoneNumber(state.newPhone!);
               }
               if (state.newEmail != null) {
                 _emailDisplayController.text = state.newEmail!;
-                AuthLocalStorage()
-                    .saveEmail(state.newEmail!); // Update local storage
+                AuthLocalStorage().saveEmail(state.newEmail!);
               }
               if (state.newImageUrl != null) {
                 setState(() => _pickedImage = null);
-                AuthLocalStorage().saveUserProfileImage(
-                    state.newImageUrl!); // Update local storage
+                AuthLocalStorage().saveUserProfileImage(state.newImageUrl!);
               }
             } else if (state is ProfileError) {
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -171,11 +169,11 @@ class _ClientUpdateProfilePageState extends State<ClientUpdateProfilePage> {
                 child: Stack(
                   children: [
                     Container(
-                      width: 100,
-                      height: 100,
+                      width: 100.w,
+                      height: 100.h,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white, width: 3),
+                        border: Border.all(color: Colors.white, width: 3.w),
                       ),
                       child: ClipOval(
                         child: _pickedImage != null
@@ -213,28 +211,28 @@ class _ClientUpdateProfilePageState extends State<ClientUpdateProfilePage> {
                       child: GestureDetector(
                         onTap: _pickImage,
                         child: Container(
-                          padding: const EdgeInsets.all(8),
+                          padding: EdgeInsets.all(8.r),
                           decoration: const BoxDecoration(
                               color: Colors.white, shape: BoxShape.circle),
                           child:
-                              Icon(Icons.edit, color: _primaryBlue, size: 20),
+                              Icon(Icons.edit, color: _primaryBlue, size: 20.r),
                         ),
                       ),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: 20.h),
               Expanded(
                   child: GestureDetector(
                 onTap: () => FocusScope.of(context).unfocus(),
                 child: Form(
                   key: _mainFormKey,
                   child: Container(
-                    height: (560 / 852) * screenHeight,
+                    height: 560.h,
                     width: double.infinity,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 24, vertical: 30),
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 24.w, vertical: 30.h),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius:
@@ -244,24 +242,22 @@ class _ClientUpdateProfilePageState extends State<ClientUpdateProfilePage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const SizedBox(height: 20),
+                          SizedBox(height: 20.h),
                           Container(
-                              padding: const EdgeInsets.all(16),
+                              padding: EdgeInsets.all(16.r),
                               decoration: BoxDecoration(
                                 color: Colors.white,
-                                borderRadius: BorderRadius.circular(20),
+                                borderRadius: BorderRadius.circular(20.r),
                                 boxShadow: [
                                   BoxShadow(
-                                    // ignore: deprecated_member_use
                                     color: _primaryBlue.withOpacity(0.1),
-                                    blurRadius: 10,
-                                    offset: const Offset(0, 4),
+                                    blurRadius: 10.r,
+                                    offset: Offset(0, 4.h),
                                   ),
                                 ],
                                 border: Border.all(
-                                    // ignore: deprecated_member_use
                                     color: Colors.grey.withOpacity(0.2),
-                                    width: 1),
+                                    width: 1.w),
                               ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -291,31 +287,35 @@ class _ClientUpdateProfilePageState extends State<ClientUpdateProfilePage> {
                                       return null;
                                     },
                                   ),
-                                  const SizedBox(height: 12),
+                                  SizedBox(height: 12.h),
                                   _buildLabel("رقم التلفون"),
                                   _buildReadOnlyFieldWithChangeAction(
                                     controller: _phoneDisplayController,
                                     icon: Icons.phone_android_outlined,
-                                    onChangeTap: () =>
-                                        _showSensitiveUpdateSheet(context,
-                                            isForPhone: true),
+                                    onChangeTap: () {
+                                      _showSensitiveUpdateSheet(context,
+                                          isForPhone: true);
+                                      setState(() {});
+                                    },
                                   ),
                                   _buildLabel("البريد الالكتروني"),
                                   _buildReadOnlyFieldWithChangeAction(
                                     controller: _emailDisplayController,
                                     icon: Icons.email_outlined,
-                                    onChangeTap: () =>
-                                        _showSensitiveUpdateSheet(context,
-                                            isForPhone: false),
+                                    onChangeTap: () {
+                                      _showSensitiveUpdateSheet(context,
+                                          isForPhone: false);
+                                      setState(() {});
+                                    },
                                   ),
-                                  const SizedBox(height: 24),
+                                  SizedBox(height: 24.h),
                                   BlocBuilder<ProfileCubit, ProfileState>(
                                     builder: (context, state) {
                                       bool isLoading =
                                           state is ProfileBasicUpdateLoading;
                                       return SizedBox(
                                         width: double.infinity,
-                                        height: 56,
+                                        height: 56.h,
                                         child: ElevatedButton(
                                           onPressed: isLoading
                                               ? null
@@ -362,7 +362,7 @@ class _ClientUpdateProfilePageState extends State<ClientUpdateProfilePage> {
                                             foregroundColor: _primaryBlue,
                                             shape: RoundedRectangleBorder(
                                               borderRadius:
-                                                  BorderRadius.circular(16),
+                                                  BorderRadius.circular(16.r),
                                               side: BorderSide(
                                                   color: _primaryBlue),
                                             ),
@@ -377,14 +377,15 @@ class _ClientUpdateProfilePageState extends State<ClientUpdateProfilePage> {
                                                   children: [
                                                     const Icon(
                                                         Icons.save_outlined),
-                                                    const SizedBox(width: 8),
+                                                    SizedBox(width: 8.w),
                                                     Text("حفظ التعديلات",
                                                         style:
                                                             GoogleFonts.cairo(
                                                                 fontWeight:
                                                                     FontWeight
                                                                         .bold,
-                                                                fontSize: 16)),
+                                                                fontSize:
+                                                                    16.sp)),
                                                   ],
                                                 ),
                                         ),
@@ -408,10 +409,10 @@ class _ClientUpdateProfilePageState extends State<ClientUpdateProfilePage> {
 
   Widget _buildLabel(String text) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8.0, right: 4),
+      padding: EdgeInsets.only(bottom: 8.h, right: 4.w),
       child: Text(text,
           style: GoogleFonts.cairo(
-              fontSize: 14, fontWeight: FontWeight.bold, color: _textBlack)),
+              fontSize: 14.sp, fontWeight: FontWeight.bold, color: _textBlack)),
     );
   }
 
@@ -423,7 +424,7 @@ class _ClientUpdateProfilePageState extends State<ClientUpdateProfilePage> {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(16.r),
         border: Border.all(color: Colors.transparent, width: 0),
       ),
       child: TextFormField(
@@ -434,27 +435,26 @@ class _ClientUpdateProfilePageState extends State<ClientUpdateProfilePage> {
         decoration: InputDecoration(
           hintText: "ادخل النص المطلوب",
           hintStyle: GoogleFonts.cairo(color: Colors.grey),
-          prefixIcon: Icon(icon, color: Colors.grey),
+          prefixIcon: Icon(icon, color: Colors.grey, size: 20.r),
           border: InputBorder.none,
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 8, vertical: 14),
+          contentPadding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 14.h),
           enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16),
-            borderSide: BorderSide(color: Colors.grey.shade300, width: 1),
+            borderRadius: BorderRadius.circular(16.r),
+            borderSide: BorderSide(color: Colors.grey.shade300, width: 1.w),
           ),
           focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16),
-            borderSide: BorderSide(color: _primaryBlue, width: 1),
+            borderRadius: BorderRadius.circular(16.r),
+            borderSide: BorderSide(color: _primaryBlue, width: 1.w),
           ),
           errorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(16.r),
             borderSide: const BorderSide(color: Colors.red, width: 1),
           ),
           focusedErrorBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(16.r),
             borderSide: const BorderSide(color: Colors.red, width: 1.5),
           ),
-          errorStyle: GoogleFonts.cairo(fontSize: 12, color: Colors.red),
+          errorStyle: GoogleFonts.cairo(fontSize: 12.sp, color: Colors.red),
         ),
       ),
     );
@@ -488,9 +488,8 @@ class _ClientUpdateProfilePageState extends State<ClientUpdateProfilePage> {
       children: [
         Container(
           decoration: BoxDecoration(
-              // ignore: deprecated_member_use
               color: Colors.grey.shade100.withOpacity(0.8),
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(16.r),
               border: Border.all(color: Colors.grey.shade300)),
           child: TextField(
             controller: TextEditingController(text: maskData(controller.text)),
@@ -498,23 +497,23 @@ class _ClientUpdateProfilePageState extends State<ClientUpdateProfilePage> {
             textDirection: TextDirection.rtl,
             style: GoogleFonts.cairo(color: Colors.grey.shade700),
             decoration: InputDecoration(
-                prefixIcon: Icon(icon, color: Colors.grey),
+                prefixIcon: Icon(icon, color: Colors.grey, size: 20.r),
                 border: InputBorder.none,
                 contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 14)),
+                    EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h)),
           ),
         ),
         Align(
           alignment: Alignment.centerLeft,
           child: Padding(
-            padding: const EdgeInsets.only(top: 8.0, left: 8.0),
+            padding: EdgeInsets.only(top: 8.h, left: 8.w),
             child: GestureDetector(
                 onTap: onChangeTap,
                 child: Text("تغيير",
                     style: GoogleFonts.cairo(
                         color: _primaryBlue,
                         fontWeight: FontWeight.bold,
-                        fontSize: 14))),
+                        fontSize: 14.sp))),
           ),
         )
       ],
@@ -526,10 +525,11 @@ class _SensitiveUpdateFlowSheet extends StatefulWidget {
   final String token;
   final bool isForPhone;
   final String currentImageUrl;
-  const _SensitiveUpdateFlowSheet(
-      {required this.token,
-      required this.isForPhone,
-      required this.currentImageUrl});
+  const _SensitiveUpdateFlowSheet({
+    required this.token,
+    required this.isForPhone,
+    required this.currentImageUrl,
+  });
 
   @override
   State<_SensitiveUpdateFlowSheet> createState() =>
@@ -542,16 +542,22 @@ class _SensitiveUpdateFlowSheetState extends State<_SensitiveUpdateFlowSheet> {
   final _confirmValueController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
+  String _currentEmail = "";
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      String? currentEmail = await AuthLocalStorage().getEmail();
+      String? email = await AuthLocalStorage().getEmail();
       if (mounted) {
-        context.read<ProfileCubit>().initiateSensitiveChange(
+        setState(() {
+          _currentEmail = email ?? "";
+        });
+
+        context.read<ProfileCubit>().sendFirstOtp(
               widget.token,
+              _currentEmail,
               isForPhone: widget.isForPhone,
-              email: currentEmail ?? "",
             );
       }
     });
@@ -565,21 +571,31 @@ class _SensitiveUpdateFlowSheetState extends State<_SensitiveUpdateFlowSheet> {
     super.dispose();
   }
 
+  String get _hashedEmail {
+    if (_currentEmail.isEmpty || !_currentEmail.contains("@")) {
+      return _currentEmail;
+    }
+    final parts = _currentEmail.split("@");
+    final name = parts[0];
+    final domain = parts[1];
+    if (name.length <= 2) return "***@$domain";
+    return "${name.substring(0, 2)}***@$domain";
+  }
+
   @override
   Widget build(BuildContext context) {
     return PopScope(
       canPop: false,
-      // ignore: deprecated_member_use
       onPopInvoked: (didPop) {
         if (didPop) return;
         final state = context.read<ProfileCubit>().state;
         if (state is ProfileLoaded) Navigator.of(context).pop();
       },
       child: Container(
-        padding: const EdgeInsets.all(24),
-        decoration: BoxDecoration(
+        padding: EdgeInsets.all(24.r),
+        decoration: const BoxDecoration(
           color: Colors.white,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
         ),
         child: BlocConsumer<ProfileCubit, ProfileState>(
           listener: (context, state) {
@@ -592,18 +608,17 @@ class _SensitiveUpdateFlowSheetState extends State<_SensitiveUpdateFlowSheet> {
                     textDirection: TextDirection.rtl),
                 backgroundColor: Colors.green,
               ));
-            } else if (state is SensitiveChangeOtpSent) {
+            } else if (state is FirstOtpSent) {
               _otpController.clear();
-            } else if (state is SensitiveChangeCurrentVerified ||
-                state is NewEmailOtpSent) {
+            } else if (state is FirstOtpVerified || state is NewEmailOtpSent) {
               _otpController.clear();
             }
           },
           builder: (context, state) {
             if (state is ProfileLoading) {
-              return const SizedBox(
-                  height: 200,
-                  child: Center(
+              return SizedBox(
+                  height: 200.h,
+                  child: const Center(
                       child: CircularProgressIndicator(
                     color: Color(0xFF3775FA),
                   )));
@@ -611,18 +626,18 @@ class _SensitiveUpdateFlowSheetState extends State<_SensitiveUpdateFlowSheet> {
             if (state is ProfileError) {
               return _buildErrorUI(context, state.message);
             }
-            if (state is SensitiveChangeOtpSent) {
-              return _buildCurrentOtpStep(context, state.hashedEmail); 
+            if (state is FirstOtpSent) {
+              return _buildCurrentOtpStep(context, _hashedEmail);
             }
-            if (state is SensitiveChangeCurrentVerified) {
+            if (state is FirstOtpVerified) {
               return _buildNewInputFieldsStep(context);
             }
             if (state is NewEmailOtpSent) {
               return _buildNewOtpStep(context);
             }
-            return const SizedBox(
-                height: 200,
-                child: Center(
+            return SizedBox(
+                height: 200.h,
+                child: const Center(
                     child: CircularProgressIndicator(
                   color: Color(0xFF3775FA),
                 )));
@@ -645,33 +660,33 @@ class _SensitiveUpdateFlowSheetState extends State<_SensitiveUpdateFlowSheet> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text("إدخال البيانات الجديدة",
-              style:
-                  GoogleFonts.cairo(fontSize: 18, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 20),
+              style: GoogleFonts.cairo(
+                  fontSize: 18.sp, fontWeight: FontWeight.bold)),
+          SizedBox(height: 20.h),
           Text(label,
               style: GoogleFonts.cairo(
-                  fontSize: 14,
+                  fontSize: 14.sp,
                   fontWeight: FontWeight.bold,
                   color: const Color(0xFF2D2D2D))),
-          const SizedBox(height: 8),
+          SizedBox(height: 8.h),
           _buildValidatedTextField(_newValueController, icon,
               isPhone: widget.isForPhone),
-          const SizedBox(height: 16),
+          SizedBox(height: 16.h),
           Text("تأكيد $label",
               style: GoogleFonts.cairo(
-                  fontSize: 14,
+                  fontSize: 14.sp,
                   fontWeight: FontWeight.bold,
                   color: const Color(0xFF2D2D2D))),
-          const SizedBox(height: 8),
+          SizedBox(height: 8.h),
           _buildValidatedTextField(_confirmValueController, icon,
               isPhone: widget.isForPhone,
               confirmController: _newValueController),
-          const SizedBox(height: 32),
+          SizedBox(height: 32.h),
           Row(
             children: [
               Expanded(
                 child: SizedBox(
-                  height: 50,
+                  height: 50.h,
                   child: OutlinedButton(
                     onPressed: () {
                       context
@@ -681,27 +696,26 @@ class _SensitiveUpdateFlowSheetState extends State<_SensitiveUpdateFlowSheet> {
                     },
                     style: OutlinedButton.styleFrom(
                         shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12)),
+                            borderRadius: BorderRadius.circular(12.r)),
                         side: BorderSide(color: Colors.grey.shade400)),
                     child: Text("إلغاء",
                         style: GoogleFonts.cairo(
                             color: Colors.grey.shade700,
-                            fontSize: 16,
+                            fontSize: 16.sp,
                             fontWeight: FontWeight.bold)),
                   ),
                 ),
               ),
-              const SizedBox(width: 16),
+              SizedBox(width: 16.w),
               Expanded(
                 child: SizedBox(
-                  height: 50,
+                  height: 50.h,
                   child: ElevatedButton(
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
                         if (widget.isForPhone) {
                           context.read<ProfileCubit>().finalizePhoneChange(
-                              widget.token,
-                              _newValueController.text);
+                              widget.token, _newValueController.text);
                         } else {
                           context.read<ProfileCubit>().sendOtpToNewEmail(
                               widget.token, _newValueController.text);
@@ -711,11 +725,11 @@ class _SensitiveUpdateFlowSheetState extends State<_SensitiveUpdateFlowSheet> {
                     style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF3775FA),
                         shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12))),
+                            borderRadius: BorderRadius.circular(12.r))),
                     child: Text(widget.isForPhone ? "حفظ" : "إرسال رمز التحقق",
                         style: GoogleFonts.cairo(
                             color: Colors.white,
-                            fontSize: 16,
+                            fontSize: 16.sp,
                             fontWeight: FontWeight.bold)),
                   ),
                 ),
@@ -733,20 +747,20 @@ class _SensitiveUpdateFlowSheetState extends State<_SensitiveUpdateFlowSheet> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text("التحقق من البريد الجديد",
-            style:
-                GoogleFonts.cairo(fontSize: 18, fontWeight: FontWeight.bold)),
-        const SizedBox(height: 16),
+            style: GoogleFonts.cairo(
+                fontSize: 18.sp, fontWeight: FontWeight.bold)),
+        SizedBox(height: 16.h),
         Text("تم إرسال رمز تحقق إلى البريد الإلكتروني الجديد: ",
             style: GoogleFonts.cairo(color: Colors.grey.shade700)),
-        const SizedBox(height: 8),
+        SizedBox(height: 8.h),
         Text(_newValueController.text,
             style: GoogleFonts.cairo(
                 color: Colors.grey.shade700, fontWeight: FontWeight.bold)),
-        const SizedBox(height: 24),
+        SizedBox(height: 24.h),
         Container(
           decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(16.r),
               border: Border.all(color: Colors.grey.shade300)),
           child: TextField(
             controller: _otpController,
@@ -756,40 +770,70 @@ class _SensitiveUpdateFlowSheetState extends State<_SensitiveUpdateFlowSheet> {
               FilteringTextInputFormatter.digitsOnly,
               LengthLimitingTextInputFormatter(6),
             ],
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               hintText: "أدخل رمز التحقق الجديد",
-              prefixIcon: Icon(Icons.lock_outline, color: Colors.grey),
+              hintStyle: GoogleFonts.cairo(),
+              prefixIcon:
+                  Icon(Icons.lock_outline, color: Colors.grey, size: 20.r),
               border: InputBorder.none,
               contentPadding:
-                  EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
             ),
           ),
         ),
-        const SizedBox(height: 32),
-        SizedBox(
-          width: double.infinity,
-          height: 50,
-          child: ElevatedButton(
-            onPressed: () {
-              if (_otpController.text.isNotEmpty) {
-                context.read<ProfileCubit>().confirmNewEmail(
-                    widget.token,
-                    _otpController.text,
-                    _newValueController.text,
-                    isForPhone: false);
-              }
-            },
-            style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF3775FA),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12))),
-            child: Text("تأكيد وتحديث",
-                style: GoogleFonts.cairo(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold)),
-          ),
-        )
+        SizedBox(height: 32.h),
+        Row(
+          children: [
+            Expanded(
+              child: SizedBox(
+                height: 50.h,
+                child: OutlinedButton(
+                  onPressed: () {
+                    context
+                        .read<ProfileCubit>()
+                        .resetUpdateFlowState(widget.currentImageUrl);
+                    Navigator.pop(context);
+                  },
+                  style: OutlinedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12.r)),
+                      side: BorderSide(color: Colors.grey.shade400)),
+                  child: Text("إلغاء",
+                      style: GoogleFonts.cairo(
+                          color: Colors.grey.shade700,
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.bold)),
+                ),
+              ),
+            ),
+            SizedBox(width: 16.w),
+            Expanded(
+                child: SizedBox(
+              width: double.infinity,
+              height: 50.h,
+              child: ElevatedButton(
+                onPressed: () {
+                  if (_otpController.text.isNotEmpty) {
+                    context.read<ProfileCubit>().verifyNewEmail(
+                          widget.token,
+                          _newValueController.text,
+                          _otpController.text,
+                        );
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF3775FA),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12.r))),
+                child: Text("تأكيد وتحديث",
+                    style: GoogleFonts.cairo(
+                        color: Colors.white,
+                        fontSize: 16.sp,
+                        fontWeight: FontWeight.bold)),
+              ),
+            ))
+          ],
+        ),
       ],
     );
   }
@@ -798,12 +842,12 @@ class _SensitiveUpdateFlowSheetState extends State<_SensitiveUpdateFlowSheet> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        const Icon(Icons.error_outline, color: Colors.red, size: 50),
-        const SizedBox(height: 16),
+        Icon(Icons.error_outline, color: Colors.red, size: 50.r),
+        SizedBox(height: 16.h),
         Text(message,
             style: GoogleFonts.cairo(color: Colors.red),
             textAlign: TextAlign.center),
-        const SizedBox(height: 24),
+        SizedBox(height: 24.h),
         Row(
           children: [
             Expanded(
@@ -817,18 +861,15 @@ class _SensitiveUpdateFlowSheetState extends State<_SensitiveUpdateFlowSheet> {
                   child: Text("إلغاء",
                       style: GoogleFonts.cairo(color: Colors.grey))),
             ),
-            const SizedBox(width: 16),
+            SizedBox(width: 16.w),
             Expanded(
               child: ElevatedButton(
-                  onPressed: () async {
-                    String? currentEmail = await AuthLocalStorage().getEmail();
-                    if (context.mounted) {
-                      context.read<ProfileCubit>().initiateSensitiveChange(
-                            widget.token,
-                            isForPhone: widget.isForPhone,
-                            email: currentEmail ?? "",
-                          );
-                    }
+                  onPressed: () {
+                    context.read<ProfileCubit>().sendFirstOtp(
+                          widget.token,
+                          _currentEmail,
+                          isForPhone: widget.isForPhone,
+                        );
                   },
                   style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF3775FA)),
@@ -847,20 +888,20 @@ class _SensitiveUpdateFlowSheetState extends State<_SensitiveUpdateFlowSheet> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text("التحقق من الهوية",
-            style:
-                GoogleFonts.cairo(fontSize: 18, fontWeight: FontWeight.bold)),
-        const SizedBox(height: 16),
+            style: GoogleFonts.cairo(
+                fontSize: 18.sp, fontWeight: FontWeight.bold)),
+        SizedBox(height: 16.h),
         Text("تم إرسال رمز تحقق إلى بريدك الإلكتروني الحالي: ",
             style: GoogleFonts.cairo(color: Colors.grey.shade700)),
-        const SizedBox(height: 8),
+        SizedBox(height: 8.h),
         Text(hashedEmail,
             style: GoogleFonts.cairo(
                 color: Colors.grey.shade700, fontWeight: FontWeight.bold)),
-        const SizedBox(height: 16),
+        SizedBox(height: 16.h),
         Container(
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(16.r),
             border: Border.all(color: Colors.grey.shade300, width: 0),
           ),
           child: TextField(
@@ -872,27 +913,29 @@ class _SensitiveUpdateFlowSheetState extends State<_SensitiveUpdateFlowSheet> {
               FilteringTextInputFormatter.digitsOnly,
               LengthLimitingTextInputFormatter(6),
             ],
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               hintText: "أدخل رمز التحقق",
-              prefixIcon: Icon(Icons.lock_outline, color: Colors.grey),
+              hintStyle: GoogleFonts.cairo(),
+              prefixIcon:
+                  Icon(Icons.lock_outline, color: Colors.grey, size: 20.r),
               border: InputBorder.none,
               contentPadding:
-                  EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
               enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(16)),
+                  borderRadius: const BorderRadius.all(Radius.circular(16)),
                   borderSide: BorderSide(color: Colors.grey)),
-              focusedBorder: OutlineInputBorder(
+              focusedBorder: const OutlineInputBorder(
                   borderRadius: BorderRadius.all(Radius.circular(16)),
                   borderSide: BorderSide(color: Color(0xFF3775FA))),
             ),
           ),
         ),
-        const SizedBox(height: 32),
+        SizedBox(height: 32.h),
         Row(
           children: [
             Expanded(
               child: SizedBox(
-                height: 50,
+                height: 50.h,
                 child: OutlinedButton(
                   onPressed: () {
                     context
@@ -902,39 +945,39 @@ class _SensitiveUpdateFlowSheetState extends State<_SensitiveUpdateFlowSheet> {
                   },
                   style: OutlinedButton.styleFrom(
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12)),
+                          borderRadius: BorderRadius.circular(12.r)),
                       side: BorderSide(color: Colors.grey.shade400)),
                   child: Text("إلغاء",
                       style: GoogleFonts.cairo(
                           color: Colors.grey.shade700,
-                          fontSize: 16,
+                          fontSize: 16.sp,
                           fontWeight: FontWeight.bold)),
                 ),
               ),
             ),
-            const SizedBox(width: 16),
+            SizedBox(width: 16.w),
             Expanded(
               child: SizedBox(
-                height: 50,
+                height: 50.h,
                 child: ElevatedButton(
-                  onPressed: () async {
+                  onPressed: () {
                     if (_otpController.text.isNotEmpty) {
-                      String? currentEmail = await AuthLocalStorage().getEmail();
-                      if (context.mounted) {
-                        context.read<ProfileCubit>().verifyCurrentEmailOtp(
-                            widget.token, _otpController.text, currentEmail ?? "",
-                            isForPhone: widget.isForPhone);
-                      }
+                      context.read<ProfileCubit>().verifyFirstOtp(
+                            widget.token,
+                            _currentEmail,
+                            _otpController.text,
+                            isForPhone: widget.isForPhone,
+                          );
                     }
                   },
                   style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF3775FA),
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12))),
+                          borderRadius: BorderRadius.circular(12.r))),
                   child: Text("تحقق",
                       style: GoogleFonts.cairo(
                           color: Colors.white,
-                          fontSize: 16,
+                          fontSize: 16.sp,
                           fontWeight: FontWeight.bold)),
                 ),
               ),
@@ -959,18 +1002,18 @@ class _SensitiveUpdateFlowSheetState extends State<_SensitiveUpdateFlowSheet> {
               ? "أدخل رقم الهاتف الجديد"
               : "أدخل البريد الإلكتروني الجديد",
           hintStyle: GoogleFonts.cairo(color: Colors.grey),
-          prefixIcon: Icon(icon, color: Colors.grey),
+          prefixIcon: Icon(icon, color: Colors.grey, size: 20.r),
           border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(16.r),
               borderSide: BorderSide(color: Colors.grey.shade300)),
           enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(16.r),
               borderSide: BorderSide(color: Colors.grey.shade300)),
           focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(16),
-              borderSide: BorderSide(color: const Color(0xFF3775FA))),
+              borderRadius: BorderRadius.circular(16.r),
+              borderSide: const BorderSide(color: Color(0xFF3775FA))),
           contentPadding:
-              const EdgeInsets.symmetric(horizontal: 16, vertical: 14)),
+              EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h)),
       validator: (value) {
         if (value == null || value.isEmpty) return "هذا الحقل مطلوب";
         if (confirmController != null && value != confirmController.text) {

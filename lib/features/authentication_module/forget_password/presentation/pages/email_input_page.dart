@@ -5,6 +5,7 @@ import 'package:el7erafe/features/authentication_module/forget_password/presenta
 import 'package:el7erafe/features/authentication_module/forget_password/presentation/pages/forget_otp_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class EmailInputPage extends StatelessWidget {
@@ -31,8 +32,6 @@ class EmailInputView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double screenWidth = MediaQuery.of(context).size.width;
-    final double screenHeight = MediaQuery.of(context).size.height;
     final double keyboardPadding = MediaQuery.of(context).viewInsets.bottom;
 
     return Scaffold(
@@ -77,17 +76,15 @@ class EmailInputView extends StatelessWidget {
               Align(
                 alignment: Alignment.topCenter,
                 child: Container(
-                    padding: EdgeInsets.only(
-                        top: (68 / 852) * screenHeight,
-                        bottom: (68 / 852) * screenHeight),
+                    padding: EdgeInsets.only(top: 68.h, bottom: 68.h),
                     color: const Color(0xFF3775FA),
-                    width: screenWidth,
-                    height: (267 / 852) * screenHeight,
+                    width: double.infinity,
+                    height: 267.h,
                     child: Align(
                       alignment: Alignment.topCenter,
                       child: SizedBox(
-                        height: (131 / 852) * screenHeight,
-                        width: (131 / 393) * screenWidth,
+                        height: 131.h,
+                        width: 131.w,
                         child: Image.asset('images/Logo.png', fit: BoxFit.fill),
                       ),
                     )),
@@ -95,41 +92,38 @@ class EmailInputView extends StatelessWidget {
               Align(
                 alignment: Alignment.bottomCenter,
                 child: ClipRRect(
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(44),
-                    topRight: Radius.circular(44),
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(44.r),
+                    topRight: Radius.circular(44.r),
                   ),
                   child: Container(
-                    height: (629 / 852) * screenHeight,
+                    height: 629.h,
                     width: double.infinity,
-                    decoration: const BoxDecoration(
-                      color: Color(0xFFFDFDFD),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFDFDFD),
                       borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(44),
-                        topRight: Radius.circular(44),
+                        topLeft: Radius.circular(44.r),
+                        topRight: Radius.circular(44.r),
                       ),
                     ),
                     child: SingleChildScrollView(
                       padding: EdgeInsets.fromLTRB(
-                          (16 / 393) * screenWidth,
-                          (44 / 852) * screenHeight,
-                          (16 / 393) * screenWidth,
-                          (44 / 852) * screenHeight + keyboardPadding),
+                          16.w, 44.h, 16.w, 44.h + keyboardPadding),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           SizedBox(
-                            height: (136 / 852) * screenHeight,
-                            width: (147 / 393) * screenWidth,
+                            height: 136.h,
+                            width: 147.w,
                             child: Image.asset('images/email_input.png',
                                 fit: BoxFit.fill),
                           ),
-                          SizedBox(height: (32 / 852) * screenHeight),
+                          SizedBox(height: 32.h),
                           Text(
                             'نسيت كلمه السر ؟',
                             textAlign: TextAlign.center,
                             style: GoogleFonts.cairo(
-                              fontSize: 24,
+                              fontSize: 24.sp,
                               fontWeight: FontWeight.w600,
                               color: const Color(0xFF3775FA),
                             ),
@@ -138,12 +132,12 @@ class EmailInputView extends StatelessWidget {
                             'اكتب البريد الالكتروني اللي سجلت بيه',
                             textAlign: TextAlign.center,
                             style: GoogleFonts.cairo(
-                              fontSize: 17,
+                              fontSize: 17.sp,
                               fontWeight: FontWeight.w400,
                               color: const Color(0xFF000000),
                             ),
                           ),
-                          SizedBox(height: (32 / 852) * screenHeight),
+                          SizedBox(height: 32.h),
                           Form(
                             key: _formKey,
                             autovalidateMode:
@@ -159,28 +153,28 @@ class EmailInputView extends StatelessWidget {
                                   prefixIcon: Icon(
                                     Icons.email,
                                     color: Color(0xFF727070),
-                                    size: 18,
+                                    size: 18.r,
                                   ),
                                   hintText: 'name@domain.com',
                                   hintStyle: GoogleFonts.cairo(
-                                      fontSize: 15,
+                                      fontSize: 15.sp,
                                       color: const Color(0xFF727070),
                                       fontWeight: FontWeight.w400),
                                   border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12),
+                                      borderRadius: BorderRadius.circular(12.r),
                                       borderSide: const BorderSide(
                                           color: Color(0xFFE2DFDF))),
                                   focusedBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12),
+                                      borderRadius: BorderRadius.circular(12.r),
                                       borderSide: const BorderSide(
                                           color: Color(0xFF3775FA))),
                                   enabledBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12),
+                                      borderRadius: BorderRadius.circular(12.r),
                                       borderSide: const BorderSide(
                                           color: Color(0xFFE2DFDF))),
-                                  contentPadding: EdgeInsets.all(12),
+                                  contentPadding: EdgeInsets.all(12.r),
                                   errorStyle: TextStyle(
-                                    fontSize: 11,
+                                    fontSize: 11.sp,
                                   ),
                                 ),
                                 validator: (value) {
@@ -200,22 +194,22 @@ class EmailInputView extends StatelessWidget {
                               ),
                             ),
                           ),
-                          SizedBox(height: (24 / 852) * screenHeight),
+                          SizedBox(height: 24.h),
                           SizedBox(
                             width: double.infinity,
-                            height: (40 / 852) * screenHeight,
+                            height: 40.h,
                             child:
                                 BlocBuilder<EmailInputCubit, EmailInputState>(
                               builder: (context, state) {
                                 final isLoading = state is EmailInputLoading;
                                 return Container(
                                     width: double.infinity,
-                                    height: (40 / 852) * screenHeight,
+                                    height: 40.h,
                                     decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(12.0),
+                                      borderRadius: BorderRadius.circular(12.r),
                                       border: Border.all(
                                         color: Color(0xFF3775FA),
-                                        width: 1.0,
+                                        width: 1.w,
                                       ),
                                     ),
                                     child: ElevatedButton(
@@ -231,22 +225,23 @@ class EmailInputView extends StatelessWidget {
                                                 158, 55, 117, 250),
                                         shape: RoundedRectangleBorder(
                                             borderRadius:
-                                                BorderRadius.circular(12.0),
+                                                BorderRadius.circular(12.r),
                                             side: const BorderSide(
                                                 color: Colors.white,
                                                 width: 1.0)),
                                       ),
                                       child: isLoading
-                                          ? const SizedBox(
-                                              height: 24,
-                                              width: 24,
-                                              child: CircularProgressIndicator(
-                                                  color: Color(0xFF3775FA),
-                                                  strokeWidth: 3),
+                                          ? SizedBox(
+                                              height: 24.r,
+                                              width: 24.r,
+                                              child:
+                                                  const CircularProgressIndicator(
+                                                      color: Color(0xFF3775FA),
+                                                      strokeWidth: 3),
                                             )
                                           : Text('ارسال',
                                               style: GoogleFonts.cairo(
-                                                  fontSize: 16,
+                                                  fontSize: 16.sp,
                                                   fontWeight: FontWeight.w500)),
                                     ));
                               },

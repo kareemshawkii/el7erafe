@@ -69,13 +69,14 @@ class ServiceRequestRepository {
       if (response.statusCode == 200 || response.statusCode == 201) {
         return const Right("تم إرسال الطلب بنجاح");
       } else if (response.statusCode == 401) {
-        return const Left("401 unauthorized");
-      }
-      else if (response.statusCode == 401) {
         AuthLocalStorage authLocalStorage = AuthLocalStorage();
         await authLocalStorage.clearSession();
-        return const Left("غير مصرح لك، برجاء تسجيل الدخول");
-      } else {
+        return const Left("401 unauthorized");
+      } else if (response.statusCode == 409) {
+        final Map<String, dynamic> errorBody = jsonDecode(response.body);
+        return  Left("409 ${errorBody['errorMessage']}");
+      }
+      else {
         try {
           final Map<String, dynamic> errorBody = jsonDecode(response.body);
           return Left(errorBody['errorMessage'] ?? "فشل إرسال الطلب");

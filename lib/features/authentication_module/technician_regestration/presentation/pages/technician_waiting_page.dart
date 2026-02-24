@@ -11,6 +11,7 @@ import 'package:el7erafe/features/authentication_module/technician_regestration/
 import 'package:el7erafe/technician.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class TechnicianWaitingPage extends StatelessWidget {
@@ -53,8 +54,6 @@ class _TechnicianWaitingViewState extends State<TechnicianWaitingView> {
 
   @override
   Widget build(BuildContext context) {
-    final double screenWidth = MediaQuery.of(context).size.width;
-    final double screenHeight = MediaQuery.of(context).size.height;
     final double keyboardPadding = MediaQuery.of(context).viewInsets.bottom;
     return Scaffold(
       resizeToAvoidBottomInset: true,
@@ -148,17 +147,15 @@ class _TechnicianWaitingViewState extends State<TechnicianWaitingView> {
               Align(
                 alignment: Alignment.topCenter,
                 child: Container(
-                    padding: EdgeInsets.only(
-                        top: (68 / 852) * screenHeight,
-                        bottom: (68 / 852) * screenHeight),
+                    padding: EdgeInsets.only(top: 68.h, bottom: 68.h),
                     color: const Color(0xFF3775FA),
-                    width: screenWidth,
-                    height: (267 / 852) * screenHeight,
+                    width: double.infinity,
+                    height: 267.h,
                     child: Align(
                       alignment: Alignment.topCenter,
                       child: SizedBox(
-                        height: (131 / 852) * screenHeight,
-                        width: (131 / 393) * screenWidth,
+                        height: 131.h,
+                        width: 131.w,
                         child: Image.asset('images/Logo.png', fit: BoxFit.fill),
                       ),
                     )),
@@ -166,50 +163,46 @@ class _TechnicianWaitingViewState extends State<TechnicianWaitingView> {
               Align(
                 alignment: Alignment.bottomCenter,
                 child: ClipRRect(
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(44),
-                    topRight: Radius.circular(44),
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(44.r),
+                    topRight: Radius.circular(44.r),
                   ),
                   child: Container(
-                    height: (629 / 852) * screenHeight,
+                    height: 629.h,
                     width: double.infinity,
-                    decoration: const BoxDecoration(
-                      color: Color(0xFFFDFDFD),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFDFDFD),
                       borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(44),
-                        topRight: Radius.circular(44),
+                        topLeft: Radius.circular(44.r),
+                        topRight: Radius.circular(44.r),
                       ),
                     ),
                     child: SingleChildScrollView(
                       padding: EdgeInsets.fromLTRB(
-                          (16 / 393) * screenWidth,
-                          (44 / 852) * screenHeight,
-                          (16 / 393) * screenWidth,
-                          (44 / 852) * screenHeight + keyboardPadding),
+                          16.w, 44.h, 16.w, 44.h + keyboardPadding),
                       physics: const ClampingScrollPhysics(),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           Image.asset('images/technician_waiting.png',
-                              width: (241 / 393) * screenWidth,
-                              height: (361 / 852) * screenHeight),
-                          SizedBox(height: (24 / 852) * screenHeight),
+                              width: 241.w, height: 361.h),
+                          SizedBox(height: 24.h),
                           Directionality(
                               textDirection: TextDirection.rtl,
                               child: Center(
                                 child: Text(
                                   'شكراً لتسجيلك كحرفي! طلبك بيتراجع دلوقتي ، وهنرد عليك خلال 24 ساعة.',
                                   style: GoogleFonts.cairo(
-                                    fontSize: 22,
+                                    fontSize: 22.sp,
                                     fontWeight: FontWeight.w600,
                                     color: const Color(0xFF000000),
                                   ),
                                 ),
                               )),
-                          SizedBox(height: (18 / 852) * screenHeight),
+                          SizedBox(height: 18.h),
                           SizedBox(
-                            height: (40 / 852) * screenHeight,
-                            width: (264 / 393) * screenWidth,
+                            height: 40.h,
+                            width: 264.w,
                             child: BlocBuilder<TechnicianStatusCubit,
                                 TechnicianStatusState>(
                               builder: (context, state) {
@@ -217,12 +210,12 @@ class _TechnicianWaitingViewState extends State<TechnicianWaitingView> {
                                     state is TechnicianStatusLoading;
                                 return Container(
                                     width: double.infinity,
-                                    height: (40 / 852) * screenHeight,
+                                    height: 40.h,
                                     decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(12.0),
+                                      borderRadius: BorderRadius.circular(12.r),
                                       border: Border.all(
                                         color: Color(0xFF3775FA),
-                                        width: 1.0,
+                                        width: 1.w,
                                       ),
                                     ),
                                     child: ElevatedButton(
@@ -238,18 +231,19 @@ class _TechnicianWaitingViewState extends State<TechnicianWaitingView> {
                                                 158, 55, 117, 250),
                                         shape: RoundedRectangleBorder(
                                             borderRadius:
-                                                BorderRadius.circular(12.0),
+                                                BorderRadius.circular(12.r),
                                             side: const BorderSide(
                                                 color: Colors.white,
                                                 width: 1.0)),
                                       ),
                                       child: isLoading
-                                          ? const SizedBox(
-                                              height: 24,
-                                              width: 24,
-                                              child: CircularProgressIndicator(
-                                                  color: Color(0xFF3775FA),
-                                                  strokeWidth: 3),
+                                          ? SizedBox(
+                                              height: 24.r,
+                                              width: 24.r,
+                                              child:
+                                                  const CircularProgressIndicator(
+                                                      color: Color(0xFF3775FA),
+                                                      strokeWidth: 3),
                                             )
                                           : Row(
                                               mainAxisAlignment:
@@ -257,16 +251,13 @@ class _TechnicianWaitingViewState extends State<TechnicianWaitingView> {
                                               children: [
                                                 Text('اعاده تحميل الصفحه',
                                                     style: GoogleFonts.cairo(
-                                                        fontSize: 16,
+                                                        fontSize: 16.sp,
                                                         fontWeight:
                                                             FontWeight.w500)),
-                                                SizedBox(
-                                                    width: (8 / 393) *
-                                                        screenWidth),
+                                                SizedBox(width: 8.w),
                                                 Icon(Icons.refresh,
                                                     color: Colors.white,
-                                                    size: (24 / 393) *
-                                                        screenWidth),
+                                                    size: 24.w),
                                               ],
                                             ),
                                     ));

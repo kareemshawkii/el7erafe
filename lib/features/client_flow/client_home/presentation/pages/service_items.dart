@@ -1,8 +1,11 @@
+// ignore_for_file: deprecated_member_use, use_build_context_synchronously
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:el7erafe/core/utils/animated_navigation.dart';
 import 'package:el7erafe/features/client_flow/client_home/data/models/service_item.dart';
 import 'package:el7erafe/features/client_flow/quick_reserve/presentation/pages/quick_reserve_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -34,7 +37,6 @@ class ServiceItemCardState extends State<ServiceItemCard> {
 
         if (mounted) {
           Navigator.push(
-            // ignore: use_build_context_synchronously
             context,
             SlideRightRoute(
               page: QuickReservePage(
@@ -52,20 +54,18 @@ class ServiceItemCardState extends State<ServiceItemCard> {
         child: Container(
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(16.r),
             border: Border.all(
               color: const Color(0xFF3775FA),
-              width: _isPressed ? 2 : 1,
+              width: _isPressed ? 2.w : 1.w,
             ),
             boxShadow: [
               BoxShadow(
                 color: _isPressed
-                    // ignore: deprecated_member_use
                     ? const Color(0xFF3775FA).withOpacity(0.3)
-                    // ignore: deprecated_member_use
                     : Colors.black.withOpacity(0.05),
-                blurRadius: _isPressed ? 12 : 6,
-                offset: const Offset(0, 4),
+                blurRadius: _isPressed ? 12.r : 6.r,
+                offset: Offset(0, 4.h),
               )
             ],
           ),
@@ -74,14 +74,14 @@ class ServiceItemCardState extends State<ServiceItemCard> {
             children: [
               CachedNetworkImage(
                 imageUrl: widget.service.imageUrl,
-                width: 60,
-                height: 60,
+                width: 60.w,
+                height: 60.h,
                 placeholder: (context, url) => Shimmer.fromColors(
                   baseColor: Colors.grey[300]!,
                   highlightColor: Colors.grey[100]!,
                   child: Container(
-                    width: 50,
-                    height: 50,
+                    width: 50.w,
+                    height: 50.h,
                     decoration: const BoxDecoration(
                         color: Colors.white, shape: BoxShape.circle),
                   ),
@@ -89,13 +89,13 @@ class ServiceItemCardState extends State<ServiceItemCard> {
                 errorWidget: (context, url, error) =>
                     const Icon(Icons.broken_image, color: Colors.grey),
               ),
-              const SizedBox(height: 8),
+              SizedBox(height: 8.h),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                padding: EdgeInsets.symmetric(horizontal: 8.w),
                 child: Text(
                   widget.service.name,
                   style: GoogleFonts.cairo(
-                    fontSize: 14,
+                    fontSize: 14.sp,
                     fontWeight: _isPressed ? FontWeight.bold : FontWeight.w600,
                     color:
                         _isPressed ? const Color(0xFF3775FA) : Colors.black87,

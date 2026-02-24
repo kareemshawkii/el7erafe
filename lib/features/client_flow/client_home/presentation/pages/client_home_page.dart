@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:el7erafe/core/services/local_storage/auth_local_storage.dart';
 import 'package:el7erafe/features/authentication_module/login/data/repositories/auth_repository.dart';
 import 'package:el7erafe/features/authentication_module/login/presentation/cubit/login_cubit.dart';
@@ -10,6 +12,7 @@ import 'package:el7erafe/features/client_flow/client_profile/presentation/pages/
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconsax/iconsax.dart';
@@ -56,36 +59,31 @@ class _ClientHomePageViewState extends State<ClientHomePageView> {
   }
 
   Future<void> _refreshHomeData() async {
-  String? updatedName = await AuthLocalStorage().getUserName();
-  if (updatedName != null && updatedName.isNotEmpty && mounted) {
-    setState(() {
-      userName = updatedName;
-    });
+    String? updatedName = await AuthLocalStorage().getUserName();
+    if (updatedName != null && updatedName.isNotEmpty && mounted) {
+      setState(() {
+        userName = updatedName;
+      });
+    }
   }
-}
 
   @override
   Widget build(BuildContext context) {
-    MediaQueryData mediaQuery = MediaQuery.of(context);
-    double height = mediaQuery.size.height;
-    double width = mediaQuery.size.width;
-
     Widget homeContent = SingleChildScrollView(
       child: Container(
         decoration: const BoxDecoration(color: Colors.white),
         child: Column(
           children: [
-            SizedBox(height: (50 / 852) * height),
+            SizedBox(height: 50.h),
             Container(
-              padding: EdgeInsets.only(
-                  left: (8 / 393) * width, right: (16 / 393) * width),
+              padding: EdgeInsets.only(left: 8.w, right: 16.w),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text.rich(
                     TextSpan(
                       style: GoogleFonts.cairo(
-                        fontSize: 23,
+                        fontSize: 23.sp,
                         fontWeight: FontWeight.w600,
                         color: Colors.black,
                         height: 1.5,
@@ -109,11 +107,11 @@ class _ClientHomePageViewState extends State<ClientHomePageView> {
                   ),
                   Row(
                     children: [
-                      SizedBox(width: (16 / 852) * width),
+                      SizedBox(width: 16.w),
                       Container(
                         alignment: Alignment.center,
-                        width: (40 / 852) * height,
-                        height: (40 / 852) * height,
+                        width: 40.w,
+                        height: 40.w,
                         decoration: const BoxDecoration(
                           color: Color(0xFF3775FA),
                           shape: BoxShape.circle,
@@ -126,10 +124,10 @@ class _ClientHomePageViewState extends State<ClientHomePageView> {
                               size: 18,
                             )),
                       ),
-                      SizedBox(width: (16 / 393) * width),
+                      SizedBox(width: 16.w),
                       Container(
-                        width: (40 / 393) * width,
-                        height: (40 / 852) * height,
+                        width: 40.w,
+                        height: 40.w,
                         decoration: const BoxDecoration(
                           color: Color(0xFF3775FA),
                           shape: BoxShape.circle,
@@ -147,31 +145,31 @@ class _ClientHomePageViewState extends State<ClientHomePageView> {
                 ],
               ),
             ),
-            SizedBox(height: (16 / 852) * height),
+            SizedBox(height: 16.h),
             Container(
                 padding: EdgeInsets.only(
-                  top: (12 / 852) * height,
-                  left: (16 / 393) * width,
-                  right: (16 / 393) * width,
-                  bottom: (12 / 852) * height,
+                  top: 12.h,
+                  left: 16.w,
+                  right: 16.w,
+                  bottom: 12.h,
                 ),
                 child: SvgPicture.asset("images/home_image.svg")),
-            SizedBox(height: (16 / 852) * height),
+            SizedBox(height: 16.h),
             Container(
               padding: EdgeInsets.only(
-                left: (16 / 393) * width,
-                right: (16 / 393) * width,
+                left: 16.w,
+                right: 16.w,
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   const Icon(Iconsax.user_search,
                       color: Color(0xFF3775FA), size: 24),
-                  SizedBox(width: (8 / 393) * width),
+                  SizedBox(width: 8.w),
                   Text(
                     "اختر خدمتك",
                     style: GoogleFonts.cairo(
-                      fontSize: 18,
+                      fontSize: 18.sp,
                       fontWeight: FontWeight.w600,
                       color: Colors.black,
                       height: 1.5,
@@ -180,7 +178,7 @@ class _ClientHomePageViewState extends State<ClientHomePageView> {
                 ],
               ),
             ),
-            SizedBox(height: (16 / 852) * height),
+            SizedBox(height: 16.h),
             BlocConsumer<HomeCubit, HomeState>(
               listener: (context, state) {
                 if (state is HomeUnauthorized) {
@@ -212,8 +210,8 @@ class _ClientHomePageViewState extends State<ClientHomePageView> {
                       children: [
                         Lottie.asset(
                           'assets/icon/loading.json',
-                          width: 200,
-                          height: 200,
+                          width: 200.w,
+                          height: 200.h,
                           repeat: true,
                           animate: true,
                         ),
@@ -223,12 +221,15 @@ class _ClientHomePageViewState extends State<ClientHomePageView> {
                 } else if (state is HomeError) {
                   return Center(child: Text(state.message));
                 } else if (state is HomeLoaded) {
+                  if (state.services.isEmpty) {
+                    return Image.asset("images/noservices.png");
+                  }
                   return Align(
                     alignment: Alignment.centerRight,
                     child: Directionality(
                       textDirection: TextDirection.rtl,
                       child: GridView.builder(
-                        padding: const EdgeInsets.all(16),
+                        padding: EdgeInsets.all(16.r),
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
                         gridDelegate:
@@ -258,7 +259,7 @@ class _ClientHomePageViewState extends State<ClientHomePageView> {
     final List<Widget> pages = [
       homeContent,
       const Center(child: Text("Booking History")),
-       ClientProfilePage(name: userName, token: token),
+      ClientProfilePage(name: userName, token: token),
     ];
 
     return BlocProvider.value(
@@ -267,25 +268,23 @@ class _ClientHomePageViewState extends State<ClientHomePageView> {
         backgroundColor: Colors.white,
         body: pages[_selectedIndex],
         bottomNavigationBar: ClipRRect(
-          borderRadius:  BorderRadius.only(
-            topLeft: Radius.circular(24),
-            topRight: Radius.circular(24),
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(24.r),
+            topRight: Radius.circular(24.r),
           ),
           child: Container(
-            height: (90 / 852) * height,
+            height: 90.h,
             decoration: BoxDecoration(
               color: Colors.white,
               border: Border.all(color: const Color(0xFF6796FA)),
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(24),
-                topRight: Radius.circular(24),
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(24.r),
+                topRight: Radius.circular(24.r),
               ),
             ),
             child: Theme(
               data: Theme.of(context).copyWith(
-                // ignore: deprecated_member_use
                 splashColor: const Color(0xFF3775FA).withOpacity(0.1),
-                // ignore: deprecated_member_use
                 highlightColor: const Color(0xFF3775FA).withOpacity(0.1),
               ),
               child: BottomNavigationBar(
@@ -296,14 +295,13 @@ class _ClientHomePageViewState extends State<ClientHomePageView> {
                 showUnselectedLabels: true,
                 showSelectedLabels: true,
                 type: BottomNavigationBarType.fixed,
-                iconSize: 20,
-                selectedFontSize: 14,
-                unselectedFontSize: 14,
+                iconSize: 20.r,
+                selectedFontSize: 14.sp,
+                unselectedFontSize: 14.sp,
                 currentIndex: _selectedIndex,
                 onTap: (index) {
                   setState(() {
                     _selectedIndex = index;
-                    
                   });
                   if (index == 0 || index == 2) {
                     _refreshHomeData();
@@ -313,12 +311,11 @@ class _ClientHomePageViewState extends State<ClientHomePageView> {
                   BottomNavigationBarItem(
                     icon: const Icon(Icons.home_outlined),
                     activeIcon: Container(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 6, horizontal: 20),
+                      padding:
+                          EdgeInsets.symmetric(vertical: 6.h, horizontal: 20.w),
                       decoration: BoxDecoration(
-                        // ignore: deprecated_member_use
                         color: const Color(0xFF3775FA).withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(12.r),
                       ),
                       child: const Icon(Icons.home),
                     ),
@@ -327,12 +324,11 @@ class _ClientHomePageViewState extends State<ClientHomePageView> {
                   BottomNavigationBarItem(
                     icon: const Icon(Icons.history_outlined),
                     activeIcon: Container(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 6, horizontal: 20),
+                      padding:
+                          EdgeInsets.symmetric(vertical: 6.h, horizontal: 20.w),
                       decoration: BoxDecoration(
-                        // ignore: deprecated_member_use
                         color: const Color(0xFF3775FA).withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(12.r),
                       ),
                       child: const Icon(Icons.history),
                     ),
@@ -341,12 +337,11 @@ class _ClientHomePageViewState extends State<ClientHomePageView> {
                   BottomNavigationBarItem(
                     icon: const Icon(Icons.person_2_outlined),
                     activeIcon: Container(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 6, horizontal: 20),
+                      padding:
+                          EdgeInsets.symmetric(vertical: 6.h, horizontal: 20.w),
                       decoration: BoxDecoration(
-                        // ignore: deprecated_member_use
                         color: const Color(0xFF3775FA).withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(12.r),
                       ),
                       child: const Icon(Icons.person),
                     ),

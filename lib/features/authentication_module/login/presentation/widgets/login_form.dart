@@ -5,6 +5,7 @@ import 'package:el7erafe/features/authentication_module/select_type/presentation
 import 'package:el7erafe/features/authentication_module/select_type/presentation/pages/select_type.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconsax/iconsax.dart';
 import '../cubit/login_cubit.dart';
@@ -42,7 +43,6 @@ class _LoginFormState extends State<LoginForm> {
 
   @override
   Widget build(BuildContext context) {
-    final double screenHeight = MediaQuery.of(context).size.height;
     return Form(
       key: _formKey,
       child: Column(
@@ -50,10 +50,10 @@ class _LoginFormState extends State<LoginForm> {
         children: [
           Text('رقم التليفون',
               style: GoogleFonts.cairo(
-                  fontSize: 16,
+                  fontSize: 16.sp,
                   fontWeight: FontWeight.w400,
                   color: Colors.black)),
-          SizedBox(height: (8 / 852) * screenHeight),
+          SizedBox(height: 8.h),
           Directionality(
             textDirection: TextDirection.rtl,
             child: TextFormField(
@@ -65,25 +65,25 @@ class _LoginFormState extends State<LoginForm> {
                 prefixIcon: Icon(
                   Iconsax.call,
                   color: Color(0xFF727070),
-                  size: 18,
+                  size: 18.r,
                 ),
                 hintText: '01X XXX XXXX',
                 hintStyle: GoogleFonts.cairo(
-                    fontSize: 15,
+                    fontSize: 15.sp,
                     color: const Color(0xFF727070),
                     fontWeight: FontWeight.w400),
                 border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(12.r),
                     borderSide: const BorderSide(color: Color(0xFFE2DFDF))),
                 focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(12.r),
                     borderSide: const BorderSide(color: Color(0xFF3775FA))),
                 enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(12.r),
                     borderSide: const BorderSide(color: Color(0xFFE2DFDF))),
-                contentPadding: EdgeInsets.all(12),
+                contentPadding: EdgeInsets.all(12.r),
                 errorStyle: TextStyle(
-                  fontSize: 11,
+                  fontSize: 11.sp,
                 ),
               ),
               validator: (value) {
@@ -97,13 +97,13 @@ class _LoginFormState extends State<LoginForm> {
               },
             ),
           ),
-          SizedBox(height: (16 / 852) * screenHeight),
+          SizedBox(height: 16.h),
           Text('كلمة السر',
               style: GoogleFonts.cairo(
-                  fontSize: 16,
+                  fontSize: 16.sp,
                   fontWeight: FontWeight.w400,
                   color: Colors.black)),
-          SizedBox(height: (8 / 852) * screenHeight),
+          SizedBox(height: 8.h),
           Directionality(
             textDirection: TextDirection.rtl,
             child: TextFormField(
@@ -114,7 +114,7 @@ class _LoginFormState extends State<LoginForm> {
               decoration: InputDecoration(
                 hintText: 'من فضلك دخل كلمه السر',
                 hintStyle: GoogleFonts.cairo(
-                    fontSize: 13,
+                    fontSize: 13.sp,
                     color: const Color(0xFF727070),
                     fontWeight: FontWeight.w400),
                 prefixIcon: const Icon(
@@ -128,23 +128,23 @@ class _LoginFormState extends State<LoginForm> {
                         ? Icons.visibility
                         : Icons.visibility_off,
                     color: const Color(0xFF727070),
-                    size: 18,
+                    size: 18.r,
                   ),
                   onPressed: () => setState(
                       () => _isPasswordObscured = !_isPasswordObscured),
                 ),
                 border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(12.r),
                     borderSide: const BorderSide(color: Color(0xFFE2DFDF))),
                 focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(12.r),
                     borderSide: const BorderSide(color: Color(0xFF3775FA))),
                 enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(12.r),
                     borderSide: const BorderSide(color: Color(0xFFE2DFDF))),
-                contentPadding: EdgeInsets.all(12),
+                contentPadding: EdgeInsets.all(12.r),
                 errorStyle: TextStyle(
-                  fontSize: 11,
+                  fontSize: 11.sp,
                 ),
               ),
               validator: (value) {
@@ -158,7 +158,7 @@ class _LoginFormState extends State<LoginForm> {
               },
             ),
           ),
-          SizedBox(height: (12 / 852) * screenHeight),
+          SizedBox(height: 12.h),
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             textDirection: TextDirection.rtl,
@@ -180,27 +180,27 @@ class _LoginFormState extends State<LoginForm> {
                 },
                 child: Text('نسيت كلمه السر؟',
                     style: GoogleFonts.cairo(
-                        fontSize: 14,
+                        fontSize: 14.sp,
                         color: const Color(0xFF3775FA),
                         fontWeight: FontWeight.w400)),
               ),
             ],
           ),
-          SizedBox(height: (12 / 852) * screenHeight),
+          SizedBox(height: 12.h),
           SizedBox(
             width: double.infinity,
-            height: (40 / 852) * screenHeight,
+            height: 40.h,
             child: BlocBuilder<LoginCubit, LoginState>(
               builder: (context, state) {
                 final isLoading = state is AuthLoading;
                 return Container(
                     width: double.infinity,
-                    height: (40 / 852) * screenHeight,
+                    height: 40.h,
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12.0),
+                      borderRadius: BorderRadius.circular(12.r),
                       border: Border.all(
                         color: Color(0xFF3775FA),
-                        width: 1.0,
+                        width: 1.w,
                       ),
                     ),
                     child: ElevatedButton(
@@ -211,32 +211,33 @@ class _LoginFormState extends State<LoginForm> {
                         disabledBackgroundColor:
                             const Color.fromARGB(158, 55, 117, 250),
                         shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12.0),
+                            borderRadius: BorderRadius.circular(12.r),
                             side: const BorderSide(
                                 color: Colors.white, width: 1.0)),
                       ),
                       child: isLoading
-                          ? const SizedBox(
-                              height: 24,
-                              width: 24,
-                              child: CircularProgressIndicator(
+                          ? SizedBox(
+                              height: 24.r,
+                              width: 24.r,
+                              child: const CircularProgressIndicator(
                                   color: Color(0xFF3775FA), strokeWidth: 3),
                             )
                           : Text('سجل دخولك',
                               style: GoogleFonts.cairo(
-                                  fontSize: 16, fontWeight: FontWeight.w500)),
+                                  fontSize: 16.sp,
+                                  fontWeight: FontWeight.w500)),
                     ));
               },
             ),
           ),
-          SizedBox(height: (8 / 852) * screenHeight),
+          SizedBox(height: 8.h),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             textDirection: TextDirection.rtl,
             children: [
               Text('لو معندكش حساب تقدر تعمل',
                   style: GoogleFonts.cairo(
-                      fontSize: 14,
+                      fontSize: 14.sp,
                       color: const Color(0xFF727070),
                       fontWeight: FontWeight.w400)),
               TextButton(
@@ -253,7 +254,7 @@ class _LoginFormState extends State<LoginForm> {
                 },
                 child: Text('حساب جديد ؟',
                     style: GoogleFonts.cairo(
-                        fontSize: 14,
+                        fontSize: 14.sp,
                         color: const Color(0xFF3775FA),
                         fontWeight: FontWeight.w400)),
               ),

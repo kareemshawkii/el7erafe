@@ -9,9 +9,11 @@ import 'package:el7erafe/features/authentication_module/technician_regestration/
 import 'package:el7erafe/features/client_flow/client_home/data/repositories/home_repository.dart';
 import 'package:el7erafe/features/client_flow/client_profile/data/repositories/client_profile_repo.dart';
 import 'package:el7erafe/features/client_flow/quick_reserve/data/repositories/quick_reserve_repo.dart';
+import 'package:el7erafe/features/client_flow/select_technician/data/repositories/select_technician_repo.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 void main() {
@@ -63,38 +65,48 @@ class MyApp extends StatelessWidget {
           RepositoryProvider(
             create: (context) => ProfileRepository(),
           ),
-        ],
-        child: MaterialApp(
-          locale: const Locale('ar'),
-          debugShowCheckedModeBanner: false,
-          title: 'El7erafe',
-          theme: ThemeData(
-            colorScheme: ColorScheme.fromSeed(
-              seedColor: const Color(0xFF3775FA),
-            ),
-            textTheme: GoogleFonts.cairoTextTheme(),
-            useMaterial3: true,
+          RepositoryProvider(
+            create: (context) => TechnicianRequestRepository(),
           ),
+        ],
+        child: ScreenUtilInit(
+          designSize: const Size(393, 852), 
+          minTextAdapt: true,
+          splitScreenMode: true,
           builder: (context, child) {
-            final mediaQueryData = MediaQuery.of(context);
-            final textScaler = mediaQueryData.textScaler;
-            final clampedTextScaler = textScaler.clamp(
-              minScaleFactor: 0.9,
-              maxScaleFactor: 1.0,
-            );
-
-            return Directionality(
-              textDirection: TextDirection.rtl,
-              child: MediaQuery(
-                data: mediaQueryData.copyWith(
-                  textScaler: clampedTextScaler,
+            return MaterialApp(
+              locale: const Locale('ar'),
+              debugShowCheckedModeBanner: false,
+              title: 'El7erafe',
+              theme: ThemeData(
+                colorScheme: ColorScheme.fromSeed(
+                  seedColor: const Color(0xFF3775FA),
                 ),
-                child: child!,
+                textTheme: GoogleFonts.cairoTextTheme(),
+                useMaterial3: true,
               ),
+              builder: (context, child) {
+                final mediaQueryData = MediaQuery.of(context);
+                final textScaler = mediaQueryData.textScaler;
+                final clampedTextScaler = textScaler.clamp(
+                  minScaleFactor: 0.9,
+                  maxScaleFactor: 1.0,
+                );
+
+                return Directionality(
+                  textDirection: TextDirection.rtl,
+                  child: MediaQuery(
+                    data: mediaQueryData.copyWith(
+                      textScaler: clampedTextScaler,
+                    ),
+                    child: child!,
+                  ),
+                );
+              },
+              home: const SplashController(),
+              routes: {},
             );
           },
-          home: const SplashController(),
-          routes: {},
         ));
   }
 }

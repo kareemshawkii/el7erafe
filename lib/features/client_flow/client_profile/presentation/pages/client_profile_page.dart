@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:el7erafe/core/services/local_storage/auth_local_storage.dart';
 import 'package:el7erafe/core/utils/animated_navigaton_with_build.dart';
 import 'package:el7erafe/features/authentication_module/login/data/repositories/auth_repository.dart';
@@ -9,14 +11,15 @@ import 'package:el7erafe/features/client_flow/client_profile/presentation/cubit/
 import 'package:el7erafe/features/client_flow/client_profile/presentation/pages/update_profile_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 class ClientProfilePage extends StatelessWidget {
-   final String? name;
-   final String? token;
+  final String? name;
+  final String? token;
 
-   const ClientProfilePage({super.key, required this.name, required this.token});
+  const ClientProfilePage({super.key, required this.name, required this.token});
 
   @override
   Widget build(BuildContext context) {
@@ -29,9 +32,9 @@ class ClientProfilePage extends StatelessWidget {
 }
 
 class ClientProfilePageView extends StatefulWidget {
-   final String? name;
+  final String? name;
   final String? token;
-   const ClientProfilePageView({super.key, this.name, this.token});
+  const ClientProfilePageView({super.key, this.name, this.token});
 
   @override
   State<ClientProfilePageView> createState() => _ClientProfilePageViewState();
@@ -40,6 +43,8 @@ class ClientProfilePageView extends StatefulWidget {
 class _ClientProfilePageViewState extends State<ClientProfilePageView> {
   bool _notificationsEnabled = false;
   String userName = "مستخدم";
+  String _displayImage = "";
+  int _imageVersion = 0;
 
   final Color _primaryBlue = const Color(0xFF3775FA);
   final Color _bgGrey = const Color(0xFFF5F7FA);
@@ -109,9 +114,11 @@ class _ClientProfilePageViewState extends State<ClientProfilePageView> {
 
   Future<void> _loadLocalData() async {
     String? storedName = await AuthLocalStorage().getUserName();
+    int savedImageVersion = await AuthLocalStorage().getImageVersion();
     if (mounted) {
       setState(() {
         userName = storedName ?? widget.name ?? "مستخدم";
+        _imageVersion = savedImageVersion;
       });
     }
   }
@@ -153,9 +160,6 @@ class _ClientProfilePageViewState extends State<ClientProfilePageView> {
 
   @override
   Widget build(BuildContext context) {
-    final double screenWidth = MediaQuery.of(context).size.width;
-    final double screenHeight = MediaQuery.of(context).size.height;
-
     return BlocConsumer<ProfileCubit, ProfileState>(
       listener: (context, state) {
         if (state is ProfileUnauth) {
@@ -172,9 +176,8 @@ class _ClientProfilePageViewState extends State<ClientProfilePageView> {
         }
       },
       builder: (context, state) {
-        String displayImage = "";
         if (state is ProfileLoaded) {
-          displayImage = state.imageUrl;
+          _displayImage = state.imageUrl;
         }
 
         return Directionality(
@@ -187,26 +190,26 @@ class _ClientProfilePageViewState extends State<ClientProfilePageView> {
                   alignment: Alignment.topCenter,
                   child: Container(
                     padding: EdgeInsets.only(
-                      top: (50 / 852) * screenHeight,
+                      top: 50.h,
                     ),
                     color: _primaryBlue,
-                    width: screenWidth,
-                    height: (300 / 852) * screenHeight,
+                    width: double.infinity,
+                    height: 300.h,
                     child: Align(
                       alignment: Alignment.topCenter,
                       child: Column(
                         children: [
                           Container(
-                            width: 100,
-                            height: 100,
+                            width: 100.w,
+                            height: 100.h,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              // ignore: deprecated_member_use
                               color: Colors.white.withOpacity(0.2),
-                              border: Border.all(color: Colors.white, width: 4),
+                              border:
+                                  Border.all(color: Colors.white, width: 4.w),
                             ),
                             child: ClipOval(
-                              child: displayImage.isEmpty
+                              child: _displayImage.isEmpty
                                   ? const Center(
                                       child: CircularProgressIndicator(
                                         color: Colors.white,
@@ -214,10 +217,12 @@ class _ClientProfilePageViewState extends State<ClientProfilePageView> {
                                       ),
                                     )
                                   : CachedNetworkImage(
-                                      imageUrl: displayImage,
+                                      imageUrl: _displayImage,
+                                      cacheKey:
+                                          "${_displayImage.split('?').first}_$_imageVersion",
                                       fit: BoxFit.cover,
-                                      width: 100,
-                                      height: 100,
+                                      width: 100.w,
+                                      height: 100.h,
                                       placeholder: (context, url) => Center(
                                         child: CircularProgressIndicator(
                                           color: _primaryBlue,
@@ -233,12 +238,11 @@ class _ClientProfilePageViewState extends State<ClientProfilePageView> {
                                     ),
                             ),
                           ),
-                          const SizedBox(height: 8),
-                          // Name
+                          SizedBox(height: 8.h),
                           Text(
                             userName,
                             style: GoogleFonts.cairo(
-                              fontSize: 20,
+                              fontSize: 20.sp,
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
                             ),
@@ -252,24 +256,24 @@ class _ClientProfilePageViewState extends State<ClientProfilePageView> {
                   alignment: Alignment.bottomCenter,
                   child: ClipRRect(
                     borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular((44 / 852) * screenHeight),
-                      topRight: Radius.circular((44 / 852) * screenHeight),
+                      topLeft: Radius.circular(44.r),
+                      topRight: Radius.circular(44.r),
                     ),
                     child: Container(
-                      height: (560 / 852) * screenHeight,
+                      height: 560.h,
                       width: double.infinity,
                       decoration: BoxDecoration(
                         color: const Color(0xFFFDFDFD),
                         borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular((44 / 852) * screenHeight),
-                          topRight: Radius.circular((44 / 852) * screenHeight),
+                          topLeft: Radius.circular(44.r),
+                          topRight: Radius.circular(44.r),
                         ),
                       ),
                       child: SingleChildScrollView(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const SizedBox(height: 12),
+                            SizedBox(height: 12.h),
                             Center(
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.start,
@@ -286,25 +290,31 @@ class _ClientProfilePageViewState extends State<ClientProfilePageView> {
                                             value: profileCubit,
                                             child: ClientUpdateProfilePage(
                                               initialName: userName,
-                                              currentImageUrl: displayImage,
+                                              currentImageUrl: _displayImage,
                                               token: widget.token ?? "",
                                             ),
                                           ),
                                         ),
                                       );
+                                      if (mounted) {
+                                        setState(() {
+                                          _imageVersion++;
+                                        });
+                                      }
                                       await _loadLocalData();
                                     },
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: const Color(0xFF4C85FB),
                                       elevation: 0,
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 24, vertical: 8),
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 24.w, vertical: 8.h),
                                       shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(12),
+                                        borderRadius:
+                                            BorderRadius.circular(12.r),
                                       ),
                                     ),
-                                    icon: const Icon(Icons.edit,
-                                        color: Colors.white, size: 16),
+                                    icon: Icon(Icons.edit,
+                                        color: Colors.white, size: 16.r),
                                     label: Text(
                                       "عدل ملفك الشخصي",
                                       style: GoogleFonts.cairo(
@@ -315,26 +325,23 @@ class _ClientProfilePageViewState extends State<ClientProfilePageView> {
                                 ],
                               ),
                             ),
-                            const SizedBox(height: 16),
+                            SizedBox(height: 16.h),
                             Container(
-                              margin:
-                                  const EdgeInsets.symmetric(horizontal: 20),
-                              padding: const EdgeInsets.symmetric(vertical: 8),
+                              margin: EdgeInsets.symmetric(horizontal: 20.w),
+                              padding: EdgeInsets.symmetric(vertical: 8.h),
                               decoration: BoxDecoration(
                                 color: Colors.white,
-                                borderRadius: BorderRadius.circular(20),
+                                borderRadius: BorderRadius.circular(20.r),
                                 boxShadow: [
                                   BoxShadow(
-                                    // ignore: deprecated_member_use
                                     color: _primaryBlue.withOpacity(0.1),
-                                    blurRadius: 10,
-                                    offset: const Offset(0, 4),
+                                    blurRadius: 10.r,
+                                    offset: Offset(0, 4.h),
                                   ),
                                 ],
                                 border: Border.all(
-                                    // ignore: deprecated_member_use
                                     color: Colors.grey.withOpacity(0.2),
-                                    width: 1),
+                                    width: 1.w),
                               ),
                               child: Column(
                                 children: [
@@ -344,8 +351,8 @@ class _ClientProfilePageViewState extends State<ClientProfilePageView> {
                                     subtitle:
                                         "اختار لو تحب توصلك تنبيهات عن الحجوزات أو العروض",
                                     trailing: SizedBox(
-                                      width: 30,
-                                      height: 20,
+                                      width: 50.w,
+                                      height: 20.h,
                                       child: Switch(
                                         value: _notificationsEnabled,
                                         activeThumbColor: _primaryBlue,
@@ -354,33 +361,35 @@ class _ClientProfilePageViewState extends State<ClientProfilePageView> {
                                       ),
                                     ),
                                   ),
-                                  const Divider(
-                                      height: 1, indent: 60, endIndent: 20),
+                                  Divider(
+                                      height: 1.h,
+                                      indent: 60.w,
+                                      endIndent: 20.w),
                                   _buildSettingItem(
                                     icon: Icons.help_outline,
                                     title: "محتاج مساعدة؟",
                                     subtitle: "اعرف حقوقك وحقوق الحرفيين",
-                                    trailing: const Icon(
-                                        Icons.arrow_forward_ios,
-                                        size: 16,
-                                        color: Colors.grey),
+                                    trailing: Icon(Icons.arrow_forward_ios,
+                                        size: 16.r, color: Colors.grey),
                                     onTap: () {},
                                   ),
-                                  const Divider(
-                                      height: 1, indent: 60, endIndent: 20),
+                                  Divider(
+                                      height: 1.h,
+                                      indent: 60.w,
+                                      endIndent: 20.w),
                                   _buildSettingItem(
                                     icon: Icons.description_outlined,
                                     title: "الشروط والأحكام",
                                     subtitle:
                                         "تواصل مع فريق الدعم لأي مشكلة أو استفسار",
-                                    trailing: const Icon(
-                                        Icons.arrow_forward_ios,
-                                        size: 16,
-                                        color: Colors.grey),
+                                    trailing: Icon(Icons.arrow_forward_ios,
+                                        size: 16.r, color: Colors.grey),
                                     onTap: () {},
                                   ),
-                                  const Divider(
-                                      height: 1, indent: 60, endIndent: 20),
+                                  Divider(
+                                      height: 1.h,
+                                      indent: 60.w,
+                                      endIndent: 20.w),
                                   _buildSettingItem(
                                     icon: Icons.logout,
                                     title: "حذف الحساب",
@@ -390,8 +399,10 @@ class _ClientProfilePageViewState extends State<ClientProfilePageView> {
                                       _onDeleteAccountPressed(context);
                                     },
                                   ),
-                                  const Divider(
-                                      height: 1, indent: 60, endIndent: 20),
+                                  Divider(
+                                      height: 1.h,
+                                      indent: 60.w,
+                                      endIndent: 20.w),
                                   _buildSettingItem(
                                     icon: Icons.logout,
                                     title: "تسجيل الخروج",
@@ -405,6 +416,7 @@ class _ClientProfilePageViewState extends State<ClientProfilePageView> {
                                 ],
                               ),
                             ),
+                            SizedBox(height: 30.h),
                           ],
                         ),
                       ),
@@ -430,30 +442,29 @@ class _ClientProfilePageViewState extends State<ClientProfilePageView> {
   }) {
     return ListTile(
       onTap: onTap,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 4.h),
       leading: Container(
-        padding: const EdgeInsets.all(8),
+        padding: EdgeInsets.all(8.r),
         decoration: BoxDecoration(
-          // ignore: deprecated_member_use
           color: (iconColor ?? _primaryBlue).withOpacity(0.1),
           shape: BoxShape.circle,
         ),
-        child: Icon(icon, color: iconColor ?? _primaryBlue, size: 20),
+        child: Icon(icon, color: iconColor ?? _primaryBlue, size: 20.r),
       ),
       title: Text(
         title,
         style: GoogleFonts.cairo(
-          fontSize: 15,
+          fontSize: 15.sp,
           fontWeight: FontWeight.bold,
           color: titleColor ?? _textBlack,
         ),
       ),
       subtitle: Padding(
-        padding: const EdgeInsets.only(top: 4.0),
+        padding: EdgeInsets.only(top: 4.h),
         child: Text(
           subtitle,
           style: GoogleFonts.cairo(
-            fontSize: 11,
+            fontSize: 11.sp,
             fontWeight: FontWeight.w400,
             color: _textGrey,
             height: 1.3,

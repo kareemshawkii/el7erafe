@@ -12,6 +12,7 @@ import 'package:el7erafe/features/authentication_module/technician_regestration/
 import 'package:el7erafe/features/authentication_module/technician_regestration/presentation/widgets/technician_registration_form.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class TechnicianRegistrationPage extends StatelessWidget {
@@ -41,8 +42,6 @@ class TechnicianRegistrationView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double screenWidth = MediaQuery.of(context).size.width;
-    final double screenHeight = MediaQuery.of(context).size.height;
     final double keyboardPadding = MediaQuery.of(context).viewInsets.bottom;
     return Scaffold(
       resizeToAvoidBottomInset: true,
@@ -109,17 +108,15 @@ class TechnicianRegistrationView extends StatelessWidget {
               Align(
                 alignment: Alignment.topCenter,
                 child: Container(
-                    padding: EdgeInsets.only(
-                        top: (68 / 852) * screenHeight,
-                        bottom: (68 / 852) * screenHeight),
+                    padding: EdgeInsets.only(top: 68.h, bottom: 68.h),
                     color: const Color(0xFF3775FA),
-                    width: screenWidth,
-                    height: (267 / 852) * screenHeight,
+                    width: double.infinity,
+                    height: 267.h,
                     child: Align(
                       alignment: Alignment.topCenter,
                       child: SizedBox(
-                        height: (131 / 852) * screenHeight,
-                        width: (131 / 393) * screenWidth,
+                        height: 131.h,
+                        width: 131.w,
                         child: Image.asset('images/Logo.png', fit: BoxFit.fill),
                       ),
                     )),
@@ -128,25 +125,22 @@ class TechnicianRegistrationView extends StatelessWidget {
                 alignment: Alignment.bottomCenter,
                 child: ClipRRect(
                   borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular((44)),
-                    topRight: Radius.circular((44)),
+                    topLeft: Radius.circular(44.r),
+                    topRight: Radius.circular(44.r),
                   ),
                   child: Container(
-                    height: (629 / 852) * screenHeight,
+                    height: 629.h,
                     width: double.infinity,
-                    decoration: const BoxDecoration(
-                      color: Color(0xFFFDFDFD),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFDFDFD),
                       borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(44),
-                        topRight: Radius.circular(44),
+                        topLeft: Radius.circular(44.r),
+                        topRight: Radius.circular(44.r),
                       ),
                     ),
                     child: SingleChildScrollView(
                       padding: EdgeInsets.fromLTRB(
-                          (16 / 393) * screenWidth,
-                          (44 / 852) * screenHeight,
-                          (16 / 393) * screenWidth,
-                          (44 / 852) * screenHeight + keyboardPadding),
+                          16.w, 44.h, 16.w, 44.h + keyboardPadding),
                       physics: const ClampingScrollPhysics(),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -154,7 +148,7 @@ class TechnicianRegistrationView extends StatelessWidget {
                           Text.rich(
                             TextSpan(
                               style: GoogleFonts.cairo(
-                                fontSize: 20,
+                                fontSize: 20.sp,
                                 fontWeight: FontWeight.w600,
                                 color: const Color(0xFF232222),
                                 height: 1.5,
@@ -171,7 +165,7 @@ class TechnicianRegistrationView extends StatelessWidget {
                               ],
                             ),
                           ),
-                          SizedBox(height: (24 / 852) * screenHeight),
+                          SizedBox(height: 24.h),
                           const TechnicianRegistrationForm(),
                         ],
                       ),

@@ -3,6 +3,7 @@ import 'package:el7erafe/features/authentication_module/login/presentation/cubit
 import 'package:el7erafe/features/authentication_module/login/presentation/pages/login_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'dart:math';
 import '../cubit/onboarding_cubit.dart';
@@ -35,9 +36,6 @@ class OnBoardingPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double screenWidth = MediaQuery.of(context).size.width;
-    final double screenHeight = MediaQuery.of(context).size.height;
-
     return BlocBuilder<OnboardingCubit, int>(
       builder: (context, currentIndex) {
         return Scaffold(
@@ -48,19 +46,16 @@ class OnBoardingPage extends StatelessWidget {
                 alignment: Alignment.topCenter,
                 child: Image.asset(
                   images[currentIndex],
-                  width: screenWidth,
+                  width: double.infinity,
                   fit: BoxFit.cover,
                 ),
               ),
               Align(
                 alignment: Alignment.bottomCenter,
                 child: Container(
-                  height: (342.0 / 852.0) * screenHeight,
-                  width: screenWidth,
-                  padding: EdgeInsets.only(
-                      top: (32.0 / 852.0) * screenHeight,
-                      left: (16.0 / 393.0) * screenWidth,
-                      right: (16.0 / 393.0) * screenWidth),
+                  height: 342.h,
+                  width: double.infinity,
+                  padding: EdgeInsets.only(top: 32.h, left: 16.w, right: 16.w),
                   decoration: const BoxDecoration(
                     color: Color(0xFFFAFAFA),
                     borderRadius: BorderRadius.only(
@@ -77,27 +72,26 @@ class OnBoardingPage extends StatelessWidget {
                           bool isActive = index == currentIndex;
                           return AnimatedContainer(
                             duration: const Duration(milliseconds: 300),
-                            margin: const EdgeInsets.symmetric(horizontal: 4.0),
-                            width: isActive ? 19 : 8,
-                            height: isActive ? 4 : 8,
+                            margin: EdgeInsets.symmetric(horizontal: 4.w),
+                            width: isActive ? 19.w : 8.w,
+                            height: isActive ? 4.h : 8.h,
                             decoration: BoxDecoration(
                               color: isActive
                                   ? const Color(0xFF3F68EC)
                                   : const Color(0xFFD9D9D9),
                               borderRadius:
-                                  BorderRadius.circular(isActive ? 4 : 8),
+                                  BorderRadius.circular(isActive ? 4.r : 8.r),
                             ),
                           );
                         }),
                       ),
                       Container(
-                        height: (182.0 / 852.0) * screenHeight,
-                        margin:
-                            EdgeInsets.only(top: (44.0 / 852.0) * screenHeight),
+                        height: 182.h,
+                        margin: EdgeInsets.only(top: 44.h),
                         child: Text.rich(
                           TextSpan(
                             style: GoogleFonts.cairo(
-                              fontSize: 20,
+                              fontSize: 20.sp,
                               fontWeight: FontWeight.w600,
                               color: const Color(0xFF232222),
                               height: 1.5,
@@ -160,17 +154,17 @@ class OnBoardingPage extends StatelessWidget {
                                   (route) => false);
                             },
                             style: TextButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 12.0, vertical: 8.0),
-                              shape: const RoundedRectangleBorder(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 12.w, vertical: 8.h),
+                              shape: RoundedRectangleBorder(
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(20.0)),
+                                    BorderRadius.all(Radius.circular(20.r)),
                               ),
                             ),
                             child: Text(
                               'تخطي',
                               style: GoogleFonts.cairo(
-                                fontSize: 14,
+                                fontSize: 14.sp,
                                 fontWeight: FontWeight.w600,
                                 color: const Color(0xFF3F68EC),
                               ),
@@ -202,16 +196,14 @@ class CustomProgressButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double screenWidth = MediaQuery.of(context).size.width;
-    final double screenHeight = MediaQuery.of(context).size.height;
     return SizedBox(
-      width: (52 / 393) * screenWidth,
-      height: (52 / 852) * screenHeight,
+      width: 52.w,
+      height: 52.h,
       child: Stack(
         alignment: Alignment.center,
         children: [
           CustomPaint(
-            size: Size((44 / 393) * screenWidth, (44 / 852) * screenHeight),
+            size: Size(44.w, 44.h),
             painter: ProgressArcPainter(
               progress: progress,
               progressColor: const Color.fromARGB(255, 34, 159, 190),
@@ -219,8 +211,8 @@ class CustomProgressButton extends StatelessWidget {
             ),
           ),
           SizedBox(
-            width: (40 / 393) * screenWidth,
-            height: (40 / 852) * screenHeight,
+            width: 40.w,
+            height: 40.h,
             child: FloatingActionButton(
               onPressed: onPressed,
               backgroundColor: const Color(0xFF3F68EC),

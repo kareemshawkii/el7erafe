@@ -426,7 +426,6 @@ class _DayPeriodControl extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final MaterialLocalizations materialLocalizations = MaterialLocalizations.of(context);
     final TimePickerThemeData timePickerTheme = _TimePickerModel.themeOf(context);
     final _TimePickerDefaults defaultTheme = _TimePickerModel.defaultThemeOf(context);
     final TimeOfDay selectedTime = _TimePickerModel.selectedTimeOf(context);
@@ -442,13 +441,13 @@ class _DayPeriodControl extends StatelessWidget {
     final Widget amButton = _AmPmButton(
       selected: amSelected,
       onPressed: () => _setAm(context),
-      label: materialLocalizations.anteMeridiemAbbreviation,
+      label: "صباحاً", 
     );
 
     final Widget pmButton = _AmPmButton(
       selected: pmSelected,
       onPressed: () => _setPm(context),
-      label: materialLocalizations.postMeridiemAbbreviation,
+      label: "مساءً", 
     );
 
     Size dayPeriodSize;
