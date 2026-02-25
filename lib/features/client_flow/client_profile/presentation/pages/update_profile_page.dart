@@ -6,7 +6,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:el7erafe/core/services/local_storage/auth_local_storage.dart';
 import 'package:el7erafe/features/client_flow/client_profile/presentation/cubit/client_profile_cubit.dart';
@@ -154,6 +153,7 @@ class _ClientUpdateProfilePageState extends State<ClientUpdateProfilePage> {
                 setState(() => _pickedImage = null);
                 AuthLocalStorage().saveUserProfileImage(state.newImageUrl!);
               }
+              Navigator.pop(context);
             } else if (state is ProfileError) {
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                 content: Text(state.message,
@@ -188,15 +188,29 @@ class _ClientUpdateProfilePageState extends State<ClientUpdateProfilePage> {
                                   }
 
                                   if (imageToDisplay.isNotEmpty) {
-                                    return CachedNetworkImage(
-                                      imageUrl: imageToDisplay,
+                                    return Image.network(
+                                      imageToDisplay,
                                       fit: BoxFit.cover,
-                                      placeholder: (context, url) =>
-                                          const CircularProgressIndicator(
-                                              color: Colors.white),
-                                      errorWidget: (context, url, error) =>
-                                          const Icon(Icons.person,
-                                              size: 60, color: Colors.grey),
+                                      loadingBuilder:
+                                          (context, child, loadingProgress) {
+                                        if (loadingProgress == null) {
+                                          return child;
+                                        }
+
+                                        return const Center(
+                                          child: CircularProgressIndicator(
+                                            color: Colors.white,
+                                          ),
+                                        );
+                                      },
+                                      errorBuilder:
+                                          (context, error, stackTrace) {
+                                        return const Icon(
+                                          Icons.person,
+                                          size: 60,
+                                          color: Colors.grey,
+                                        );
+                                      },
                                     );
                                   }
                                   return const Icon(Icons.person,
@@ -601,13 +615,6 @@ class _SensitiveUpdateFlowSheetState extends State<_SensitiveUpdateFlowSheet> {
           listener: (context, state) {
             if (state is FieldUpdateSuccess) {
               Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                content: Text(
-                    'تم تحديث ${widget.isForPhone ? "رقم الهاتف" : "البريد الإلكتروني"} بنجاح',
-                    style: GoogleFonts.cairo(),
-                    textDirection: TextDirection.rtl),
-                backgroundColor: Colors.green,
-              ));
             } else if (state is FirstOtpSent) {
               _otpController.clear();
             } else if (state is FirstOtpVerified || state is NewEmailOtpSent) {

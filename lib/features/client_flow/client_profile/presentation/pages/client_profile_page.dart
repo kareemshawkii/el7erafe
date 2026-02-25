@@ -1,5 +1,4 @@
 // ignore_for_file: deprecated_member_use
-
 import 'package:el7erafe/core/services/local_storage/auth_local_storage.dart';
 import 'package:el7erafe/core/utils/animated_navigaton_with_build.dart';
 import 'package:el7erafe/features/authentication_module/login/data/repositories/auth_repository.dart';
@@ -13,7 +12,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 
 class ClientProfilePage extends StatelessWidget {
   final String? name;
@@ -44,7 +42,6 @@ class _ClientProfilePageViewState extends State<ClientProfilePageView> {
   bool _notificationsEnabled = false;
   String userName = "مستخدم";
   String _displayImage = "";
-  int _imageVersion = 0;
 
   final Color _primaryBlue = const Color(0xFF3775FA);
   final Color _bgGrey = const Color(0xFFF5F7FA);
@@ -114,11 +111,13 @@ class _ClientProfilePageViewState extends State<ClientProfilePageView> {
 
   Future<void> _loadLocalData() async {
     String? storedName = await AuthLocalStorage().getUserName();
-    int savedImageVersion = await AuthLocalStorage().getImageVersion();
+    String? storedImage = await AuthLocalStorage().getUserProfileImage();
     if (mounted) {
       setState(() {
         userName = storedName ?? widget.name ?? "مستخدم";
-        _imageVersion = savedImageVersion;
+        if (storedImage != null && storedImage.isNotEmpty) {
+          _displayImage = storedImage;
+        }
       });
     }
   }
@@ -162,6 +161,7 @@ class _ClientProfilePageViewState extends State<ClientProfilePageView> {
   Widget build(BuildContext context) {
     return BlocConsumer<ProfileCubit, ProfileState>(
       listener: (context, state) {
+        if (ModalRoute.of(context)?.isCurrent != true) return;
         if (state is ProfileUnauth) {
           _navigateToLogin(context, state.message);
         } else if (state is ProfileActionSuccess) {
@@ -216,25 +216,40 @@ class _ClientProfilePageViewState extends State<ClientProfilePageView> {
                                         strokeWidth: 3,
                                       ),
                                     )
-                                  : CachedNetworkImage(
-                                      imageUrl: _displayImage,
-                                      cacheKey:
-                                          "${_displayImage.split('?').first}_$_imageVersion",
+                                  : Image.network(
+                                      _displayImage,
                                       fit: BoxFit.cover,
                                       width: 100.w,
                                       height: 100.h,
-                                      placeholder: (context, url) => Center(
-                                        child: CircularProgressIndicator(
-                                          color: _primaryBlue,
-                                          strokeWidth: 3,
-                                        ),
-                                      ),
-                                      errorWidget: (context, url, error) =>
-                                          const Icon(
-                                        Icons.person,
-                                        size: 50,
-                                        color: Colors.grey,
-                                      ),
+                                      loadingBuilder:
+                                          (context, child, loadingProgress) {
+                                        if (loadingProgress == null) {
+                                          return child;
+                                        }
+                                        return Center(
+                                          child: CircularProgressIndicator(
+                                            color: _primaryBlue,
+                                            strokeWidth: 3,
+                                            value: loadingProgress
+                                                        .expectedTotalBytes !=
+                                                    null
+                                                ? loadingProgress
+                                                        .cumulativeBytesLoaded /
+                                                    (loadingProgress
+                                                            .expectedTotalBytes ??
+                                                        1)
+                                                : null,
+                                          ),
+                                        );
+                                      },
+                                      errorBuilder:
+                                          (context, error, stackTrace) {
+                                        return const Icon(
+                                          Icons.person,
+                                          size: 50,
+                                          color: Colors.grey,
+                                        );
+                                      },
                                     ),
                             ),
                           ),
@@ -296,12 +311,13 @@ class _ClientProfilePageViewState extends State<ClientProfilePageView> {
                                           ),
                                         ),
                                       );
-                                      if (mounted) {
-                                        setState(() {
-                                          _imageVersion++;
-                                        });
+                                      if (_displayImage.isNotEmpty) {
+                                        await NetworkImage(_displayImage)
+                                            .evict();
                                       }
                                       await _loadLocalData();
+                                      profileCubit.loadProfile(
+                                          widget.token ?? "", userName);
                                     },
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: const Color(0xFF4C85FB),

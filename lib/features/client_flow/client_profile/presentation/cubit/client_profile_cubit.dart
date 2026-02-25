@@ -61,6 +61,18 @@ class ProfileCubit extends Cubit<ProfileState> {
   }
 
   void updateBasicInfo(String token, String name, File? imageFile) async {
+    if (imageFile != null) {
+      if (!imageFile.existsSync()) {
+        emit(ProfileError("ملف الصورة غير موجود."));
+        return;
+      }
+      final int fileSize = imageFile.lengthSync();
+      if (fileSize == 0 || fileSize > 1 * 1024 * 1024) { 
+        emit(ProfileError("حجم الصورة يجب أن يكون بين 1 بايت و 1 ميجابايت."));
+        return;
+      }
+    }
+
     emit(ProfileBasicUpdateLoading());
     final result = await _repo.updateBasicProfile(token, name, imageFile);
     result.fold(
@@ -101,7 +113,7 @@ class ProfileCubit extends Cubit<ProfileState> {
     final result = await _repo.verifyNewEmail(token, email, newOtpCode);
     result.fold(
       (error) => _handleError(error),
-      (success) => emit(FieldUpdateSuccess("تم تحديث البريد الإلكتروني بنجاح", newEmail: email)),
+      (success) => emit(FieldUpdateSuccess("تم تحديث البريد الإلكتروني بنجاح إلى $email", newEmail: email)),
     );
   }
 
@@ -110,7 +122,7 @@ class ProfileCubit extends Cubit<ProfileState> {
     final result = await _repo.finalizePhoneChange(token, newPhone);
     result.fold(
       (error) => _handleError(error),
-      (successMessage) => emit(FieldUpdateSuccess("تم تحديث رقم الهاتف بنجاح", newPhone: newPhone)),
+      (successMessage) => emit(FieldUpdateSuccess("تم تحديث رقم الهاتف بنجاح إلى $newPhone", newPhone: newPhone)),
     );
   }
 

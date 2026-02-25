@@ -120,7 +120,6 @@ class ProfileRepository {
         }
         if (imageFile != null) {
           await AuthLocalStorage().deleteUserProfileImage();
-          await AuthLocalStorage().incrementImageVersion();
         }
         return Right("تم تحديث البيانات بنجاح");
       } else if (response.statusCode == 401) {
