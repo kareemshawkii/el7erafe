@@ -9,7 +9,7 @@ import 'package:el7erafe/features/authentication_module/technician_regestration/
 import 'package:el7erafe/features/authentication_module/technician_regestration/presentation/cubit/technician_waiting_page_cubit.dart';
 import 'package:el7erafe/features/authentication_module/technician_regestration/presentation/cubit/technician_waititng_page_state.dart';
 import 'package:el7erafe/features/authentication_module/technician_regestration/presentation/pages/technician_resubmit_page.dart';
-import 'package:el7erafe/technician.dart';
+import 'package:el7erafe/features/technician_flow/tech_home/presentation/pages/tech_home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -128,7 +128,7 @@ class _TechnicianWaitingViewState extends State<TechnicianWaitingView> {
             Navigator.pushAndRemoveUntil(
               context,
               SlideRightRouteWithBuild(
-                builder: (_) => const TechnicianPage(),
+                builder: (_) => const TechHomePage(),
               ),
               (route) => false,
             );

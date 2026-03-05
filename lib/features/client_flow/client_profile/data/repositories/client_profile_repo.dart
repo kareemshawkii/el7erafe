@@ -68,8 +68,8 @@ class ProfileRepository {
 
   Future<Either<String, String>> logout(String token) async {
     try {
-      final response = await http.get(
-        Uri.parse('$_baseUrl/api/cf/profile'),
+      final response = await http.post(
+        Uri.parse('$_baseUrl/api/auth/logout'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',

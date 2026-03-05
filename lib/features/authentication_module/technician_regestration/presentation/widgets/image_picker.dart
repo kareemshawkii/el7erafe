@@ -4,6 +4,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
+import 'package:path_provider/path_provider.dart';
 
 class ImagePickerButton extends StatefulWidget {
   final String? disabledImage;
@@ -122,6 +124,23 @@ class _ImagePickerButtonState extends State<ImagePickerButton> {
     );
   }
 
+  Future<File> _compressImage(File file) async {
+    int size = file.lengthSync();
+    if (size <= 1024 * 1024) return file;
+
+    final tempDir = await getTemporaryDirectory();
+    final targetPath =
+        '${tempDir.path}/compressed_${DateTime.now().millisecondsSinceEpoch}.jpg';
+
+    final XFile? result = await FlutterImageCompress.compressAndGetFile(
+      file.absolute.path,
+      targetPath,
+      quality: 60,
+    );
+
+    return result != null ? File(result.path) : file;
+  }
+
   Future<void> _pickImage(ImageSource source) async {
     try {
       final XFile? pickedFile = await _picker.pickImage(
@@ -148,22 +167,11 @@ class _ImagePickerButtonState extends State<ImagePickerButton> {
         return;
       }
 
-      final int sizeInBytes = await pickedFile.length();
-      const int maxSizeInBytes = 1 * 1024 * 1024;
+      File originalFile = File(pickedFile.path);
 
-      if (sizeInBytes > maxSizeInBytes) {
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("حجم الصورة يجب ألا يتجاوز 1 ميجابايت.",
-                textDirection: TextDirection.rtl),
-            backgroundColor: Colors.red,
-          ),
-        );
-        return;
-      }
+      File finalCompressedFile = await _compressImage(originalFile);
 
-      if (sizeInBytes == 0) {
+      if (finalCompressedFile.lengthSync() == 0) {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -175,14 +183,12 @@ class _ImagePickerButtonState extends State<ImagePickerButton> {
         return;
       }
 
-      final File newImageFile = File(pickedFile.path);
-
       setState(() {
-        _pickedImage = newImageFile;
+        _pickedImage = finalCompressedFile;
       });
 
       if (widget.onImagePicked != null) {
-        widget.onImagePicked!(newImageFile);
+        widget.onImagePicked!(finalCompressedFile);
       }
     } catch (e) {
       if (!mounted) return;

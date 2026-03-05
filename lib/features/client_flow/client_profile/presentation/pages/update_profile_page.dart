@@ -4,12 +4,14 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:el7erafe/core/services/local_storage/auth_local_storage.dart';
 import 'package:el7erafe/features/client_flow/client_profile/presentation/cubit/client_profile_cubit.dart';
 import 'package:el7erafe/features/client_flow/client_profile/presentation/cubit/client_profile_state.dart';
+import 'package:path_provider/path_provider.dart';
 
 String hashedEmail = "";
 
@@ -68,13 +70,107 @@ class _ClientUpdateProfilePageState extends State<ClientUpdateProfilePage> {
     super.dispose();
   }
 
-  Future<void> _pickImage() async {
-    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
-    if (image != null) {
-      setState(() {
-        _pickedImage = File(image.path);
-      });
+  Future<File> _compressImage(File file) async {
+    int size = file.lengthSync();
+    if (size <= 1024 * 1024) return file;
+    final tempDir = await getTemporaryDirectory();
+    final targetPath =
+        '${tempDir.path}/compressed_${DateTime.now().millisecondsSinceEpoch}.jpg';
+    final XFile? result = await FlutterImageCompress.compressAndGetFile(
+      file.absolute.path,
+      targetPath,
+      quality: 60,
+    );
+
+    return result != null ? File(result.path) : file;
+  }
+
+  Future<void> _pickImage(ImageSource source,
+      {required bool isProfileImage}) async {
+    try {
+      final XFile? image = await _picker.pickImage(
+        source: source,
+        maxWidth: 1024,
+        imageQuality: 85,
+      );
+
+      if (image != null) {
+        File originalFile = File(image.path);
+        File compressedFile = await _compressImage(originalFile);
+
+        if (compressedFile.lengthSync() == 0) {
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                  "حدث خطأ أثناء معالجة الصورة. الرجاء المحاولة مرة أخرى.",
+                  textDirection: TextDirection.rtl),
+              backgroundColor: Colors.red,
+            ),
+          );
+          return;
+        }
+
+        setState(() {
+          if (isProfileImage) {
+            _pickedImage = compressedFile;
+          }
+        });
+      }
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('حدث خطأ أثناء اختيار الصورة',
+              textDirection: TextDirection.rtl),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
+  }
+
+  void _showImageSourceSheet(BuildContext context,
+      {required bool isProfileImage}) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (BuildContext ctx) {
+        return SafeArea(
+          child: Directionality(
+            textDirection: TextDirection.rtl,
+            child: Wrap(
+              children: <Widget>[
+                ListTile(
+                  leading:
+                      Icon(Icons.photo_camera, color: Colors.black, size: 24.r),
+                  title: Text('الكاميرا ',
+                      style: TextStyle(color: Colors.black, fontSize: 14.sp)),
+                  onTap: () {
+                    Navigator.of(ctx).pop();
+                    _pickImage(ImageSource.camera,
+                        isProfileImage: isProfileImage);
+                  },
+                ),
+                Divider(height: 1.h),
+                ListTile(
+                  leading: Icon(Icons.photo_library,
+                      color: Colors.black, size: 24.r),
+                  title: Text('المعرض ',
+                      style: TextStyle(color: Colors.black, fontSize: 14.sp)),
+                  onTap: () {
+                    Navigator.of(ctx).pop();
+                    _pickImage(ImageSource.gallery,
+                        isProfileImage: isProfileImage);
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   void _showSensitiveUpdateSheet(BuildContext ctx, {required bool isForPhone}) {
@@ -103,8 +199,9 @@ class _ClientUpdateProfilePageState extends State<ClientUpdateProfilePage> {
         );
       },
     ).then((_) {
-      // ignore: use_build_context_synchronously
-      ctx.read<ProfileCubit>().resetUpdateFlowState(widget.currentImageUrl);
+      if (ctx.mounted) {
+        ctx.read<ProfileCubit>().resetUpdateFlowState(widget.currentImageUrl);
+      }
     });
   }
 
@@ -233,7 +330,8 @@ class _ClientUpdateProfilePageState extends State<ClientUpdateProfilePage> {
                         bottom: 0,
                         right: 0,
                         child: GestureDetector(
-                          onTap: _pickImage,
+                          onTap: () => _showImageSourceSheet(context,
+                              isProfileImage: true),
                           child: Container(
                             padding: EdgeInsets.all(8.r),
                             decoration: const BoxDecoration(

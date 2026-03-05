@@ -8,16 +8,23 @@ import 'package:signalr_netcore/hub_connection.dart';
 import 'package:signalr_netcore/hub_connection_builder.dart';
 
 class InboxRepository {
-  final String baseUrl = "https://el7rafe-gma4hrg0e9epfsc0.uaenorth-01.azurewebsites.net";
-  final String hubUrl = "https://el7rafe-gma4hrg0e9epfsc0.uaenorth-01.azurewebsites.net/chatHub";
+  final String baseUrl =
+      "https://el7rafe-gma4hrg0e9epfsc0.uaenorth-01.azurewebsites.net";
+  final String hubUrl =
+      "https://el7rafe-gma4hrg0e9epfsc0.uaenorth-01.azurewebsites.net/chatHub";
   HubConnection? _hubConnection;
 
-  Future<Either<List<InboxConversationModel>,String>> getInbox() async {
+  Future<Either<List<InboxConversationModel>, String>> getInbox() async {
     AuthLocalStorage authLocalStorage = AuthLocalStorage();
     String? token = await authLocalStorage.getToken();
+    String? userType = await authLocalStorage.getUserType();
+
+    String endpoint =
+        (userType == 'T') ? '/api/tech/inbox' : '/api/cf/inbox';
+
     try {
       final response = await http.get(
-        Uri.parse('$baseUrl/api/cf/inbox'),
+        Uri.parse('$baseUrl$endpoint'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
@@ -26,16 +33,16 @@ class InboxRepository {
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
-        return Left(data.map((json) => InboxConversationModel.fromJson(json)).toList());
+        return Left(
+            data.map((json) => InboxConversationModel.fromJson(json)).toList());
       } else if (response.statusCode == 401) {
         await authLocalStorage.clearSession();
-        return Right("401 unauthorized");
-      }
-      else {
-        return Right("فشل في تحميل المحادثات");
+        return const Right("401 unauthorized");
+      } else {
+        return const Right("فشل في تحميل المحادثات");
       }
     } catch (e) {
-      return Right("خطأ في الاتصال، تأكد من الإنترنت");
+      return const Right("خطأ في الاتصال، تأكد من الإنترنت");
     }
   }
 
@@ -46,9 +53,10 @@ class InboxRepository {
       String? token = await AuthLocalStorage().getToken();
 
       _hubConnection = HubConnectionBuilder()
-          .withUrl(hubUrl, options: HttpConnectionOptions(
-            accessTokenFactory: () async => token ?? "",
-          ))
+          .withUrl(hubUrl,
+              options: HttpConnectionOptions(
+                accessTokenFactory: () async => token ?? "",
+              ))
           .withAutomaticReconnect()
           .build();
 
@@ -56,11 +64,12 @@ class InboxRepository {
         if (arguments != null && arguments.isNotEmpty) {
           try {
             final List<dynamic> data = arguments[0] as List<dynamic>;
-            
+
             final updatedInbox = data
-                .map((json) => InboxConversationModel.fromJson(json as Map<String, dynamic>))
+                .map((json) => InboxConversationModel.fromJson(
+                    json as Map<String, dynamic>))
                 .toList();
-            
+
             if (onInboxUpdated != null) {
               onInboxUpdated(updatedInbox);
             }
@@ -71,7 +80,6 @@ class InboxRepository {
       });
 
       await _hubConnection?.start();
-      
     } catch (e) {
       throw Exception("فشل الاتصال بالخادم يرجي التحقق من الإنترنت");
     }

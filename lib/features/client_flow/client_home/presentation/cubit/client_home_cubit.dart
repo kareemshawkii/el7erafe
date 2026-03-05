@@ -7,7 +7,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 class HomeCubit extends Cubit<HomeState> {
   final HomeRepository _repository;
 
-  // Cache the services list to prevent the UI from going blank
   List<ServiceItem> _cachedServices = [];
 
   HomeCubit(this._repository) : super(HomeInitial());

@@ -1,3 +1,4 @@
+import 'package:el7erafe/features/technician_flow/tech_home/presentation/pages/tech_home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -24,7 +25,6 @@ import 'package:el7erafe/features/client_flow/client_home/presentation/pages/cli
 import 'package:el7erafe/features/client_flow/client_profile/data/repositories/client_profile_repo.dart';
 import 'package:el7erafe/features/client_flow/quick_reserve/data/repositories/quick_reserve_repo.dart';
 import 'package:el7erafe/features/client_flow/select_technician/data/repositories/select_technician_repo.dart';
-import 'package:el7erafe/technician.dart';
 
 enum InitialRoute {
   onboarding,
@@ -105,7 +105,7 @@ class _MyAppState extends State<MyApp> {
       case InitialRoute.clientHome:
         return const ClientHomePage();
       case InitialRoute.technicianHome:
-        return const TechnicianPage();
+        return const TechHomePage();
       case InitialRoute.technicianWaiting:
         return BlocProvider(
           create: (context) => TechnicianStatusCubit(

@@ -33,6 +33,8 @@ dependencies:
   signalr_netcore: ^1.4.4
   url_launcher: ^6.3.2
   geolocator: ^14.0.2
+  flutter_image_compress: ^2.3.0
+  path_provider: ^2.1.2
 
 cupertino_icons: ^1.0.8
 
