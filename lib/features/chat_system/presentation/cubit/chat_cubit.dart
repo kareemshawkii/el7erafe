@@ -12,62 +12,94 @@ class ChatCubit extends Cubit<ChatState> {
   int currentPage = 1;
   final int _pageSize = 50;
 
+  bool _isReceiverOnline = false;
+
   ChatCubit(this.repository, {required this.chatId, required this.receiverId})
       : super(ChatInitial());
 
   Future<void> connectAndLoadHistory() async {
     emit(ChatLoading());
     try {
-      await repository.initConnection(onMessageReceived: (newMessage) {
-        final exists = _messages.any((m) => m.id == newMessage.id);
-        if (!exists) {
-          _messages.insert(0, newMessage);
-          if (!isClosed) emit(ChatLoaded(List.from(_messages)));
-          if (newMessage.senderId == receiverId) {
-            repository.markMessagesAsRead(chatId, receiverId);
+      await repository.initConnection(
+        onMessageReceived: (newMessage) {
+          final exists = _messages.any((m) => m.id == newMessage.id);
+          if (!exists) {
+            _messages.insert(0, newMessage);
+            if (!isClosed) {
+              emit(ChatLoaded(List.from(_messages),
+                  isOnline: _isReceiverOnline));
+            }
+            if (newMessage.senderId == receiverId) {
+              repository.markMessagesAsRead(chatId, receiverId);
+            }
           }
-        }
-      }, onMessageStatusUpdated: (messageId, newStatus) {
-        bool hasChanges = false;
-        for (int i = 0; i < _messages.length; i++) {
-          if (_messages[i].senderId != receiverId) {
-            if (newStatus == 'Read' && _messages[i].messageStatus != 'Read') {
-              _messages[i] = _messages[i].copyWith(messageStatus: 'Read');
-              hasChanges = true;
-            } else if (newStatus == 'Delivered' &&
-                _messages[i].messageStatus == 'Sent') {
-              _messages[i] = _messages[i]
-                  .copyWith(messageStatus: 'Delivered', id: messageId);
-              hasChanges = true;
-            } else if (_messages[i].id == messageId) {
+        },
+        onMessageStatusUpdated: (messageId, newStatus) {
+          bool hasChanges = false;
+          for (int i = 0; i < _messages.length; i++) {
+            if (_messages[i].senderId != receiverId) {
+              if (newStatus == 'Read' && _messages[i].messageStatus != 'Read') {
+                _messages[i] = _messages[i].copyWith(messageStatus: 'Read');
+                hasChanges = true;
+              } else if (newStatus == 'Delivered' &&
+                  _messages[i].messageStatus == 'Sent') {
+                _messages[i] = _messages[i]
+                    .copyWith(messageStatus: 'Delivered', id: messageId);
+                hasChanges = true;
+              } else if (_messages[i].id == messageId) {
+                _messages[i] = _messages[i].copyWith(messageStatus: newStatus);
+                hasChanges = true;
+              }
+            }
+          }
+          if (hasChanges && !isClosed) {
+            emit(ChatLoaded(List.from(_messages), isOnline: _isReceiverOnline));
+          }
+        },
+        onMessagesRead: (incomingChatId, messageIds, newStatus) {
+          if (incomingChatId != chatId) return;
+
+          bool hasChanges = false;
+          for (int i = 0; i < _messages.length; i++) {
+            if (messageIds.contains(_messages[i].id)) {
               _messages[i] = _messages[i].copyWith(messageStatus: newStatus);
               hasChanges = true;
             }
           }
-        }
-        if (hasChanges && !isClosed) emit(ChatLoaded(List.from(_messages)));
-      }, onMessagesRead: (incomingChatId, messageIds, newStatus) {
-        if (incomingChatId != chatId) return;
 
-        bool hasChanges = false;
-        for (int i = 0; i < _messages.length; i++) {
-          if (messageIds.contains(_messages[i].id)) {
-            _messages[i] = _messages[i].copyWith(messageStatus: newStatus);
-            hasChanges = true;
+          if (hasChanges && !isClosed) {
+            emit(ChatLoaded(List.from(_messages), isOnline: _isReceiverOnline));
           }
-        }
-
-        if (hasChanges && !isClosed) {
-          emit(ChatLoaded(List.from(_messages)));
-        }
-      });
+        },
+        onUserOnline: (userId) {
+          if (userId == receiverId) {
+            _isReceiverOnline = true;
+            if (!isClosed && state is ChatLoaded) {
+              emit(ChatLoaded(List.from(_messages),
+                  isOnline: _isReceiverOnline));
+            }
+          }
+        },
+        onUserOffline: (userId) {
+          if (userId == receiverId) {
+            _isReceiverOnline = false;
+            if (!isClosed && state is ChatLoaded) {
+              emit(ChatLoaded(List.from(_messages),
+                  isOnline: _isReceiverOnline));
+            }
+          }
+        },
+      );
 
       _messages =
           await repository.getChatHistory(chatId, currentPage, _pageSize);
 
       if (!isClosed) {
-        emit(ChatLoaded(List.from(_messages),
-            hasReachedMax: _messages.length < _pageSize));
+        emit(ChatLoaded(
+          List.from(_messages),
+          hasReachedMax: _messages.length < _pageSize,
+          isOnline: _isReceiverOnline,
+        ));
       }
 
       await repository.markMessagesAsRead(chatId, receiverId);
@@ -91,12 +123,12 @@ class ChatCubit extends Cubit<ChatState> {
 
     try {
       _messages.insert(0, optimisticMessage);
-      emit(ChatLoaded(List.from(_messages)));
+      emit(ChatLoaded(List.from(_messages), isOnline: _isReceiverOnline));
       await repository.sendMessage(receiverId, content);
     } catch (e) {
       _messages.remove(optimisticMessage);
       if (!isClosed) {
-        emit(ChatLoaded(List.from(_messages)));
+        emit(ChatLoaded(List.from(_messages), isOnline: _isReceiverOnline));
         emit(ChatError("فشل في إرسال الرسالة"));
       }
     }

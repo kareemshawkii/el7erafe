@@ -232,42 +232,59 @@ class _ChatRoomViewState extends State<ChatRoomView> {
                     child: Icon(Icons.arrow_forward_ios,
                         color: Colors.white, size: 24.r))),
             SizedBox(width: 12.w),
-            Stack(
-              children: [
-                CircleAvatar(
-                    radius: 22.r,
-                    backgroundImage: NetworkImage(widget.receiverImage)),
-                Positioned(
-                  bottom: 0,
-                  right: 0,
-                  child: Container(
-                    width: 12.r,
-                    height: 12.r,
-                    decoration: BoxDecoration(
-                        color: Colors.green,
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                            color: const Color(0xFF3775FA), width: 2.w)),
+            BlocBuilder<ChatCubit, ChatState>(
+              builder: (context, state) {
+                bool isUserOnline = false;
+                if (state is ChatLoaded) {
+                  isUserOnline = state.isOnline;
+                }
+                return Expanded(
+                  child: Row(
+                    children: [
+                      Stack(
+                        children: [
+                          CircleAvatar(
+                              radius: 22.r,
+                              backgroundImage:
+                                  NetworkImage(widget.receiverImage)),
+                          Positioned(
+                            bottom: 0,
+                            right: 0,
+                            child: Container(
+                              width: 12.r,
+                              height: 12.r,
+                              decoration: BoxDecoration(
+                                  color:
+                                      isUserOnline ? Colors.green : Colors.grey,
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                      color: const Color(0xFF3775FA),
+                                      width: 2.w)),
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(width: 12.w),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(widget.receiverName,
+                                style: GoogleFonts.cairo(
+                                    color: Colors.white,
+                                    fontSize: 16.sp,
+                                    fontWeight: FontWeight.bold)),
+                            SizedBox(height: 4.h),
+                            Text(isUserOnline ? "متصل الان" : "غير متصل",
+                                style: GoogleFonts.cairo(
+                                    color: Colors.white70, fontSize: 12.sp)),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-              ],
-            ),
-            SizedBox(width: 12.w),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(widget.receiverName,
-                      style: GoogleFonts.cairo(
-                          color: Colors.white,
-                          fontSize: 16.sp,
-                          fontWeight: FontWeight.bold)),
-                  SizedBox(height: 4.h),
-                  Text("متصل الان",
-                      style: GoogleFonts.cairo(
-                          color: Colors.white70, fontSize: 12.sp)),
-                ],
-              ),
+                );
+              },
             ),
           ],
         ),

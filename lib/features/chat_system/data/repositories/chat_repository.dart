@@ -12,6 +12,8 @@ class ChatRepository {
     Function(int messageId, String newStatus)? onMessageStatusUpdated,
     Function(int chatId, List<int> messageIds, String newStatus)?
         onMessagesRead,
+    Function(String)? onUserOnline,
+    Function(String)? onUserOffline,
   }) async {
     try {
       String? token = await AuthLocalStorage().getToken();
@@ -67,6 +69,18 @@ class ChatRepository {
         }
       });
 
+      _hubConnection?.on("UserOnline", (arguments) {
+        if (arguments != null && arguments.isNotEmpty) {
+          if (onUserOnline != null) onUserOnline(arguments[0].toString());
+        }
+      });
+
+      _hubConnection?.on("UserOffline", (arguments) {
+        if (arguments != null && arguments.isNotEmpty) {
+          if (onUserOffline != null) onUserOffline(arguments[0].toString());
+        }
+      });
+
       await _hubConnection?.start();
     } catch (e) {
       throw Exception("فشل الاتصال بالخادم");
@@ -100,7 +114,7 @@ class ChatRepository {
     }
     try {
       await _hubConnection?.invoke("SendMessage", args: [
-        {"receiverId": receiverId, "content": content,"messageType": "Text"}
+        {"receiverId": receiverId, "content": content, "messageType": "Text"}
       ]);
     } catch (e) {
       throw Exception("فشل في إرسال الرسالة");

@@ -9,8 +9,9 @@ class ChatLoading extends ChatState {}
 class ChatLoaded extends ChatState {
   final List<ChatMessageModel> messages;
   final bool hasReachedMax;
+  final bool isOnline;
 
-  ChatLoaded(this.messages, {this.hasReachedMax = false});
+  ChatLoaded(this.messages, {this.hasReachedMax = false, this.isOnline = false});
 }
 
 class ChatError extends ChatState {
