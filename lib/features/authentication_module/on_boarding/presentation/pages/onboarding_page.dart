@@ -1,3 +1,4 @@
+import 'package:el7erafe/core/utils/animated_navigaton_with_build.dart';
 import 'package:el7erafe/features/authentication_module/login/data/repositories/auth_repository.dart';
 import 'package:el7erafe/features/authentication_module/login/presentation/cubit/login_cubit.dart';
 import 'package:el7erafe/features/authentication_module/login/presentation/pages/login_page.dart';
@@ -52,80 +53,111 @@ class OnBoardingPage extends StatelessWidget {
               ),
               Align(
                 alignment: Alignment.bottomCenter,
-                child: Container(
-                  height: 342.h,
-                  width: double.infinity,
-                  padding: EdgeInsets.only(top: 32.h, left: 16.w, right: 16.w),
-                  decoration: const BoxDecoration(
-                    color: Color(0xFFFAFAFA),
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(50),
-                      topRight: Radius.circular(50),
+                child: TweenAnimationBuilder<double>(
+                  tween: Tween(begin: 0.0, end: 1.0),
+                  duration: const Duration(milliseconds: 600),
+                  curve: Curves.easeOutCubic,
+                  builder: (context, value, child) {
+                    return Transform.translate(
+                      offset: Offset(0, 100 * (1 - value)),
+                      child: Opacity(
+                        opacity: value,
+                        child: child,
+                      ),
+                    );
+                  },
+                  child: Container(
+                    height: 342.h,
+                    width: double.infinity,
+                    padding:
+                        EdgeInsets.only(top: 32.h, left: 16.w, right: 16.w),
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFFAFAFA),
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(50),
+                        topRight: Radius.circular(50),
+                      ),
                     ),
-                  ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: List.generate(totalPages, (index) {
-                          bool isActive = index == currentIndex;
-                          return AnimatedContainer(
-                            duration: const Duration(milliseconds: 300),
-                            margin: EdgeInsets.symmetric(horizontal: 4.w),
-                            width: isActive ? 19.w : 8.w,
-                            height: isActive ? 4.h : 8.h,
-                            decoration: BoxDecoration(
-                              color: isActive
-                                  ? const Color(0xFF3F68EC)
-                                  : const Color(0xFFD9D9D9),
-                              borderRadius:
-                                  BorderRadius.circular(isActive ? 4.r : 8.r),
-                            ),
-                          );
-                        }),
-                      ),
-                      Container(
-                        height: 182.h,
-                        margin: EdgeInsets.only(top: 44.h),
-                        child: Text.rich(
-                          TextSpan(
-                            style: GoogleFonts.cairo(
-                              fontSize: 20.sp,
-                              fontWeight: FontWeight.w600,
-                              color: const Color(0xFF232222),
-                              height: 1.5,
-                            ),
-                            children: <TextSpan>[
-                              TextSpan(text: titleOne[currentIndex]),
-                              TextSpan(
-                                text: titleTwo[currentIndex],
-                                style: const TextStyle(
-                                  color: Colors.blueAccent,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: List.generate(totalPages, (index) {
+                            bool isActive = index == currentIndex;
+                            return AnimatedContainer(
+                              duration: const Duration(milliseconds: 300),
+                              margin: EdgeInsets.symmetric(horizontal: 4.w),
+                              width: isActive ? 19.w : 8.w,
+                              height: isActive ? 4.h : 8.h,
+                              decoration: BoxDecoration(
+                                color: isActive
+                                    ? const Color(0xFF3F68EC)
+                                    : const Color(0xFFD9D9D9),
+                                borderRadius:
+                                    BorderRadius.circular(isActive ? 4.r : 8.r),
                               ),
-                              TextSpan(text: titleThree[currentIndex]),
-                            ],
-                          ),
-                          textAlign: TextAlign.center,
+                            );
+                          }),
                         ),
-                      ),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          CustomProgressButton(
-                            progress: progresses[currentIndex],
-                            onPressed: () {
-                              if (currentIndex < totalPages - 1) {
-                                context
-                                    .read<OnboardingCubit>()
-                                    .nextPage(totalPages);
-                              } else {
+                        Container(
+                          height: 182.h,
+                          margin: EdgeInsets.only(top: 44.h),
+                          child: Text.rich(
+                            TextSpan(
+                              style: GoogleFonts.cairo(
+                                fontSize: 20.sp,
+                                fontWeight: FontWeight.w600,
+                                color: const Color(0xFF232222),
+                                height: 1.5,
+                              ),
+                              children: <TextSpan>[
+                                TextSpan(text: titleOne[currentIndex]),
+                                TextSpan(
+                                  text: titleTwo[currentIndex],
+                                  style: const TextStyle(
+                                    color: Colors.blueAccent,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                TextSpan(text: titleThree[currentIndex]),
+                              ],
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            CustomProgressButton(
+                              progress: progresses[currentIndex],
+                              onPressed: () {
+                                if (currentIndex < totalPages - 1) {
+                                  context
+                                      .read<OnboardingCubit>()
+                                      .nextPage(totalPages);
+                                } else {
+                                  Navigator.pushAndRemoveUntil(
+                                      context,
+                                      SlideRightRouteWithBuild(
+                                        builder: (context) => BlocProvider(
+                                          create: (context) => LoginCubit(
+                                            authRepository: RepositoryProvider
+                                                .of<AuthRepository>(context),
+                                          ),
+                                          child: const LoginPage(),
+                                        ),
+                                      ),
+                                      (route) => false);
+                                }
+                              },
+                            ),
+                            TextButton(
+                              onPressed: () {
                                 Navigator.pushAndRemoveUntil(
                                     context,
-                                    MaterialPageRoute(
+                                    SlideRightRouteWithBuild(
                                       builder: (context) => BlocProvider(
                                         create: (context) => LoginCubit(
                                           authRepository: RepositoryProvider.of<
@@ -135,44 +167,28 @@ class OnBoardingPage extends StatelessWidget {
                                       ),
                                     ),
                                     (route) => false);
-                              }
-                            },
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pushAndRemoveUntil(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => BlocProvider(
-                                      create: (context) => LoginCubit(
-                                        authRepository: RepositoryProvider.of<
-                                            AuthRepository>(context),
-                                      ),
-                                      child: const LoginPage(),
-                                    ),
-                                  ),
-                                  (route) => false);
-                            },
-                            style: TextButton.styleFrom(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 12.w, vertical: 8.h),
-                              shape: RoundedRectangleBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(20.r)),
+                              },
+                              style: TextButton.styleFrom(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 12.w, vertical: 8.h),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(20.r)),
+                                ),
+                              ),
+                              child: Text(
+                                'تخطي',
+                                style: GoogleFonts.cairo(
+                                  fontSize: 14.sp,
+                                  fontWeight: FontWeight.w600,
+                                  color: const Color(0xFF3F68EC),
+                                ),
                               ),
                             ),
-                            child: Text(
-                              'تخطي',
-                              style: GoogleFonts.cairo(
-                                fontSize: 14.sp,
-                                fontWeight: FontWeight.w600,
-                                color: const Color(0xFF3F68EC),
-                              ),
-                            ),
-                          ),
-                        ],
-                      )
-                    ],
+                          ],
+                        )
+                      ],
+                    ),
                   ),
                 ),
               ),

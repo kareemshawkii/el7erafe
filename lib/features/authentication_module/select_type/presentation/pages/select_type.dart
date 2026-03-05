@@ -1,3 +1,4 @@
+import 'package:el7erafe/core/utils/animated_navigaton_with_build.dart';
 import 'package:el7erafe/features/authentication_module/client_regestration/data/repositories/client_registration_repo.dart';
 import 'package:el7erafe/features/authentication_module/client_regestration/presentation/cubit/client_registration_cubit.dart';
 import 'package:el7erafe/features/authentication_module/client_regestration/presentation/pages/client_registration_page.dart';
@@ -54,168 +55,215 @@ class SelectTypeView extends StatelessWidget {
                 topLeft: Radius.circular(44.r),
                 topRight: Radius.circular(44.r),
               ),
-              child: Container(
-                height: 629.h,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFFDFDFD),
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(44.r),
-                    topRight: Radius.circular(44.r),
+              child: TweenAnimationBuilder<double>(
+                tween: Tween(begin: 0.0, end: 1.0),
+                duration: const Duration(milliseconds: 600),
+                curve: Curves.easeOutCubic,
+                builder: (context, value, child) {
+                  return Transform.translate(
+                    offset: Offset(0, 200 * (1 - value)),
+                    child: Opacity(
+                      opacity: value,
+                      child: child,
+                    ),
+                  );
+                },
+                child: Container(
+                  height: 629.h,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFDFDFD),
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(44.r),
+                      topRight: Radius.circular(44.r),
+                    ),
                   ),
-                ),
-                child: SingleChildScrollView(
-                  padding: EdgeInsets.fromLTRB(16.w, 44.h, 16.w, 44.h),
-                  child: Directionality(
-                    textDirection: TextDirection.rtl,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('قولنا انت حرفي ولا مستخدم',
-                            style: GoogleFonts.cairo(
-                                fontSize: 24.sp,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.black)),
-                        SizedBox(height: 32.h),
-                        Text('التصنيف',
-                            style: GoogleFonts.cairo(
-                                fontSize: 16.sp,
-                                fontWeight: FontWeight.w400,
-                                color: Colors.black)),
-                        SizedBox(height: 8.h),
-                        BlocBuilder<SelectTypeCubit, UserType>(
-                          builder: (context, selection) {
-                            return Column(
-                              children: [
-                                Card(
-                                  color: Colors.white,
-                                  elevation: 0,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12.r),
-                                    side: BorderSide(
-                                      color: selection == UserType.user
-                                          ? const Color(0xFF3775FA)
-                                          : Color(0xFFE2DFDF),
-                                      width: 1.w,
-                                    ),
-                                  ),
-                                  child: ListTile(
-                                    splashColor: Colors.transparent,
-                                    onTap: () => context
-                                        .read<SelectTypeCubit>()
-                                        .selectType(UserType.user),
-                                    title: Text('مستخدم',
-                                        style: GoogleFonts.cairo(
-                                            color: const Color(0xFF727070),
-                                            fontSize: 14.sp,
-                                            fontWeight: FontWeight.w400)),
-                                    leading: _CustomRadioIcon(
-                                      isSelected: selection == UserType.user,
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(height: 8.h),
-                                Card(
-                                  color: Colors.white,
-                                  elevation: 0,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12.r),
-                                    side: BorderSide(
-                                      color: selection == UserType.technician
-                                          ? const Color(0xFF3775FA)
-                                          : Color(0xFFE2DFDF),
-                                      width: 1.w,
-                                    ),
-                                  ),
-                                  child: ListTile(
-                                    splashColor: Colors.transparent,
-                                    onTap: () => context
-                                        .read<SelectTypeCubit>()
-                                        .selectType(UserType.technician),
-                                    title: Text('حرفي',
-                                        style: GoogleFonts.cairo(
-                                            color: const Color(0xFF727070),
-                                            fontSize: 14.sp,
-                                            fontWeight: FontWeight.w400)),
-                                    leading: _CustomRadioIcon(
-                                      isSelected:
-                                          selection == UserType.technician,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            );
-                          },
-                        ),
-                        SizedBox(height: 24.h),
-                        Container(
-                            width: double.infinity,
-                            height: 40.h,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(12.r),
-                              border: Border.all(
-                                color: Color(0xFF3775FA),
-                                width: 1.w,
-                              ),
-                            ),
-                            child: Padding(
-                              padding: EdgeInsets.all(1.r),
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  if (context.read<SelectTypeCubit>().state ==
-                                      UserType.user) {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => BlocProvider(
-                                          create: (context) =>
-                                              ClientRegistrationCubit(
-                                                  clientRegRepository:
-                                                      RepositoryProvider.of<
-                                                              ClientRegRepository>(
-                                                          context)),
-                                          child: const ClientRegistrationPage(),
+                  child: SingleChildScrollView(
+                    padding: EdgeInsets.fromLTRB(16.w, 44.h, 16.w, 44.h),
+                    child: Directionality(
+                      textDirection: TextDirection.rtl,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('قولنا انت حرفي ولا مستخدم',
+                              style: GoogleFonts.cairo(
+                                  fontSize: 24.sp,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.black)),
+                          SizedBox(height: 32.h),
+                          Text('التصنيف',
+                              style: GoogleFonts.cairo(
+                                  fontSize: 16.sp,
+                                  fontWeight: FontWeight.w400,
+                                  color: Colors.black)),
+                          SizedBox(height: 8.h),
+                          BlocBuilder<SelectTypeCubit, UserType>(
+                            builder: (context, selection) {
+                              return Column(
+                                children: [
+                                  TweenAnimationBuilder<double>(
+                                    tween: Tween(begin: 0.0, end: 1.0),
+                                    duration: const Duration(milliseconds: 600),
+                                    curve: Curves.easeOutCubic,
+                                    builder: (context, value, child) {
+                                      return Transform.translate(
+                                        offset: Offset(0, 30 * (1 - value)),
+                                        child: Opacity(
+                                          opacity: value,
+                                          child: child,
+                                        ),
+                                      );
+                                    },
+                                    child: Card(
+                                      color: Colors.white,
+                                      elevation: 0,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(12.r),
+                                        side: BorderSide(
+                                          color: selection == UserType.user
+                                              ? const Color(0xFF3775FA)
+                                              : Color(0xFFE2DFDF),
+                                          width: 1.w,
                                         ),
                                       ),
-                                    );
-                                  } else if (context
-                                          .read<SelectTypeCubit>()
-                                          .state ==
-                                      UserType.technician) {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => BlocProvider(
-                                          create: (context) =>
-                                              TechnicianRegistrationCubit(
-                                                  technicianRegRepository:
-                                                      RepositoryProvider.of<
-                                                              TechnicianRegRepository>(
-                                                          context)),
-                                          child:
-                                              const TechnicianRegistrationPage(),
+                                      child: ListTile(
+                                        splashColor: Colors.transparent,
+                                        onTap: () => context
+                                            .read<SelectTypeCubit>()
+                                            .selectType(UserType.user),
+                                        title: Text('مستخدم',
+                                            style: GoogleFonts.cairo(
+                                                color: const Color(0xFF727070),
+                                                fontSize: 14.sp,
+                                                fontWeight: FontWeight.w400)),
+                                        leading: _CustomRadioIcon(
+                                          isSelected:
+                                              selection == UserType.user,
                                         ),
                                       ),
-                                    );
-                                  }
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFF3775FA),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12.r),
+                                    ),
                                   ),
-                                ),
-                                child: Text(
-                                  'يلا نبدأ',
-                                  style: GoogleFonts.cairo(
-                                    fontSize: 16.sp,
-                                    fontWeight: FontWeight.w500,
-                                    color: Colors.white,
+                                  SizedBox(height: 8.h),
+                                  TweenAnimationBuilder<double>(
+                                    tween: Tween(begin: 0.0, end: 1.0),
+                                    duration: const Duration(milliseconds: 800),
+                                    curve: Curves.easeOutCubic,
+                                    builder: (context, value, child) {
+                                      return Transform.translate(
+                                        offset: Offset(0, 30 * (1 - value)),
+                                        child: Opacity(
+                                          opacity: value,
+                                          child: child,
+                                        ),
+                                      );
+                                    },
+                                    child: Card(
+                                      color: Colors.white,
+                                      elevation: 0,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(12.r),
+                                        side: BorderSide(
+                                          color:
+                                              selection == UserType.technician
+                                                  ? const Color(0xFF3775FA)
+                                                  : Color(0xFFE2DFDF),
+                                          width: 1.w,
+                                        ),
+                                      ),
+                                      child: ListTile(
+                                        splashColor: Colors.transparent,
+                                        onTap: () => context
+                                            .read<SelectTypeCubit>()
+                                            .selectType(UserType.technician),
+                                        title: Text('حرفي',
+                                            style: GoogleFonts.cairo(
+                                                color: const Color(0xFF727070),
+                                                fontSize: 14.sp,
+                                                fontWeight: FontWeight.w400)),
+                                        leading: _CustomRadioIcon(
+                                          isSelected:
+                                              selection == UserType.technician,
+                                        ),
+                                      ),
+                                    ),
                                   ),
+                                ],
+                              );
+                            },
+                          ),
+                          SizedBox(height: 24.h),
+                          Container(
+                              width: double.infinity,
+                              height: 40.h,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12.r),
+                                border: Border.all(
+                                  color: Color(0xFF3775FA),
+                                  width: 1.w,
                                 ),
                               ),
-                            ))
-                      ],
+                              child: Padding(
+                                padding: EdgeInsets.all(1.r),
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    if (context.read<SelectTypeCubit>().state ==
+                                        UserType.user) {
+                                      Navigator.push(
+                                        context,
+                                        SlideRightRouteWithBuild(
+                                          builder: (context) => BlocProvider(
+                                            create: (context) =>
+                                                ClientRegistrationCubit(
+                                                    clientRegRepository:
+                                                        RepositoryProvider.of<
+                                                                ClientRegRepository>(
+                                                            context)),
+                                            child:
+                                                const ClientRegistrationPage(),
+                                          ),
+                                        ),
+                                      );
+                                    } else if (context
+                                            .read<SelectTypeCubit>()
+                                            .state ==
+                                        UserType.technician) {
+                                      Navigator.push(
+                                        context,
+                                        SlideRightRouteWithBuild(
+                                          builder: (context) => BlocProvider(
+                                            create: (context) =>
+                                                TechnicianRegistrationCubit(
+                                                    technicianRegRepository:
+                                                        RepositoryProvider.of<
+                                                                TechnicianRegRepository>(
+                                                            context)),
+                                            child:
+                                                const TechnicianRegistrationPage(),
+                                          ),
+                                        ),
+                                      );
+                                    }
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color(0xFF3775FA),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12.r),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    'يلا نبدأ',
+                                    style: GoogleFonts.cairo(
+                                      fontSize: 16.sp,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ))
+                        ],
+                      ),
                     ),
                   ),
                 ),

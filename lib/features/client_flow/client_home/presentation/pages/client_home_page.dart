@@ -1,9 +1,11 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:el7erafe/core/services/local_storage/auth_local_storage.dart';
+import 'package:el7erafe/core/utils/animated_navigaton_with_build.dart';
 import 'package:el7erafe/features/authentication_module/login/data/repositories/auth_repository.dart';
 import 'package:el7erafe/features/authentication_module/login/presentation/cubit/login_cubit.dart';
 import 'package:el7erafe/features/authentication_module/login/presentation/pages/login_page.dart';
+import 'package:el7erafe/features/chat_system/presentation/pages/inbox_page.dart';
 import 'package:el7erafe/features/client_flow/client_home/data/repositories/home_repository.dart';
 import 'package:el7erafe/features/client_flow/client_home/presentation/cubit/client_home_cubit.dart';
 import 'package:el7erafe/features/client_flow/client_home/presentation/cubit/client_home_state.dart';
@@ -13,7 +15,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:lottie/lottie.dart';
@@ -35,16 +36,19 @@ class ClientHomePageView extends StatefulWidget {
 }
 
 class _ClientHomePageViewState extends State<ClientHomePageView> {
-  String userName = "كريم";
+  String userName = "";
   String token = "";
+  String currentUserID = "";
   late final HomeCubit _homeCubit;
   int _selectedIndex = 0;
+  int unreadMessagesCount = 0;
 
   @override
   void initState() {
     super.initState();
     _homeCubit = HomeCubit(HomeRepository())..fetchServices();
     _loadUserData();
+    _homeCubit.fetchTotalUnreadCount();
   }
 
   Future<void> _loadUserData() async {
@@ -52,7 +56,7 @@ class _ClientHomePageViewState extends State<ClientHomePageView> {
     final token = await AuthLocalStorage().getToken();
     if (mounted) {
       setState(() {
-        userName = name ?? "كريم";
+        userName = name!;
         this.token = token ?? "";
       });
     }
@@ -75,85 +79,155 @@ class _ClientHomePageViewState extends State<ClientHomePageView> {
         child: Column(
           children: [
             SizedBox(height: 50.h),
-            Container(
-              padding: EdgeInsets.only(left: 8.w, right: 16.w),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text.rich(
-                    TextSpan(
-                      style: GoogleFonts.cairo(
-                        fontSize: 23.sp,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black,
-                        height: 1.5,
-                      ),
-                      children: <TextSpan>[
-                        const TextSpan(
-                          text: "أهلا.. ",
-                          style: TextStyle(
-                            color: Colors.blueAccent,
-                            fontWeight: FontWeight.bold,
-                          ),
+            TweenAnimationBuilder<double>(
+              tween: Tween(begin: 0.0, end: 1.0),
+              duration: const Duration(milliseconds: 600),
+              curve: Curves.easeOutCubic,
+              builder: (context, value, child) {
+                return Transform.translate(
+                  offset: Offset(0, -20 * (1 - value)),
+                  child: Opacity(
+                    opacity: value,
+                    child: child,
+                  ),
+                );
+              },
+              child: Container(
+                padding: EdgeInsets.only(left: 8.w, right: 16.w),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text.rich(
+                      TextSpan(
+                        style: GoogleFonts.cairo(
+                          fontSize: 23.sp,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black,
+                          height: 1.5,
                         ),
-                        TextSpan(
-                          text: userName,
+                        children: <TextSpan>[
+                          const TextSpan(
+                            text: "أهلا.. ",
+                            style: TextStyle(
+                              color: Colors.blueAccent,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          TextSpan(
+                            text: userName,
+                          ),
+                        ],
+                      ),
+                      textAlign: TextAlign.center,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    Row(
+                      children: [
+                        SizedBox(width: 16.w),
+                        Container(
+                          width: 40.w,
+                          height: 40.w,
+                          decoration: const BoxDecoration(
+                            color: Color(0xFF3775FA),
+                            shape: BoxShape.circle,
+                          ),
+                          child: IconButton(
+                              onPressed: () {},
+                              icon: const Icon(
+                                Iconsax.notification,
+                                color: Colors.white,
+                                size: 18,
+                              )),
+                        ),
+                        SizedBox(width: 16.w),
+                        Container(
+                          alignment: Alignment.center,
+                          width: 40.w,
+                          height: 40.w,
+                          decoration: const BoxDecoration(
+                            color: Color(0xFF3775FA),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              IconButton(
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    SlideRightRouteWithBuild(
+                                      builder: (context) => const InboxPage(),
+                                    ),
+                                  ).then((_) {
+                                    _homeCubit.fetchTotalUnreadCount();
+                                  });
+                                },
+                                icon: const Icon(
+                                  Iconsax.message5,
+                                  color: Colors.white,
+                                  size: 18,
+                                ),
+                              ),
+                              if (unreadMessagesCount > 0)
+                                Positioned(
+                                  top: 8.h,
+                                  right: 6.w,
+                                  child: Container(
+                                    padding: EdgeInsets.all(3.r),
+                                    decoration: BoxDecoration(
+                                      color: Colors.red,
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                          color: const Color(0xFF3775FA),
+                                          width: 1.5),
+                                    ),
+                                    child: Text(
+                                      unreadMessagesCount > 9
+                                          ? '+9'
+                                          : unreadMessagesCount.toString(),
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 8.sp,
+                                        fontWeight: FontWeight.bold,
+                                        height: 1,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
                         ),
                       ],
                     ),
-                    textAlign: TextAlign.center,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  Row(
-                    children: [
-                      SizedBox(width: 16.w),
-                      Container(
-                        alignment: Alignment.center,
-                        width: 40.w,
-                        height: 40.w,
-                        decoration: const BoxDecoration(
-                          color: Color(0xFF3775FA),
-                          shape: BoxShape.circle,
-                        ),
-                        child: IconButton(
-                            onPressed: () {},
-                            icon: const Icon(
-                              Iconsax.message5,
-                              color: Colors.white,
-                              size: 18,
-                            )),
-                      ),
-                      SizedBox(width: 16.w),
-                      Container(
-                        width: 40.w,
-                        height: 40.w,
-                        decoration: const BoxDecoration(
-                          color: Color(0xFF3775FA),
-                          shape: BoxShape.circle,
-                        ),
-                        child: IconButton(
-                            onPressed: () {},
-                            icon: const Icon(
-                              Iconsax.notification,
-                              color: Colors.white,
-                              size: 18,
-                            )),
-                      ),
-                    ],
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
             SizedBox(height: 16.h),
-            Container(
-                padding: EdgeInsets.only(
-                  top: 12.h,
-                  left: 16.w,
-                  right: 16.w,
-                  bottom: 12.h,
-                ),
-                child: SvgPicture.asset("images/home_image.svg")),
+            TweenAnimationBuilder<double>(
+              tween: Tween(begin: 0.0, end: 1.0),
+              duration: const Duration(milliseconds: 600),
+              curve: Curves.easeOutCubic,
+              builder: (context, value, child) {
+                return Transform.translate(
+                  offset: Offset(0, 20 * (1 - value)),
+                  child: Opacity(
+                    opacity: value,
+                    child: child,
+                  ),
+                );
+              },
+              child: Container(
+                  padding: EdgeInsets.only(
+                    top: 12.h,
+                    left: 16.w,
+                    right: 16.w,
+                    bottom: 12.h,
+                  ),
+                  child: SvgPicture.asset("images/home_image.svg")),
+            ),
             SizedBox(height: 16.h),
             Container(
               padding: EdgeInsets.only(
@@ -181,7 +255,11 @@ class _ClientHomePageViewState extends State<ClientHomePageView> {
             SizedBox(height: 16.h),
             BlocConsumer<HomeCubit, HomeState>(
               listener: (context, state) {
-                if (state is HomeUnauthorized) {
+                if (state is HomeUnreadCountUpdated) {
+                  setState(() {
+                    unreadMessagesCount = state.count;
+                  });
+                } else if (state is HomeUnauthorized) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content:
@@ -191,7 +269,7 @@ class _ClientHomePageViewState extends State<ClientHomePageView> {
                   );
                   Navigator.pushAndRemoveUntil(
                     context,
-                    MaterialPageRoute(
+                    SlideRightRouteWithBuild(
                       builder: (context) => BlocProvider(
                         create: (context) =>
                             LoginCubit(authRepository: AuthRepository()),
@@ -222,7 +300,13 @@ class _ClientHomePageViewState extends State<ClientHomePageView> {
                   return Center(child: Text(state.message));
                 } else if (state is HomeLoaded) {
                   if (state.services.isEmpty) {
-                    return Image.asset("images/noservices.png");
+                    return TweenAnimationBuilder<double>(
+                      tween: Tween(begin: 0.0, end: 1.0),
+                      duration: const Duration(milliseconds: 500),
+                      builder: (context, value, child) =>
+                          Opacity(opacity: value, child: child),
+                      child: Image.asset("images/noservices.png"),
+                    );
                   }
                   return Align(
                     alignment: Alignment.centerRight,
@@ -241,8 +325,24 @@ class _ClientHomePageViewState extends State<ClientHomePageView> {
                         ),
                         itemCount: state.services.length,
                         itemBuilder: (context, index) {
-                          return ServiceItemCard(
-                              service: state.services[index]);
+                          return TweenAnimationBuilder<double>(
+                            key: ValueKey(state.services[index].id),
+                            tween: Tween(begin: 0.0, end: 1.0),
+                            duration:
+                                Duration(milliseconds: 400 + (index * 75)),
+                            curve: Curves.easeOutCubic,
+                            builder: (context, value, child) {
+                              return Transform.translate(
+                                offset: Offset(0, 30 * (1 - value)),
+                                child: Opacity(
+                                  opacity: value,
+                                  child: child,
+                                ),
+                              );
+                            },
+                            child:
+                                ServiceItemCard(service: state.services[index]),
+                          );
                         },
                       ),
                     ),
@@ -267,7 +367,7 @@ class _ClientHomePageViewState extends State<ClientHomePageView> {
       child: Scaffold(
           backgroundColor: Colors.white,
           body: pages[_selectedIndex],
-          bottomNavigationBar: SafeArea( 
+          bottomNavigationBar: SafeArea(
             child: ClipRRect(
               borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(24.r),

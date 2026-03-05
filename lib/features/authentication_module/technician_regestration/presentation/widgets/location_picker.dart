@@ -1,9 +1,8 @@
-library;
-
 import 'dart:convert';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 enum Language { arabic, english }
 
@@ -14,8 +13,7 @@ class Governorate {
   final String nameAr;
   final List<City> cities;
 
-  Governorate(
-      {required this.nameEn, required this.nameAr, this.cities = const []});
+  Governorate({required this.nameEn, required this.nameAr, this.cities = const []});
 
   factory Governorate.fromJson(Map<String, dynamic> json) {
     var cityList = json['cities'] as List? ?? [];
@@ -83,12 +81,21 @@ class _EgyptGovernoratePickerState extends State<EgyptGovernoratePicker> {
   List<City> _cities = [];
 
   Governorate? _selectedGovernorate;
-  City? _selectedCity;
+
+  final ValueNotifier<Governorate?> _govNotifier = ValueNotifier<Governorate?>(null);
+  final ValueNotifier<City?> _cityNotifier = ValueNotifier<City?>(null);
 
   @override
   void initState() {
     super.initState();
     _loadGovernorates();
+  }
+
+  @override
+  void dispose() {
+    _govNotifier.dispose();
+    _cityNotifier.dispose();
+    super.dispose();
   }
 
   Future<void> _loadGovernorates() async {
@@ -160,13 +167,14 @@ class _EgyptGovernoratePickerState extends State<EgyptGovernoratePicker> {
     }
     setState(() {
       _selectedGovernorate = gov;
+      _govNotifier.value = gov;
       _cities = gov.cities;
       _cities.sort((a, b) {
         return widget.language == Language.arabic
             ? a.nameAr.compareTo(b.nameAr)
             : a.nameEn.compareTo(b.nameEn);
       });
-      _selectedCity = null;
+      _cityNotifier.value = null;
     });
   }
 
@@ -176,7 +184,7 @@ class _EgyptGovernoratePickerState extends State<EgyptGovernoratePicker> {
       widget.onCityChanged?.call(_getCityName(city));
     }
     setState(() {
-      _selectedCity = city;
+      _cityNotifier.value = city;
     });
   }
 
@@ -191,7 +199,7 @@ class _EgyptGovernoratePickerState extends State<EgyptGovernoratePicker> {
     return Column(
       children: [
         _buildGovernorateDropdown(),
-        if (widget.showCities) const SizedBox(height: 16.0),
+        if (widget.showCities) SizedBox(height: 16.0.h),
         if (widget.showCities) _buildCityDropdown(),
       ],
     );
@@ -203,7 +211,7 @@ class _EgyptGovernoratePickerState extends State<EgyptGovernoratePicker> {
         Row(
           children: [
             Expanded(child: _buildGovernorateDropdown()),
-            if (widget.showCities) const SizedBox(width: 16.0),
+            if (widget.showCities) SizedBox(width: 16.0.w),
             if (widget.showCities) Expanded(child: _buildCityDropdown()),
           ],
         ),
@@ -215,36 +223,45 @@ class _EgyptGovernoratePickerState extends State<EgyptGovernoratePicker> {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: DropdownButtonFormField2<Governorate>(
+        valueListenable: _govNotifier,
         alignment: AlignmentDirectional.centerEnd,
-        decoration: InputDecoration(
-          hintText: widget.governorateDropdownLabel.tr(widget.language),
-          border: const OutlineInputBorder(),
-          contentPadding: const EdgeInsets.all(8),
-          enabledBorder: OutlineInputBorder(
-            borderSide: BorderSide(
-              color: Color(0xFFE2DFDF),
+        hint: Align(
+          alignment: Alignment.centerRight,
+          child: Text(
+            widget.governorateDropdownLabel.tr(widget.language),
+            style: TextStyle(
+              color: Colors.grey.shade600,
+              fontSize: 14.sp,
             ),
-            borderRadius: BorderRadius.circular(12.0),
+          ),
+        ),
+        decoration: InputDecoration(
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.0.r)),
+          contentPadding: EdgeInsets.all(8.r),
+          enabledBorder: OutlineInputBorder(
+            borderSide: const BorderSide(color: Color(0xFFE2DFDF)),
+            borderRadius: BorderRadius.circular(12.0.r),
           ),
           focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(
-              color: Color(0xFF3775FA),
-            ),
-            borderRadius: BorderRadius.circular(12.0),
+            borderSide: const BorderSide(color: Color(0xFF3775FA)),
+            borderRadius: BorderRadius.circular(12.0.r),
           ),
         ),
         dropdownStyleData: DropdownStyleData(
-          maxHeight: (200 / 852) * MediaQuery.of(context).size.height,
+          isOverButton: false,
+          offset: const Offset(0, -5),
+          maxHeight: 250.h,
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12.0),
+            borderRadius: BorderRadius.circular(12.0.r),
             color: Colors.white,
           ),
         ),
+        menuItemStyleData: MenuItemStyleData(
+          padding: EdgeInsets.symmetric(horizontal: 16.w),
+        ),
         isExpanded: true,
-        value: _selectedGovernorate,
         items: _governorates.map((Governorate gov) {
-          return DropdownMenuItem<Governorate>(
-              alignment: AlignmentDirectional.centerEnd,
+          return DropdownItem<Governorate>(
               value: gov,
               child: Align(
                 alignment: Alignment.centerRight,
@@ -256,57 +273,55 @@ class _EgyptGovernoratePickerState extends State<EgyptGovernoratePicker> {
               ));
         }).toList(),
         onChanged: (val) => _onGovernorateSelected(val),
-        disabledHint: Text(widget.governorateDropdownLabel.tr(widget.language)),
       ),
     );
   }
 
   Widget _buildCityDropdown() {
     bool isGovSelected = _selectedGovernorate != null;
+
     return Directionality(
       textDirection: TextDirection.rtl,
       child: DropdownButtonFormField2<City>(
+        valueListenable: _cityNotifier,
+        items: _cities.map((City city) {
+          return DropdownItem<City>(
+            value: city,
+            child: Align(
+              alignment: Alignment.centerRight,
+              child: Text(
+                _getCityName(city),
+                style: widget.selectedItemStyle,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          );
+        }).toList(),
+        onChanged: isGovSelected ? (val) => _onCitySelected(val) : null,
         decoration: InputDecoration(
           hintText: widget.cityDropdownLabel.tr(widget.language),
-          border: const OutlineInputBorder(),
-          contentPadding: const EdgeInsets.all(8),
+          contentPadding: EdgeInsets.symmetric(vertical: 8.h),
           enabledBorder: OutlineInputBorder(
-            borderSide: BorderSide(
-              color: Color(0xFFE2DFDF),
-            ),
-            borderRadius: BorderRadius.circular(12.0),
+            borderSide: const BorderSide(color: Color(0xFFE2DFDF)),
+            borderRadius: BorderRadius.circular(12.0.r),
           ),
           focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(
-              color: Color(0xFF3775FA),
-            ),
-            borderRadius: BorderRadius.circular(12.0),
+            borderSide: const BorderSide(color: Color(0xFF3775FA)),
+            borderRadius: BorderRadius.circular(12.0.r),
           ),
         ),
         dropdownStyleData: DropdownStyleData(
-          maxHeight: (200 / 852) * MediaQuery.of(context).size.height,
+          maxHeight: 250.h,
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12.0),
+            borderRadius: BorderRadius.circular(12.0.r),
             color: Colors.white,
           ),
         ),
+        menuItemStyleData: MenuItemStyleData(
+          padding: EdgeInsets.symmetric(horizontal: 16.w),
+        ),
         isExpanded: true,
-        value: _selectedCity,
-        items: _cities.map((City city) {
-          return DropdownMenuItem<City>(
-              alignment: AlignmentDirectional.centerEnd,
-              value: city,
-              child: Align(
-                alignment: Alignment.centerRight,
-                child: Text(
-                  _getCityName(city),
-                  style: widget.selectedItemStyle,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ));
-        }).toList(),
-        onChanged: isGovSelected ? (val) => _onCitySelected(val) : null,
-        disabledHint: Text(widget.cityDropdownLabel.tr(widget.language)),
+        hint: Text(widget.cityDropdownLabel.tr(widget.language)),
       ),
     );
   }
@@ -317,11 +332,9 @@ extension _PublicTranslator on String {
     bool isArabic = language == Language.arabic;
     switch (this) {
       case "Governorate":
-        if (isArabic) return "المحافظة";
-        return "Governorate";
+        return isArabic ? "المحافظة" : "Governorate";
       case "City":
-        if (isArabic) return "المدينة";
-        return "City";
+        return isArabic ? "المدينة" : "City";
       default:
         return this;
     }

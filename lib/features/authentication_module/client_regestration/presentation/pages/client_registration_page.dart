@@ -1,4 +1,7 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:el7erafe/core/services/local_storage/auth_local_storage.dart';
+import 'package:el7erafe/core/utils/animated_navigaton_with_build.dart';
 import 'package:el7erafe/features/authentication_module/client_regestration/data/repositories/client_registration_repo.dart';
 import 'package:el7erafe/features/authentication_module/client_regestration/presentation/cubit/client_registration_cubit.dart';
 import 'package:el7erafe/features/authentication_module/client_regestration/presentation/cubit/client_registration_state.dart';
@@ -65,7 +68,7 @@ class ClientRegistrationView extends StatelessWidget {
             );
             Navigator.push(
               context,
-              MaterialPageRoute(
+              SlideRightRouteWithBuild(
                 builder: (context) => BlocProvider(
                   create: (context) => OtpCubit(
                       otpRepository:
@@ -83,9 +86,7 @@ class ClientRegistrationView extends StatelessWidget {
               Align(
                 alignment: Alignment.topCenter,
                 child: Container(
-                    padding: EdgeInsets.only(
-                        top: 68.h,
-                        bottom: 68.h),
+                    padding: EdgeInsets.only(top: 68.h, bottom: 68.h),
                     color: const Color(0xFF3775FA),
                     width: double.infinity,
                     height: 267.h,
@@ -99,60 +100,70 @@ class ClientRegistrationView extends StatelessWidget {
                     )),
               ),
               Align(
-                alignment: Alignment.bottomCenter,
-                child: ClipRRect( 
-                  borderRadius:  BorderRadius.only(
-                    topLeft: Radius.circular(44.r),
-                    topRight: Radius.circular(44.r),
-                  ),  
-                  child: Container(
-                  height: 629.h,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: Color(0xFFFDFDFD),
+                  alignment: Alignment.bottomCenter,
+                  child: ClipRRect(
                     borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(44.r),
                       topRight: Radius.circular(44.r),
                     ),
-                  ),
-                  child: SingleChildScrollView(
-                    padding: EdgeInsets.fromLTRB(
-                        16.w,
-                        44.h,
-                        16.w,
-                        44.h + keyboardPadding),
-                    physics: const ClampingScrollPhysics(),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text.rich(
-                          TextSpan(
-                            style: GoogleFonts.cairo(
-                              fontSize: 20.sp,
-                              fontWeight: FontWeight.w600,
-                              color: const Color(0xFF232222),
-                              height: 1.5,
-                            ),
-                            children: <TextSpan>[
-                              TextSpan(text: "خلينا نعمل حساب"),
-                              TextSpan(
-                                text: " مستخدم جديد",
-                                style: const TextStyle(
-                                  color: Colors.blueAccent,
-                                  fontWeight: FontWeight.w600,
+                    child: TweenAnimationBuilder<double>(
+                      tween: Tween(begin: 0.0, end: 1.0),
+                      duration: const Duration(milliseconds: 600),
+                      curve: Curves.easeOutCubic,
+                      builder: (context, value, child) {
+                        return Transform.translate(
+                          offset: Offset(0, 200 * (1 - value)),
+                          child: Opacity(
+                            opacity: value,
+                            child: child,
+                          ),
+                        );
+                      },
+                      child: Container(
+                        height: 629.h,
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: Color(0xFFFDFDFD),
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(44.r),
+                            topRight: Radius.circular(44.r),
+                          ),
+                        ),
+                        child: SingleChildScrollView(
+                          padding: EdgeInsets.fromLTRB(
+                              16.w, 44.h, 16.w, 44.h + keyboardPadding),
+                          physics: const ClampingScrollPhysics(),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text.rich(
+                                TextSpan(
+                                  style: GoogleFonts.cairo(
+                                    fontSize: 20.sp,
+                                    fontWeight: FontWeight.w600,
+                                    color: const Color(0xFF232222),
+                                    height: 1.5,
+                                  ),
+                                  children: <TextSpan>[
+                                    TextSpan(text: "خلينا نعمل حساب"),
+                                    TextSpan(
+                                      text: " مستخدم جديد",
+                                      style: const TextStyle(
+                                        color: Colors.blueAccent,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
+                              SizedBox(height: 24.h),
+                              const ClientRegistrationForm(),
                             ],
                           ),
                         ),
-                        SizedBox(height: 24.h),
-                        const ClientRegistrationForm(),
-                      ],
+                      ),
                     ),
-                  ),
-                ),
-                )
-              ),
+                  )),
             ],
           ),
         ),

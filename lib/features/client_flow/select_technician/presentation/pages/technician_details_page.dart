@@ -1,6 +1,7 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:el7erafe/core/utils/animated_navigaton_with_build.dart';
 import 'package:el7erafe/features/client_flow/client_home/presentation/pages/client_home_page.dart';
 import 'package:el7erafe/features/client_flow/select_technician/data/models/technicians_model.dart';
 import 'package:el7erafe/features/client_flow/select_technician/presentation/pages/technician_reservation_success_page.dart';
@@ -52,77 +53,99 @@ class TechnicianDetailsPage extends StatelessWidget {
                 child: Stack(
                   clipBehavior: Clip.none,
                   children: [
-                    Container(
-                      margin: EdgeInsets.only(top: 50.h),
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                        borderRadius:
-                            BorderRadius.vertical(top: Radius.circular(30)),
-                      ),
-                      child: ListView(
-                        padding: EdgeInsets.only(
-                            top: 60.h, left: 16.w, right: 16.w, bottom: 24.h),
-                        children: [
-                          Text(
-                            technician.name,
-                            textAlign: TextAlign.center,
-                            style: GoogleFonts.cairo(
-                              fontSize: 22.sp,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black87,
+                    TweenAnimationBuilder<double>(
+                      tween: Tween(begin: 0.0, end: 1.0),
+                      duration: const Duration(milliseconds: 600),
+                      curve: Curves.easeOutCubic,
+                      builder: (context, value, child) {
+                        return Transform.translate(
+                          offset: Offset(0, 200 * (1 - value)),
+                          child: child,
+                        );
+                      },
+                      child: Container(
+                        margin: EdgeInsets.only(top: 50.h),
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          borderRadius:
+                              BorderRadius.vertical(top: Radius.circular(30)),
+                        ),
+                        child: ListView(
+                          padding: EdgeInsets.only(
+                              top: 60.h, left: 16.w, right: 16.w, bottom: 24.h),
+                          children: [
+                            Text(
+                              technician.name,
+                              textAlign: TextAlign.center,
+                              style: GoogleFonts.cairo(
+                                fontSize: 22.sp,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black87,
+                              ),
                             ),
-                          ),
-                          SizedBox(height: 12.h),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              _buildStatItem(Icons.handyman_outlined,
-                                  technician.serviceName),
-                              SizedBox(width: 20.w),
-                              _buildStatItem(Icons.star,
-                                  technician.rating.toStringAsFixed(1),
-                                  iconColor: const Color(0xFFFFC107)),
-                              SizedBox(width: 20.w),
-                              _buildStatItem(
-                                  Icons.location_on_outlined, technician.city),
-                            ],
-                          ),
-                          SizedBox(height: 24.h),
-                          _buildAboutSection(),
-                          SizedBox(height: 16.h),
-                          _buildPortfolioSection(context),
-                        ],
+                            SizedBox(height: 12.h),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                _buildStatItem(Icons.handyman_outlined,
+                                    technician.serviceName),
+                                SizedBox(width: 20.w),
+                                _buildStatItem(Icons.star,
+                                    technician.rating.toStringAsFixed(1),
+                                    iconColor: const Color(0xFFFFC107)),
+                                SizedBox(width: 20.w),
+                                _buildStatItem(
+                                    Icons.location_on_outlined, technician.city),
+                              ],
+                            ),
+                            SizedBox(height: 24.h),
+                            _buildAboutSection(),
+                            SizedBox(height: 16.h),
+                            _buildPortfolioSection(context),
+                          ],
+                        ),
                       ),
                     ),
                     Positioned(
                       top: 0,
                       left: 0,
                       right: 0,
-                      child: Center(
-                        child: Container(
-                          padding: EdgeInsets.all(4.r),
-                          decoration: BoxDecoration(
-                              color: Colors.white,
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                  color: Color(0xFF3775FA), width: 2.w)),
-                          child: ClipOval(
-                            child: CachedNetworkImage(
-                              imageUrl: technician.profilePicture.isNotEmpty
-                                  ? technician.profilePicture
-                                  : 'https://i.pinimg.com/736x/62/09/cc/6209cc7f4a9201b74b3a85ef329d3996.jpg',
-                              width: 90.w,
-                              height: 90.h,
-                              fit: BoxFit.cover,
-                              placeholder: (context, url) => Shimmer.fromColors(
-                                baseColor: Colors.grey[300]!,
-                                highlightColor: Colors.grey[100]!,
-                                child: Container(color: Colors.white),
-                              ),
-                              errorWidget: (context, url, error) => Container(
-                                color: Colors.grey.shade200,
-                                child: Icon(Icons.person,
-                                    color: Colors.grey, size: 40.r),
+                      child: TweenAnimationBuilder<double>(
+                        tween: Tween(begin: 0.0, end: 1.0),
+                        duration: const Duration(milliseconds: 600),
+                        curve: Curves.easeOutBack,
+                        builder: (context, value, child) {
+                          return Transform.scale(
+                            scale: value,
+                            child: child,
+                          );
+                        },
+                        child: Center(
+                          child: Container(
+                            padding: EdgeInsets.all(4.r),
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                    color: const Color(0xFF3775FA), width: 2.w)),
+                            child: ClipOval(
+                              child: CachedNetworkImage(
+                                imageUrl: technician.profilePicture.isNotEmpty
+                                    ? technician.profilePicture
+                                    : 'https://i.pinimg.com/736x/62/09/cc/6209cc7f4a9201b74b3a85ef329d3996.jpg',
+                                width: 90.w,
+                                height: 90.h,
+                                fit: BoxFit.cover,
+                                placeholder: (context, url) => Shimmer.fromColors(
+                                  baseColor: Colors.grey[300]!,
+                                  highlightColor: Colors.grey[100]!,
+                                  child: Container(color: Colors.white),
+                                ),
+                                errorWidget: (context, url, error) => Container(
+                                  color: Colors.grey.shade200,
+                                  child: Icon(Icons.person,
+                                      color: Colors.grey, size: 40.r),
+                                ),
                               ),
                             ),
                           ),
@@ -421,7 +444,7 @@ class TechnicianDetailsPage extends StatelessWidget {
                           Navigator.pop(context);
                           Navigator.pushAndRemoveUntil(
                             context,
-                            MaterialPageRoute(
+                            SlideRightRouteWithBuild(
                                 builder: (_) => const ClientHomePage()),
                             (route) => false,
                           );
@@ -472,7 +495,7 @@ class TechnicianDetailsPage extends StatelessWidget {
                         Navigator.pop(context);
                         Navigator.pushAndRemoveUntil(
                           context,
-                          MaterialPageRoute(
+                          SlideRightRouteWithBuild(
                             builder: (context) => ClientHomePage(),
                           ),
                           (route) => false,
@@ -499,7 +522,7 @@ class TechnicianDetailsPage extends StatelessWidget {
             );
             Navigator.pushAndRemoveUntil(
               context,
-              MaterialPageRoute(
+              SlideRightRouteWithBuild(
                 builder: (context) => BlocProvider(
                   create: (context) =>
                       LoginCubit(authRepository: AuthRepository()),
@@ -511,7 +534,7 @@ class TechnicianDetailsPage extends StatelessWidget {
           } else if (state is SubmitReservationSuccess) {
             Navigator.pushAndRemoveUntil(
               context,
-              MaterialPageRoute(
+              SlideRightRouteWithBuild(
                   builder: (_) => const SelectTechnicianSuccessPage()),
               (route) => false,
             );
@@ -553,32 +576,6 @@ class TechnicianDetailsPage extends StatelessWidget {
                               fontWeight: FontWeight.w600,
                             ),
                           ),
-                  ),
-                ),
-              ),
-              SizedBox(width: 12.w),
-              Expanded(
-                child: SizedBox(
-                  height: 40.h,
-                  child: OutlinedButton(
-                    onPressed: () {
-                      // Implement Chat / Call functionality
-                    },
-                    style: OutlinedButton.styleFrom(
-                      side:
-                          const BorderSide(color: Color(0xFF3775FA), width: 1),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12.r),
-                      ),
-                    ),
-                    child: Text(
-                      "تواصل مع الفني",
-                      style: GoogleFonts.cairo(
-                        color: const Color(0xFF3775FA),
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
                   ),
                 ),
               ),

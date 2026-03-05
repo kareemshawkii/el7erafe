@@ -1,3 +1,4 @@
+import 'package:el7erafe/core/utils/animated_navigaton_with_build.dart';
 import 'package:el7erafe/features/client_flow/client_home/presentation/pages/client_home_page.dart';
 import 'package:el7erafe/core/services/local_storage/auth_local_storage.dart';
 import 'package:el7erafe/features/authentication_module/login/data/repositories/auth_repository.dart';
@@ -62,7 +63,7 @@ class _SplashControllerState extends State<SplashController> {
     if (!mounted) return;
     Navigator.pushAndRemoveUntil(
       context,
-      MaterialPageRoute(
+      SlideRightRouteWithBuild(
         builder: (_) => BlocProvider(
           create: (_) => OnboardingCubit(),
           child: OnBoardingPage(),
@@ -76,7 +77,7 @@ class _SplashControllerState extends State<SplashController> {
     if (!mounted) return;
     Navigator.pushAndRemoveUntil(
       context,
-      MaterialPageRoute(
+      SlideRightRouteWithBuild(
         builder: (_) => BlocProvider(
           create: (_) => LoginCubit(
             authRepository: RepositoryProvider.of<AuthRepository>(context),
@@ -92,7 +93,7 @@ class _SplashControllerState extends State<SplashController> {
     if (!mounted) return;
     Navigator.pushAndRemoveUntil(
       context,
-      MaterialPageRoute(builder: (_) => const ClientHomePage()),
+      SlideRightRouteWithBuild(builder: (_) => const ClientHomePage()),
       (route) => false,
     );
   }
@@ -101,7 +102,7 @@ class _SplashControllerState extends State<SplashController> {
     if (!mounted) return;
     Navigator.pushAndRemoveUntil(
       context,
-      MaterialPageRoute(builder: (_) => const TechnicianPage()),
+      SlideRightRouteWithBuild(builder: (_) => const TechnicianPage()),
       (route) => false,
     );
   }
@@ -110,7 +111,7 @@ class _SplashControllerState extends State<SplashController> {
     if (!mounted) return;
     Navigator.pushAndRemoveUntil(
       context,
-      MaterialPageRoute(
+      SlideRightRouteWithBuild(
         builder: (_) => BlocProvider(
           create: (_) => TechnicianStatusCubit(
             statusRepository:

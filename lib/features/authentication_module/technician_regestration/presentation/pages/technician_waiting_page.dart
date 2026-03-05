@@ -1,4 +1,5 @@
 import 'package:el7erafe/core/services/local_storage/auth_local_storage.dart';
+import 'package:el7erafe/core/utils/animated_navigaton_with_build.dart';
 import 'package:el7erafe/features/authentication_module/login/data/repositories/auth_repository.dart';
 import 'package:el7erafe/features/authentication_module/login/presentation/cubit/login_cubit.dart';
 import 'package:el7erafe/features/authentication_module/login/presentation/pages/login_page.dart';
@@ -78,7 +79,7 @@ class _TechnicianWaitingViewState extends State<TechnicianWaitingView> {
               );
               Navigator.pushAndRemoveUntil(
                 context,
-                MaterialPageRoute(
+                SlideRightRouteWithBuild(
                   builder: (_) => BlocProvider(
                     create: (_) => TechnicianResubmitCubit(
                       technicianRegRepository:
@@ -102,7 +103,7 @@ class _TechnicianWaitingViewState extends State<TechnicianWaitingView> {
             );
             Navigator.pushAndRemoveUntil(
               context,
-              MaterialPageRoute(
+              SlideRightRouteWithBuild(
                 builder: (_) => BlocProvider(
                   create: (_) => LoginCubit(
                     authRepository:
@@ -126,7 +127,9 @@ class _TechnicianWaitingViewState extends State<TechnicianWaitingView> {
             );
             Navigator.pushAndRemoveUntil(
               context,
-              MaterialPageRoute(builder: (_) => const TechnicianPage()),
+              SlideRightRouteWithBuild(
+                builder: (_) => const TechnicianPage(),
+              ),
               (route) => false,
             );
             AuthLocalStorage authStorage = AuthLocalStorage();
@@ -167,104 +170,120 @@ class _TechnicianWaitingViewState extends State<TechnicianWaitingView> {
                     topLeft: Radius.circular(44.r),
                     topRight: Radius.circular(44.r),
                   ),
-                  child: Container(
-                    height: 629.h,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFFDFDFD),
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(44.r),
-                        topRight: Radius.circular(44.r),
+                  child: TweenAnimationBuilder<double>(
+                    tween: Tween(begin: 0.0, end: 1.0),
+                    duration: const Duration(milliseconds: 600),
+                    curve: Curves.easeOutCubic,
+                    builder: (context, value, child) {
+                      return Transform.translate(
+                        offset: Offset(0, 200 * (1 - value)),
+                        child: Opacity(
+                          opacity: value,
+                          child: child,
+                        ),
+                      );
+                    },
+                    child: Container(
+                      height: 629.h,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFDFDFD),
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(44.r),
+                          topRight: Radius.circular(44.r),
+                        ),
                       ),
-                    ),
-                    child: SingleChildScrollView(
-                      padding: EdgeInsets.fromLTRB(
-                          16.w, 44.h, 16.w, 44.h + keyboardPadding),
-                      physics: const ClampingScrollPhysics(),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Image.asset('images/technician_waiting.png',
-                              width: 241.w, height: 361.h),
-                          SizedBox(height: 24.h),
-                          Directionality(
-                              textDirection: TextDirection.rtl,
-                              child: Center(
-                                child: Text(
-                                  'شكراً لتسجيلك كحرفي! طلبك بيتراجع دلوقتي ، وهنرد عليك خلال 24 ساعة.',
-                                  style: GoogleFonts.cairo(
-                                    fontSize: 22.sp,
-                                    fontWeight: FontWeight.w600,
-                                    color: const Color(0xFF000000),
-                                  ),
-                                ),
-                              )),
-                          SizedBox(height: 18.h),
-                          SizedBox(
-                            height: 40.h,
-                            width: 264.w,
-                            child: BlocBuilder<TechnicianStatusCubit,
-                                TechnicianStatusState>(
-                              builder: (context, state) {
-                                final isLoading =
-                                    state is TechnicianStatusLoading;
-                                return Container(
-                                    width: double.infinity,
-                                    height: 40.h,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(12.r),
-                                      border: Border.all(
-                                        color: Color(0xFF3775FA),
-                                        width: 1.w,
-                                      ),
+                      child: SingleChildScrollView(
+                        padding: EdgeInsets.fromLTRB(
+                            16.w, 44.h, 16.w, 44.h + keyboardPadding),
+                        physics: const ClampingScrollPhysics(),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Image.asset('images/technician_waiting.png',
+                                width: 241.w, height: 361.h),
+                            SizedBox(height: 24.h),
+                            Directionality(
+                                textDirection: TextDirection.rtl,
+                                child: Center(
+                                  child: Text(
+                                    'شكراً لتسجيلك كحرفي! طلبك بيتراجع دلوقتي ، وهنرد عليك خلال 24 ساعة.',
+                                    style: GoogleFonts.cairo(
+                                      fontSize: 22.sp,
+                                      fontWeight: FontWeight.w600,
+                                      color: const Color(0xFF000000),
                                     ),
-                                    child: ElevatedButton(
-                                      onPressed: isLoading
-                                          ? null
-                                          : () => _onReloadPressed(context),
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor:
-                                            const Color(0xFF3775FA),
-                                        foregroundColor: Colors.white,
-                                        disabledBackgroundColor:
-                                            const Color.fromARGB(
-                                                158, 55, 117, 250),
-                                        shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(12.r),
-                                            side: const BorderSide(
-                                                color: Colors.white,
-                                                width: 1.0)),
+                                  ),
+                                )),
+                            SizedBox(height: 18.h),
+                            SizedBox(
+                              height: 40.h,
+                              width: 264.w,
+                              child: BlocBuilder<TechnicianStatusCubit,
+                                  TechnicianStatusState>(
+                                builder: (context, state) {
+                                  final isLoading =
+                                      state is TechnicianStatusLoading;
+                                  return Container(
+                                      width: double.infinity,
+                                      height: 40.h,
+                                      decoration: BoxDecoration(
+                                        borderRadius:
+                                            BorderRadius.circular(12.r),
+                                        border: Border.all(
+                                          color: Color(0xFF3775FA),
+                                          width: 1.w,
+                                        ),
                                       ),
-                                      child: isLoading
-                                          ? SizedBox(
-                                              height: 24.r,
-                                              width: 24.r,
-                                              child:
-                                                  const CircularProgressIndicator(
-                                                      color: Color(0xFF3775FA),
-                                                      strokeWidth: 3),
-                                            )
-                                          : Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                Text('اعاده تحميل الصفحه',
-                                                    style: GoogleFonts.cairo(
-                                                        fontSize: 16.sp,
-                                                        fontWeight:
-                                                            FontWeight.w500)),
-                                                SizedBox(width: 8.w),
-                                                Icon(Icons.refresh,
-                                                    color: Colors.white,
-                                                    size: 24.w),
-                                              ],
-                                            ),
-                                    ));
-                              },
+                                      child: ElevatedButton(
+                                        onPressed: isLoading
+                                            ? null
+                                            : () => _onReloadPressed(context),
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor:
+                                              const Color(0xFF3775FA),
+                                          foregroundColor: Colors.white,
+                                          disabledBackgroundColor:
+                                              const Color.fromARGB(
+                                                  158, 55, 117, 250),
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(12.r),
+                                              side: const BorderSide(
+                                                  color: Colors.white,
+                                                  width: 1.0)),
+                                        ),
+                                        child: isLoading
+                                            ? SizedBox(
+                                                height: 24.r,
+                                                width: 24.r,
+                                                child:
+                                                    const CircularProgressIndicator(
+                                                        color:
+                                                            Color(0xFF3775FA),
+                                                        strokeWidth: 3),
+                                              )
+                                            : Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  Text('اعاده تحميل الصفحه',
+                                                      style: GoogleFonts.cairo(
+                                                          fontSize: 16.sp,
+                                                          fontWeight:
+                                                              FontWeight.w500)),
+                                                  SizedBox(width: 8.w),
+                                                  Icon(Icons.refresh,
+                                                      color: Colors.white,
+                                                      size: 24.w),
+                                                ],
+                                              ),
+                                      ));
+                                },
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),

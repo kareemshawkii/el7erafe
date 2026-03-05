@@ -165,99 +165,120 @@ class _ClientUpdateProfilePageState extends State<ClientUpdateProfilePage> {
           },
           child: Column(
             children: [
-              Center(
-                child: Stack(
-                  children: [
-                    Container(
-                      width: 100.w,
-                      height: 100.h,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white, width: 3.w),
-                      ),
-                      child: ClipOval(
-                        child: _pickedImage != null
-                            ? Image.file(_pickedImage!, fit: BoxFit.cover)
-                            : BlocBuilder<ProfileCubit, ProfileState>(
-                                builder: (context, state) {
-                                  String imageToDisplay =
-                                      widget.currentImageUrl;
-                                  if (state is ProfileLoaded &&
-                                      state.imageUrl.isNotEmpty) {
-                                    imageToDisplay = state.imageUrl;
-                                  }
+              TweenAnimationBuilder<double>(
+                tween: Tween(begin: 0.0, end: 1.0),
+                duration: const Duration(milliseconds: 600),
+                curve: Curves.easeOutBack,
+                builder: (context, value, child) {
+                  return Transform.scale(
+                    scale: value,
+                    child: child,
+                  );
+                },
+                child: Center(
+                  child: Stack(
+                    children: [
+                      Container(
+                        width: 100.w,
+                        height: 100.h,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.white, width: 3.w),
+                        ),
+                        child: ClipOval(
+                          child: _pickedImage != null
+                              ? Image.file(_pickedImage!, fit: BoxFit.cover)
+                              : BlocBuilder<ProfileCubit, ProfileState>(
+                                  builder: (context, state) {
+                                    String imageToDisplay =
+                                        widget.currentImageUrl;
+                                    if (state is ProfileLoaded &&
+                                        state.imageUrl.isNotEmpty) {
+                                      imageToDisplay = state.imageUrl;
+                                    }
 
-                                  if (imageToDisplay.isNotEmpty) {
-                                    return Image.network(
-                                      imageToDisplay,
-                                      fit: BoxFit.cover,
-                                      loadingBuilder:
-                                          (context, child, loadingProgress) {
-                                        if (loadingProgress == null) {
-                                          return child;
-                                        }
+                                    if (imageToDisplay.isNotEmpty) {
+                                      return Image.network(
+                                        imageToDisplay,
+                                        fit: BoxFit.cover,
+                                        loadingBuilder:
+                                            (context, child, loadingProgress) {
+                                          if (loadingProgress == null) {
+                                            return child;
+                                          }
 
-                                        return const Center(
-                                          child: CircularProgressIndicator(
-                                            color: Colors.white,
-                                          ),
-                                        );
-                                      },
-                                      errorBuilder:
-                                          (context, error, stackTrace) {
-                                        return const Icon(
-                                          Icons.person,
-                                          size: 60,
-                                          color: Colors.grey,
-                                        );
-                                      },
-                                    );
-                                  }
-                                  return const Icon(Icons.person,
-                                      size: 60, color: Colors.grey);
-                                },
-                              ),
-                      ),
-                    ),
-                    Positioned(
-                      bottom: 0,
-                      right: 0,
-                      child: GestureDetector(
-                        onTap: _pickImage,
-                        child: Container(
-                          padding: EdgeInsets.all(8.r),
-                          decoration: const BoxDecoration(
-                              color: Colors.white, shape: BoxShape.circle),
-                          child:
-                              Icon(Icons.edit, color: _primaryBlue, size: 20.r),
+                                          return const Center(
+                                            child: CircularProgressIndicator(
+                                              color: Colors.white,
+                                            ),
+                                          );
+                                        },
+                                        errorBuilder:
+                                            (context, error, stackTrace) {
+                                          return const Icon(
+                                            Icons.person,
+                                            size: 60,
+                                            color: Colors.grey,
+                                          );
+                                        },
+                                      );
+                                    }
+                                    return const Icon(Icons.person,
+                                        size: 60, color: Colors.grey);
+                                  },
+                                ),
                         ),
                       ),
-                    ),
-                  ],
+                      Positioned(
+                        bottom: 0,
+                        right: 0,
+                        child: GestureDetector(
+                          onTap: _pickImage,
+                          child: Container(
+                            padding: EdgeInsets.all(8.r),
+                            decoration: const BoxDecoration(
+                                color: Colors.white, shape: BoxShape.circle),
+                            child: Icon(Icons.edit,
+                                color: _primaryBlue, size: 20.r),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
               SizedBox(height: 20.h),
               Expanded(
-                  child: GestureDetector(
-                onTap: () => FocusScope.of(context).unfocus(),
-                child: Form(
-                  key: _mainFormKey,
-                  child: Container(
-                    height: 560.h,
-                    width: double.infinity,
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 24.w, vertical: 30.h),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius:
-                          const BorderRadius.vertical(top: Radius.circular(30)),
-                    ),
-                    child: SingleChildScrollView(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SizedBox(height: 20.h),
-                          Container(
+                  child: TweenAnimationBuilder<double>(
+                tween: Tween(begin: 0.0, end: 1.0),
+                duration: const Duration(milliseconds: 600),
+                curve: Curves.easeOutCubic,
+                builder: (context, value, child) {
+                  return Transform.translate(
+                    offset: Offset(0, 200 * (1 - value)),
+                    child: child,
+                  );
+                },
+                child: GestureDetector(
+                  onTap: () => FocusScope.of(context).unfocus(),
+                  child: Form(
+                    key: _mainFormKey,
+                    child: Container(
+                      height: 560.h,
+                      width: double.infinity,
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 24.w, vertical: 30.h),
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        borderRadius:
+                            BorderRadius.vertical(top: Radius.circular(30)),
+                      ),
+                      child: SingleChildScrollView(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(height: 20.h),
+                            Container(
                               padding: EdgeInsets.all(16.r),
                               decoration: BoxDecoration(
                                 color: Colors.white,
@@ -407,8 +428,10 @@ class _ClientUpdateProfilePageState extends State<ClientUpdateProfilePage> {
                                     },
                                   ),
                                 ],
-                              )),
-                        ],
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -928,8 +951,8 @@ class _SensitiveUpdateFlowSheetState extends State<_SensitiveUpdateFlowSheet> {
               border: InputBorder.none,
               contentPadding:
                   EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
-              enabledBorder: OutlineInputBorder(
-                  borderRadius: const BorderRadius.all(Radius.circular(16)),
+              enabledBorder: const OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(16)),
                   borderSide: BorderSide(color: Colors.grey)),
               focusedBorder: const OutlineInputBorder(
                   borderRadius: BorderRadius.all(Radius.circular(16)),

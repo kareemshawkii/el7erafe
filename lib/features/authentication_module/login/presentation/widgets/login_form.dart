@@ -1,3 +1,4 @@
+import 'package:el7erafe/core/utils/animated_navigaton_with_build.dart';
 import 'package:el7erafe/features/authentication_module/forget_password/data/repositories/email_input_repo.dart';
 import 'package:el7erafe/features/authentication_module/forget_password/presentation/cubit/email_input_cubit.dart';
 import 'package:el7erafe/features/authentication_module/forget_password/presentation/pages/email_input_page.dart';
@@ -167,7 +168,7 @@ class _LoginFormState extends State<LoginForm> {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(
+                    SlideRightRouteWithBuild(
                       builder: (context) => BlocProvider(
                         create: (context) => EmailInputCubit(
                             emailInputRepository:
@@ -244,7 +245,7 @@ class _LoginFormState extends State<LoginForm> {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(
+                    SlideRightRouteWithBuild(
                       builder: (context) => BlocProvider(
                         create: (context) => SelectTypeCubit(),
                         child: SelectTypePage(),

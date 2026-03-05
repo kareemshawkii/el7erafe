@@ -1,3 +1,4 @@
+import 'package:el7erafe/core/utils/animated_navigaton_with_build.dart';
 import 'package:el7erafe/features/client_flow/client_home/presentation/pages/client_home_page.dart';
 import 'package:el7erafe/core/services/local_storage/auth_local_storage.dart';
 import 'package:el7erafe/features/authentication_module/otp_page/data/Repository/otp_repository.dart';
@@ -52,14 +53,16 @@ class LoginView extends StatelessWidget {
               if (!context.mounted) return;
               Navigator.pushAndRemoveUntil(
                 context,
-                MaterialPageRoute(builder: (_) => const ClientHomePage()),
+                SlideRightRouteWithBuild(
+                    builder: (_) => const ClientHomePage()),
                 (route) => false,
               );
             } else if (type == 'T') {
               if (!context.mounted) return;
               Navigator.pushAndRemoveUntil(
                 context,
-                MaterialPageRoute(builder: (_) => const TechnicianPage()),
+                SlideRightRouteWithBuild(
+                    builder: (_) => const TechnicianPage()),
                 (route) => false,
               );
             } else {
@@ -95,7 +98,7 @@ class LoginView extends StatelessWidget {
               );
               Navigator.push(
                 context,
-                MaterialPageRoute(
+                SlideRightRouteWithBuild(
                   builder: (context) => BlocProvider(
                     create: (context) => OtpCubit(
                         otpRepository:
@@ -129,7 +132,7 @@ class LoginView extends StatelessWidget {
               );
               Navigator.push(
                 context,
-                MaterialPageRoute(
+                SlideRightRouteWithBuild(
                   builder: (context) => BlocProvider(
                     create: (context) => TechnicianOtpCubit(
                         otpRepository:
@@ -161,7 +164,7 @@ class LoginView extends StatelessWidget {
             );
             Navigator.pushAndRemoveUntil(
               context,
-              MaterialPageRoute(
+              SlideRightRouteWithBuild(
                 builder: (context) => BlocProvider(
                   create: (context) => TechnicianStatusCubit(
                     statusRepository:
@@ -185,7 +188,7 @@ class LoginView extends StatelessWidget {
             );
             Navigator.pushAndRemoveUntil(
               context,
-              MaterialPageRoute(
+              SlideRightRouteWithBuild(
                 builder: (context) => BlocProvider(
                   create: (context) => TechnicianResubmitCubit(
                     technicianRegRepository:
@@ -235,30 +238,44 @@ class LoginView extends StatelessWidget {
                     topLeft: Radius.circular(44.r),
                     topRight: Radius.circular(44.r),
                   ),
-                  child: Container(
-                    height: 629.h,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFFDFDFD),
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(44.r),
-                        topRight: Radius.circular(44.r),
+                  child: TweenAnimationBuilder<double>(
+                    tween: Tween(begin: 0.0, end: 1.0),
+                    duration: const Duration(milliseconds: 600),
+                    curve: Curves.easeOutCubic,
+                    builder: (context, value, child) {
+                      return Transform.translate(
+                        offset: Offset(0, 200 * (1 - value)),
+                        child: Opacity(
+                          opacity: value,
+                          child: child,
+                        ),
+                      );
+                    },
+                    child: Container(
+                      height: 629.h,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFDFDFD),
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(44.r),
+                          topRight: Radius.circular(44.r),
+                        ),
                       ),
-                    ),
-                    child: SingleChildScrollView(
-                      padding: EdgeInsets.fromLTRB(
-                          16.w, 44.h, 16.w, 44.h + keyboardPadding),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('تسجيل الدخول',
-                              style: GoogleFonts.cairo(
-                                  fontSize: 24.sp,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.black)),
-                          SizedBox(height: 24.h),
-                          const LoginForm(),
-                        ],
+                      child: SingleChildScrollView(
+                        padding: EdgeInsets.fromLTRB(
+                            16.w, 44.h, 16.w, 44.h + keyboardPadding),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('تسجيل الدخول',
+                                style: GoogleFonts.cairo(
+                                    fontSize: 24.sp,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.black)),
+                            SizedBox(height: 24.h),
+                            const LoginForm(),
+                          ],
+                        ),
                       ),
                     ),
                   ),

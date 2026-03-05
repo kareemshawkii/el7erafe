@@ -1,4 +1,5 @@
 import 'package:el7erafe/core/services/local_storage/auth_local_storage.dart';
+import 'package:el7erafe/core/utils/animated_navigaton_with_build.dart';
 import 'package:el7erafe/features/authentication_module/login/data/repositories/auth_repository.dart';
 import 'package:el7erafe/features/authentication_module/login/presentation/cubit/login_cubit.dart';
 import 'package:el7erafe/features/authentication_module/login/presentation/pages/login_page.dart';
@@ -86,7 +87,7 @@ class _TechnicianOtpViewState extends State<TechnicianOtpView> {
             );
             Navigator.pushAndRemoveUntil(
               context,
-              MaterialPageRoute(builder: (_) => const TechnicianPage()),
+              SlideRightRouteWithBuild(builder: (_) => const TechnicianPage()),
               (route) => false,
             );
           } else if (state is TechnicianOtpResent) {
@@ -107,7 +108,7 @@ class _TechnicianOtpViewState extends State<TechnicianOtpView> {
             );
             Navigator.pushAndRemoveUntil(
               context,
-              MaterialPageRoute(
+              SlideRightRouteWithBuild(
                 builder: (_) => BlocProvider(
                   create: (_) => TechnicianStatusCubit(
                     statusRepository:
@@ -127,7 +128,7 @@ class _TechnicianOtpViewState extends State<TechnicianOtpView> {
             );
             Navigator.pushAndRemoveUntil(
               context,
-              MaterialPageRoute(
+              SlideRightRouteWithBuild(
                 builder: (_) => BlocProvider(
                   create: (_) => TechnicianResubmitCubit(
                     technicianRegRepository:
@@ -149,7 +150,7 @@ class _TechnicianOtpViewState extends State<TechnicianOtpView> {
             );
             Navigator.pushAndRemoveUntil(
               context,
-              MaterialPageRoute(
+              SlideRightRouteWithBuild(
                 builder: (_) => BlocProvider(
                   create: (_) => LoginCubit(
                     authRepository:
@@ -191,143 +192,160 @@ class _TechnicianOtpViewState extends State<TechnicianOtpView> {
                     topLeft: Radius.circular(44.r),
                     topRight: Radius.circular(44.r),
                   ),
-                  child: Container(
-                    height: 629.h,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFFDFDFD),
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(44.r),
-                        topRight: Radius.circular(44.r),
+                  child: TweenAnimationBuilder<double>(
+                    tween: Tween(begin: 0.0, end: 1.0),
+                    duration: const Duration(milliseconds: 600),
+                    curve: Curves.easeOutCubic,
+                    builder: (context, value, child) {
+                      return Transform.translate(
+                        offset: Offset(0, 200 * (1 - value)),
+                        child: Opacity(
+                          opacity: value,
+                          child: child,
+                        ),
+                      );
+                    },
+                    child: Container(
+                      height: 629.h,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFDFDFD),
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(44.r),
+                          topRight: Radius.circular(44.r),
+                        ),
                       ),
-                    ),
-                    child: SingleChildScrollView(
-                      padding: EdgeInsets.fromLTRB(
-                          16.w, 44.h, 16.w, 44.h + keyboardPadding),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Center(
-                              child: SizedBox(
-                            height: 136.h,
-                            width: 182.w,
-                            child:
-                                Image.asset('images/otp.png', fit: BoxFit.fill),
-                          )),
-                          SizedBox(height: 32.h),
-                          Center(
-                            child: Text(
-                              'أدخل رمز التحقق',
-                              style: GoogleFonts.cairo(
-                                fontSize: 24.sp,
-                                fontWeight: FontWeight.w600,
-                                color: const Color(0xFF1E1E1E),
+                      child: SingleChildScrollView(
+                        padding: EdgeInsets.fromLTRB(
+                            16.w, 44.h, 16.w, 44.h + keyboardPadding),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Center(
+                                child: SizedBox(
+                              height: 136.h,
+                              width: 182.w,
+                              child: Image.asset('images/otp.png',
+                                  fit: BoxFit.fill),
+                            )),
+                            SizedBox(height: 32.h),
+                            Center(
+                              child: Text(
+                                'أدخل رمز التحقق',
+                                style: GoogleFonts.cairo(
+                                  fontSize: 24.sp,
+                                  fontWeight: FontWeight.w600,
+                                  color: const Color(0xFF1E1E1E),
+                                ),
                               ),
                             ),
-                          ),
-                          SizedBox(height: 8.h),
-                          Center(
-                            child: Text(
-                              'أدخل الكود المرسل على بريدك لإكمال العملية',
-                              style: GoogleFonts.cairo(
-                                fontSize: 16.sp,
-                                fontWeight: FontWeight.w400,
-                                color: const Color(0xFF6B6B6B),
+                            SizedBox(height: 8.h),
+                            Center(
+                              child: Text(
+                                'أدخل الكود المرسل على بريدك لإكمال العملية',
+                                style: GoogleFonts.cairo(
+                                  fontSize: 16.sp,
+                                  fontWeight: FontWeight.w400,
+                                  color: const Color(0xFF6B6B6B),
+                                ),
                               ),
                             ),
-                          ),
-                          SizedBox(height: 24.h),
-                          Directionality(
-                            textDirection: TextDirection.ltr,
-                            child: OtpTextField(
-                              numberOfFields: 6,
-                              fieldWidth: 50.w,
-                              fieldHeight: 50.h,
-                              borderColor: const Color(0xFF3775FA),
-                              enabledBorderColor: const Color(0xFFE2DFDF),
-                              focusedBorderColor: const Color(0xFF3775FA),
-                              borderRadius: BorderRadius.circular(12.r),
-                              showFieldAsBox: true,
-                              onSubmit: (String verificationCode) {
-                                setState(() {
-                                  _enteredOtp = verificationCode;
-                                });
-                              },
-                              onCodeChanged: (String code) {
-                                setState(() {
-                                  _enteredOtp = code;
-                                });
-                              },
-                            ),
-                          ),
-                          SizedBox(height: 24.h),
-                          BlocBuilder<TechnicianOtpCubit, TechnicianOtpState>(
-                            builder: (context, state) {
-                              final isLoading = state is TechnicianOtpLoading;
-                              return Container(
-                                  width: double.infinity,
-                                  height: 40.h,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(12.r),
-                                    border: Border.all(
-                                      color: Color(0xFF3775FA),
-                                      width: 1.w,
-                                    ),
-                                  ),
-                                  child: ElevatedButton(
-                                    onPressed: isLoading ? null : _onOtpPressed,
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: const Color(0xFF3775FA),
-                                      foregroundColor: Colors.white,
-                                      disabledBackgroundColor:
-                                          const Color.fromARGB(
-                                              158, 55, 117, 250),
-                                      shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(12.r),
-                                          side: const BorderSide(
-                                              color: Colors.white, width: 1.0)),
-                                    ),
-                                    child: isLoading
-                                        ? SizedBox(
-                                            height: 24.r,
-                                            width: 24.r,
-                                            child:
-                                                const CircularProgressIndicator(
-                                                    color: Color(0xFF3775FA),
-                                                    strokeWidth: 3),
-                                          )
-                                        : Text('تحقق',
-                                            style: GoogleFonts.cairo(
-                                                fontSize: 16.sp,
-                                                fontWeight: FontWeight.w500)),
-                                  ));
-                            },
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            textDirection: TextDirection.rtl,
-                            children: [
-                              Text('ماوصلكش الكود؟  ابعت طلب',
-                                  style: GoogleFonts.cairo(
-                                      fontSize: 14.sp,
-                                      color: const Color(0xFF727070),
-                                      fontWeight: FontWeight.w400)),
-                              TextButton(
-                                onPressed: () {
-                                  context
-                                      .read<TechnicianOtpCubit>()
-                                      .resendOtp(widget.email);
+                            SizedBox(height: 24.h),
+                            Directionality(
+                              textDirection: TextDirection.ltr,
+                              child: OtpTextField(
+                                numberOfFields: 6,
+                                fieldWidth: 50.w,
+                                fieldHeight: 50.h,
+                                borderColor: const Color(0xFF3775FA),
+                                enabledBorderColor: const Color(0xFFE2DFDF),
+                                focusedBorderColor: const Color(0xFF3775FA),
+                                borderRadius: BorderRadius.circular(12.r),
+                                showFieldAsBox: true,
+                                onSubmit: (String verificationCode) {
+                                  setState(() {
+                                    _enteredOtp = verificationCode;
+                                  });
                                 },
-                                child: Text('لإعادة الإرسال',
+                                onCodeChanged: (String code) {
+                                  setState(() {
+                                    _enteredOtp = code;
+                                  });
+                                },
+                              ),
+                            ),
+                            SizedBox(height: 24.h),
+                            BlocBuilder<TechnicianOtpCubit, TechnicianOtpState>(
+                              builder: (context, state) {
+                                final isLoading = state is TechnicianOtpLoading;
+                                return Container(
+                                    width: double.infinity,
+                                    height: 40.h,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(12.r),
+                                      border: Border.all(
+                                        color: Color(0xFF3775FA),
+                                        width: 1.w,
+                                      ),
+                                    ),
+                                    child: ElevatedButton(
+                                      onPressed:
+                                          isLoading ? null : _onOtpPressed,
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor:
+                                            const Color(0xFF3775FA),
+                                        foregroundColor: Colors.white,
+                                        disabledBackgroundColor:
+                                            const Color.fromARGB(
+                                                158, 55, 117, 250),
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(12.r),
+                                            side: const BorderSide(
+                                                color: Colors.white,
+                                                width: 1.0)),
+                                      ),
+                                      child: isLoading
+                                          ? SizedBox(
+                                              height: 24.r,
+                                              width: 24.r,
+                                              child:
+                                                  const CircularProgressIndicator(
+                                                      color: Color(0xFF3775FA),
+                                                      strokeWidth: 3),
+                                            )
+                                          : Text('تحقق',
+                                              style: GoogleFonts.cairo(
+                                                  fontSize: 16.sp,
+                                                  fontWeight: FontWeight.w500)),
+                                    ));
+                              },
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              textDirection: TextDirection.rtl,
+                              children: [
+                                Text('ماوصلكش الكود؟  ابعت طلب',
                                     style: GoogleFonts.cairo(
                                         fontSize: 14.sp,
-                                        color: const Color(0xFF3775FA),
+                                        color: const Color(0xFF727070),
                                         fontWeight: FontWeight.w400)),
-                              ),
-                            ],
-                          ),
-                        ],
+                                TextButton(
+                                  onPressed: () {
+                                    context
+                                        .read<TechnicianOtpCubit>()
+                                        .resendOtp(widget.email);
+                                  },
+                                  child: Text('لإعادة الإرسال',
+                                      style: GoogleFonts.cairo(
+                                          fontSize: 14.sp,
+                                          color: const Color(0xFF3775FA),
+                                          fontWeight: FontWeight.w400)),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),

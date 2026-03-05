@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:el7erafe/core/utils/animated_navigaton_with_build.dart';
 import 'package:el7erafe/features/authentication_module/client_regestration/presentation/cubit/password_strength_cubit.dart';
 import 'package:el7erafe/features/authentication_module/client_regestration/presentation/cubit/password_strength_state.dart';
 import 'package:el7erafe/features/authentication_module/login/data/repositories/auth_repository.dart';
@@ -27,6 +28,7 @@ class TechnicianRegistrationForm extends StatefulWidget {
 
 class _TechnicianRegistrationFormState
     extends State<TechnicianRegistrationForm> {
+  final ValueNotifier<String?> _serviceNotifier = ValueNotifier<String?>(null);
   final _formKey = GlobalKey<FormState>();
   bool _isPasswordObscured = true;
   bool _isConfirmPasswordObscured = true;
@@ -386,78 +388,78 @@ class _TechnicianRegistrationFormState
                   Directionality(
                       textDirection: TextDirection.rtl,
                       child: SizedBox(
-                        width: 175.w,
-                        child: DropdownButtonFormField2<String>(
-                          decoration: InputDecoration(
-                            enabledBorder: OutlineInputBorder(
-                              borderSide: const BorderSide(
-                                color: Color(0xFFE2DFDF),
+                          width: 165.w,
+                          child: DropdownButtonFormField2<String>(
+                            valueListenable: _serviceNotifier,
+                            isExpanded: true,
+                            onChanged: isLoading
+                                ? null
+                                : (newValue) {
+                                    setState(() {
+                                      selectedService = newValue;
+                                      _serviceNotifier.value = newValue;
+                                    });
+                                  },
+                            decoration: InputDecoration(
+                              enabledBorder: OutlineInputBorder(
+                                borderSide:
+                                    const BorderSide(color: Color(0xFFE2DFDF)),
+                                borderRadius: BorderRadius.circular(12.r),
                               ),
-                              borderRadius: BorderRadius.circular(12.r),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderSide: const BorderSide(
-                                color: Color(0xFF3775FA),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide:
+                                    const BorderSide(color: Color(0xFF3775FA)),
+                                borderRadius: BorderRadius.circular(12.r),
                               ),
-                              borderRadius: BorderRadius.circular(12.r),
+                              contentPadding: EdgeInsets.all(8.r),
+                              hintText: isLoading
+                                  ? "جارٍ تحميل الحرف..."
+                                  : "اختار حرفتك",
                             ),
-                            contentPadding: EdgeInsets.all(8.r),
-                            hintText: isLoading
-                                ? "جارٍ تحميل الحرف..."
-                                : "اختار حرفتك",
-                          ),
-                          disabledHint: const Text("جارٍ تحميل الحرف..."),
-                          value: selectedService,
-                          isExpanded: true,
-                          dropdownStyleData: DropdownStyleData(
-                            maxHeight: 200.h,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(12.r),
-                              color: Colors.white,
+                            dropdownStyleData: DropdownStyleData(
+                              maxHeight: 200.h,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12.r),
+                                color: Colors.white,
+                              ),
                             ),
-                          ),
-                          items: isLoading
-                              ? [
-                                  const DropdownMenuItem<String>(
-                                    value: null,
-                                    enabled: false,
-                                    child: Center(
-                                      child: SizedBox(
-                                        width: 24,
-                                        height: 24,
-                                        child: CircularProgressIndicator(
-                                            strokeWidth: 3),
+                            menuItemStyleData: MenuItemStyleData(
+                              padding: EdgeInsets.symmetric(horizontal: 16.w),
+                            ),
+                            items: isLoading
+                                ? [
+                                    DropdownItem<String>(
+                                      value: null,
+                                      enabled: false,
+                                      child: const Center(
+                                        child: SizedBox(
+                                          width: 24,
+                                          height: 24,
+                                          child: CircularProgressIndicator(
+                                              strokeWidth: 3),
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                ]
-                              : services.map((service) {
-                                  return DropdownMenuItem<String>(
-                                      alignment: AlignmentDirectional.centerEnd,
+                                  ]
+                                : services.map((service) {
+                                    return DropdownItem<String>(
                                       value: service,
                                       child: Align(
                                         alignment: Alignment.centerRight,
                                         child: Text(
                                           service,
                                           style: GoogleFonts.cairo(
-                                              fontSize: 15.sp,
-                                              color: const Color.fromARGB(
-                                                  255, 0, 0, 0),
-                                              fontWeight: FontWeight.w400),
+                                            fontSize: 15.sp,
+                                            color: Colors.black,
+                                            fontWeight: FontWeight.w400,
+                                          ),
                                           overflow: TextOverflow.ellipsis,
                                           textDirection: TextDirection.rtl,
                                         ),
-                                      ));
-                                }).toList(),
-                          onChanged: isLoading
-                              ? null
-                              : (newValue) {
-                                  setState(() {
-                                    selectedService = newValue;
-                                  });
-                                },
-                        ),
-                      )),
+                                      ),
+                                    );
+                                  }).toList(),
+                          ))),
                   SizedBox(height: 16.h),
                   Text('صوره شخصيه',
                       style: GoogleFonts.cairo(
@@ -828,7 +830,7 @@ class _TechnicianRegistrationFormState
                 onPressed: () {
                   Navigator.pushAndRemoveUntil(
                     context,
-                    MaterialPageRoute(
+                    SlideRightRouteWithBuild(
                       builder: (context) => BlocProvider(
                         create: (context) => LoginCubit(
                             authRepository: context.read<AuthRepository>()),

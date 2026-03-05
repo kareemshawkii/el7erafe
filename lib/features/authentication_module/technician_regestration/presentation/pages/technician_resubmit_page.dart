@@ -1,3 +1,4 @@
+import 'package:el7erafe/core/utils/animated_navigaton_with_build.dart';
 import 'package:el7erafe/features/authentication_module/login/data/repositories/auth_repository.dart';
 import 'package:el7erafe/features/authentication_module/login/presentation/cubit/login_cubit.dart';
 import 'package:el7erafe/features/authentication_module/login/presentation/pages/login_page.dart';
@@ -54,7 +55,7 @@ class TechnicianResubmitView extends StatelessWidget {
             );
             Navigator.pushAndRemoveUntil(
               context,
-              MaterialPageRoute(
+              SlideRightRouteWithBuild(
                 builder: (context) => BlocProvider(
                   create: (context) => TechnicianStatusCubit(
                     statusRepository:
@@ -74,7 +75,7 @@ class TechnicianResubmitView extends StatelessWidget {
             );
             Navigator.pushAndRemoveUntil(
               context,
-              MaterialPageRoute(
+              SlideRightRouteWithBuild(
                 builder: (_) => BlocProvider(
                   create: (_) => LoginCubit(
                     authRepository:
@@ -114,46 +115,60 @@ class TechnicianResubmitView extends StatelessWidget {
                     topLeft: Radius.circular(44.r),
                     topRight: Radius.circular(44.r),
                   ),
-                  child: Container(
-                    height: 629.h,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFFDFDFD),
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(44.r),
-                        topRight: Radius.circular(44.r),
+                  child: TweenAnimationBuilder<double>(
+                    tween: Tween(begin: 0.0, end: 1.0),
+                    duration: const Duration(milliseconds: 600),
+                    curve: Curves.easeOutCubic,
+                    builder: (context, value, child) {
+                      return Transform.translate(
+                        offset: Offset(0, 200 * (1 - value)),
+                        child: Opacity(
+                          opacity: value,
+                          child: child,
+                        ),
+                      );
+                    },
+                    child: Container(
+                      height: 629.h,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFDFDFD),
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(44.r),
+                          topRight: Radius.circular(44.r),
+                        ),
                       ),
-                    ),
-                    child: SingleChildScrollView(
-                      padding: EdgeInsets.fromLTRB(
-                          16.w, 44.h, 16.w, 44.h + keyboardPadding),
-                      physics: const ClampingScrollPhysics(),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text.rich(
-                            TextSpan(
-                              style: GoogleFonts.cairo(
-                                fontSize: 20.sp,
-                                fontWeight: FontWeight.w600,
-                                color: const Color(0xFF232222),
-                                height: 1.5,
-                              ),
-                              children: <TextSpan>[
-                                TextSpan(text: "اعاده ارسال البيانات "),
-                                TextSpan(
-                                  text: "المرفوضة",
-                                  style: const TextStyle(
-                                    color: Colors.blueAccent,
-                                    fontWeight: FontWeight.w600,
-                                  ),
+                      child: SingleChildScrollView(
+                        padding: EdgeInsets.fromLTRB(
+                            16.w, 44.h, 16.w, 44.h + keyboardPadding),
+                        physics: const ClampingScrollPhysics(),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text.rich(
+                              TextSpan(
+                                style: GoogleFonts.cairo(
+                                  fontSize: 20.sp,
+                                  fontWeight: FontWeight.w600,
+                                  color: const Color(0xFF232222),
+                                  height: 1.5,
                                 ),
-                              ],
+                                children: <TextSpan>[
+                                  TextSpan(text: "اعاده ارسال البيانات "),
+                                  TextSpan(
+                                    text: "المرفوضة",
+                                    style: const TextStyle(
+                                      color: Colors.blueAccent,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                          SizedBox(height: 24.h),
-                          const TechnicianResubmitForm(),
-                        ],
+                            SizedBox(height: 24.h),
+                            const TechnicianResubmitForm(),
+                          ],
+                        ),
                       ),
                     ),
                   ),

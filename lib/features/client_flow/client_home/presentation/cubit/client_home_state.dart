@@ -20,3 +20,8 @@ class HomeUnauthorized extends HomeState {
   final String message;
   HomeUnauthorized(this.message);
 }
+
+class HomeUnreadCountUpdated extends HomeState {
+  final int count;
+  HomeUnreadCountUpdated(this.count);
+}

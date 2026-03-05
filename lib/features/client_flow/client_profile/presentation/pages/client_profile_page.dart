@@ -64,7 +64,7 @@ class _ClientProfilePageViewState extends State<ClientProfilePageView> {
     );
     Navigator.pushAndRemoveUntil(
       context,
-      MaterialPageRoute(
+      SlideRightRouteWithBuild(
         builder: (context) => BlocProvider(
           create: (context) => LoginCubit(authRepository: AuthRepository()),
           child: const LoginPage(),
@@ -199,67 +199,95 @@ class _ClientProfilePageViewState extends State<ClientProfilePageView> {
                       alignment: Alignment.topCenter,
                       child: Column(
                         children: [
-                          Container(
-                            width: 100.w,
-                            height: 100.h,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Colors.white.withOpacity(0.2),
-                              border:
-                                  Border.all(color: Colors.white, width: 4.w),
-                            ),
-                            child: ClipOval(
-                              child: _displayImage.isEmpty
-                                  ? const Center(
-                                      child: CircularProgressIndicator(
-                                        color: Colors.white,
-                                        strokeWidth: 3,
+                          TweenAnimationBuilder<double>(
+                            tween: Tween(begin: 0.0, end: 1.0),
+                            duration: const Duration(milliseconds: 600),
+                            curve: Curves.easeOutCubic,
+                            builder: (context, value, child) {
+                              return Transform.scale(
+                                scale: value,
+                                child: Opacity(
+                                  opacity: value,
+                                  child: child,
+                                ),
+                              );
+                            },
+                            child: Container(
+                              width: 100.w,
+                              height: 100.h,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.white.withOpacity(0.2),
+                                border:
+                                    Border.all(color: Colors.white, width: 4.w),
+                              ),
+                              child: ClipOval(
+                                child: _displayImage.isEmpty
+                                    ? const Center(
+                                        child: CircularProgressIndicator(
+                                          color: Colors.white,
+                                          strokeWidth: 3,
+                                        ),
+                                      )
+                                    : Image.network(
+                                        _displayImage,
+                                        fit: BoxFit.cover,
+                                        width: 100.w,
+                                        height: 100.h,
+                                        loadingBuilder:
+                                            (context, child, loadingProgress) {
+                                          if (loadingProgress == null) {
+                                            return child;
+                                          }
+                                          return Center(
+                                            child: CircularProgressIndicator(
+                                              color: _primaryBlue,
+                                              strokeWidth: 3,
+                                              value: loadingProgress
+                                                          .expectedTotalBytes !=
+                                                      null
+                                                  ? loadingProgress
+                                                          .cumulativeBytesLoaded /
+                                                      (loadingProgress
+                                                              .expectedTotalBytes ??
+                                                          1)
+                                                  : null,
+                                            ),
+                                          );
+                                        },
+                                        errorBuilder:
+                                            (context, error, stackTrace) {
+                                          return const Icon(
+                                            Icons.person,
+                                            size: 50,
+                                            color: Colors.grey,
+                                          );
+                                        },
                                       ),
-                                    )
-                                  : Image.network(
-                                      _displayImage,
-                                      fit: BoxFit.cover,
-                                      width: 100.w,
-                                      height: 100.h,
-                                      loadingBuilder:
-                                          (context, child, loadingProgress) {
-                                        if (loadingProgress == null) {
-                                          return child;
-                                        }
-                                        return Center(
-                                          child: CircularProgressIndicator(
-                                            color: _primaryBlue,
-                                            strokeWidth: 3,
-                                            value: loadingProgress
-                                                        .expectedTotalBytes !=
-                                                    null
-                                                ? loadingProgress
-                                                        .cumulativeBytesLoaded /
-                                                    (loadingProgress
-                                                            .expectedTotalBytes ??
-                                                        1)
-                                                : null,
-                                          ),
-                                        );
-                                      },
-                                      errorBuilder:
-                                          (context, error, stackTrace) {
-                                        return const Icon(
-                                          Icons.person,
-                                          size: 50,
-                                          color: Colors.grey,
-                                        );
-                                      },
-                                    ),
+                              ),
                             ),
                           ),
                           SizedBox(height: 8.h),
-                          Text(
-                            userName,
-                            style: GoogleFonts.cairo(
-                              fontSize: 20.sp,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                          TweenAnimationBuilder<double>(
+                            tween: Tween(begin: 0.0, end: 1.0),
+                            duration: const Duration(milliseconds: 800),
+                            curve: Curves.easeOutCubic,
+                            builder: (context, value, child) {
+                              return Transform.translate(
+                                offset: Offset(0, 10 * (1 - value)),
+                                child: Opacity(
+                                  opacity: value,
+                                  child: child,
+                                ),
+                              );
+                            },
+                            child: Text(
+                              userName,
+                              style: GoogleFonts.cairo(
+                                fontSize: 20.sp,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
                             ),
                           ),
                         ],
@@ -274,166 +302,178 @@ class _ClientProfilePageViewState extends State<ClientProfilePageView> {
                       topLeft: Radius.circular(44.r),
                       topRight: Radius.circular(44.r),
                     ),
-                    child: Container(
-                      height: 560.h,
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFFDFDFD),
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(44.r),
-                          topRight: Radius.circular(44.r),
+                    child: TweenAnimationBuilder<double>(
+                      tween: Tween(begin: 0.0, end: 1.0),
+                      duration: const Duration(milliseconds: 600),
+                      curve: Curves.easeOutCubic,
+                      builder: (context, value, child) {
+                        return Transform.translate(
+                          offset: Offset(0, 200 * (1 - value)),
+                          child: child,
+                        );
+                      },
+                      child: Container(
+                        height: 560.h,
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFDFDFD),
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(44.r),
+                            topRight: Radius.circular(44.r),
+                          ),
                         ),
-                      ),
-                      child: SingleChildScrollView(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            SizedBox(height: 12.h),
-                            Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  ElevatedButton.icon(
-                                    onPressed: () async {
-                                      final profileCubit =
-                                          context.read<ProfileCubit>();
-                                      await Navigator.push(
-                                        context,
-                                        SlideRightRouteWithBuild(
-                                          builder: (context) =>
-                                              BlocProvider.value(
-                                            value: profileCubit,
-                                            child: ClientUpdateProfilePage(
-                                              initialName: userName,
-                                              currentImageUrl: _displayImage,
-                                              token: widget.token ?? "",
+                        child: SingleChildScrollView(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              SizedBox(height: 12.h),
+                              Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    ElevatedButton.icon(
+                                      onPressed: () async {
+                                        final profileCubit =
+                                            context.read<ProfileCubit>();
+                                        await Navigator.push(
+                                          context,
+                                          SlideRightRouteWithBuild(
+                                            builder: (context) =>
+                                                BlocProvider.value(
+                                              value: profileCubit,
+                                              child: ClientUpdateProfilePage(
+                                                initialName: userName,
+                                                currentImageUrl: _displayImage,
+                                                token: widget.token ?? "",
+                                              ),
                                             ),
                                           ),
+                                        );
+                                        if (_displayImage.isNotEmpty) {
+                                          await NetworkImage(_displayImage)
+                                              .evict();
+                                        }
+                                        await _loadLocalData();
+                                        profileCubit.loadProfile(
+                                            widget.token ?? "", userName);
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor:
+                                            const Color(0xFF4C85FB),
+                                        elevation: 0,
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: 24.w, vertical: 8.h),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(12.r),
                                         ),
-                                      );
-                                      if (_displayImage.isNotEmpty) {
-                                        await NetworkImage(_displayImage)
-                                            .evict();
-                                      }
-                                      await _loadLocalData();
-                                      profileCubit.loadProfile(
-                                          widget.token ?? "", userName);
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: const Color(0xFF4C85FB),
-                                      elevation: 0,
-                                      padding: EdgeInsets.symmetric(
-                                          horizontal: 24.w, vertical: 8.h),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(12.r),
+                                      ),
+                                      icon: Icon(Icons.edit,
+                                          color: Colors.white, size: 16.r),
+                                      label: Text(
+                                        "عدل ملفك الشخصي",
+                                        style: GoogleFonts.cairo(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.w600),
                                       ),
                                     ),
-                                    icon: Icon(Icons.edit,
-                                        color: Colors.white, size: 16.r),
-                                    label: Text(
-                                      "عدل ملفك الشخصي",
-                                      style: GoogleFonts.cairo(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.w600),
+                                  ],
+                                ),
+                              ),
+                              SizedBox(height: 16.h),
+                              Container(
+                                margin: EdgeInsets.symmetric(horizontal: 20.w),
+                                padding: EdgeInsets.symmetric(vertical: 8.h),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(20.r),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: _primaryBlue.withOpacity(0.1),
+                                      blurRadius: 10.r,
+                                      offset: Offset(0, 4.h),
                                     ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            SizedBox(height: 16.h),
-                            Container(
-                              margin: EdgeInsets.symmetric(horizontal: 20.w),
-                              padding: EdgeInsets.symmetric(vertical: 8.h),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(20.r),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: _primaryBlue.withOpacity(0.1),
-                                    blurRadius: 10.r,
-                                    offset: Offset(0, 4.h),
-                                  ),
-                                ],
-                                border: Border.all(
-                                    color: Colors.grey.withOpacity(0.2),
-                                    width: 1.w),
-                              ),
-                              child: Column(
-                                children: [
-                                  _buildSettingItem(
-                                    icon: Icons.notifications_none_outlined,
-                                    title: "الإشعارات",
-                                    subtitle:
-                                        "اختار لو تحب توصلك تنبيهات عن الحجوزات أو العروض",
-                                    trailing: SizedBox(
-                                      width: 50.w,
-                                      height: 20.h,
-                                      child: Switch(
-                                        value: _notificationsEnabled,
-                                        activeThumbColor: _primaryBlue,
-                                        onChanged: (val) => setState(
-                                            () => _notificationsEnabled = val),
+                                  ],
+                                  border: Border.all(
+                                      color: Colors.grey.withOpacity(0.2),
+                                      width: 1.w),
+                                ),
+                                child: Column(
+                                  children: [
+                                    _buildSettingItem(
+                                      icon: Icons.notifications_none_outlined,
+                                      title: "الإشعارات",
+                                      subtitle:
+                                          "اختار لو تحب توصلك تنبيهات عن الحجوزات أو العروض",
+                                      trailing: SizedBox(
+                                        width: 50.w,
+                                        height: 20.h,
+                                        child: Switch(
+                                          value: _notificationsEnabled,
+                                          activeThumbColor: _primaryBlue,
+                                          onChanged: (val) => setState(() =>
+                                              _notificationsEnabled = val),
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                  Divider(
-                                      height: 1.h,
-                                      indent: 60.w,
-                                      endIndent: 20.w),
-                                  _buildSettingItem(
-                                    icon: Icons.help_outline,
-                                    title: "محتاج مساعدة؟",
-                                    subtitle: "اعرف حقوقك وحقوق الحرفيين",
-                                    trailing: Icon(Icons.arrow_forward_ios,
-                                        size: 16.r, color: Colors.grey),
-                                    onTap: () {},
-                                  ),
-                                  Divider(
-                                      height: 1.h,
-                                      indent: 60.w,
-                                      endIndent: 20.w),
-                                  _buildSettingItem(
-                                    icon: Icons.description_outlined,
-                                    title: "الشروط والأحكام",
-                                    subtitle:
-                                        "تواصل مع فريق الدعم لأي مشكلة أو استفسار",
-                                    trailing: Icon(Icons.arrow_forward_ios,
-                                        size: 16.r, color: Colors.grey),
-                                    onTap: () {},
-                                  ),
-                                  Divider(
-                                      height: 1.h,
-                                      indent: 60.w,
-                                      endIndent: 20.w),
-                                  _buildSettingItem(
-                                    icon: Icons.logout,
-                                    title: "حذف الحساب",
-                                    subtitle:
-                                        "احذف حسابك وجميع بياناتك نهائياً",
-                                    onTap: () {
-                                      _onDeleteAccountPressed(context);
-                                    },
-                                  ),
-                                  Divider(
-                                      height: 1.h,
-                                      indent: 60.w,
-                                      endIndent: 20.w),
-                                  _buildSettingItem(
-                                    icon: Icons.logout,
-                                    title: "تسجيل الخروج",
-                                    subtitle: "اخرج من الحساب بأمان",
-                                    iconColor: _dangerRed,
-                                    titleColor: _dangerRed,
-                                    onTap: () {
-                                      _onLogoutPressed(context);
-                                    },
-                                  ),
-                                ],
+                                    Divider(
+                                        height: 1.h,
+                                        indent: 60.w,
+                                        endIndent: 20.w),
+                                    _buildSettingItem(
+                                      icon: Icons.help_outline,
+                                      title: "محتاج مساعدة؟",
+                                      subtitle: "اعرف حقوقك وحقوق الحرفيين",
+                                      trailing: Icon(Icons.arrow_forward_ios,
+                                          size: 16.r, color: Colors.grey),
+                                      onTap: () {},
+                                    ),
+                                    Divider(
+                                        height: 1.h,
+                                        indent: 60.w,
+                                        endIndent: 20.w),
+                                    _buildSettingItem(
+                                      icon: Icons.description_outlined,
+                                      title: "الشروط والأحكام",
+                                      subtitle:
+                                          "تواصل مع فريق الدعم لأي مشكلة أو استفسار",
+                                      trailing: Icon(Icons.arrow_forward_ios,
+                                          size: 16.r, color: Colors.grey),
+                                      onTap: () {},
+                                    ),
+                                    Divider(
+                                        height: 1.h,
+                                        indent: 60.w,
+                                        endIndent: 20.w),
+                                    _buildSettingItem(
+                                      icon: Icons.logout,
+                                      title: "حذف الحساب",
+                                      subtitle:
+                                          "احذف حسابك وجميع بياناتك نهائياً",
+                                      onTap: () {
+                                        _onDeleteAccountPressed(context);
+                                      },
+                                    ),
+                                    Divider(
+                                        height: 1.h,
+                                        indent: 60.w,
+                                        endIndent: 20.w),
+                                    _buildSettingItem(
+                                      icon: Icons.logout,
+                                      title: "تسجيل الخروج",
+                                      subtitle: "اخرج من الحساب بأمان",
+                                      iconColor: _dangerRed,
+                                      titleColor: _dangerRed,
+                                      onTap: () {
+                                        _onLogoutPressed(context);
+                                      },
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                            SizedBox(height: 30.h),
-                          ],
+                              SizedBox(height: 30.h),
+                            ],
+                          ),
                         ),
                       ),
                     ),
