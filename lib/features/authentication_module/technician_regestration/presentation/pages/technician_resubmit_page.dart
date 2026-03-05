@@ -98,7 +98,7 @@ class TechnicianResubmitView extends StatelessWidget {
                     padding: EdgeInsets.only(top: 68.h, bottom: 68.h),
                     color: const Color(0xFF3775FA),
                     width: double.infinity,
-                    height: 267.h,
+                    height: double.infinity,
                     child: Align(
                       alignment: Alignment.topCenter,
                       child: SizedBox(
