@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1018829688873",
+    "project_id": "el7erafe",
+    "storage_bucket": "el7erafe.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1018829688873:android:b171a04da630be92ab8c38",
+        "android_client_info": {
+          "package_name": "com.example.el7erafe"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyATJIqI_QkNgtXAl9JYCF7_FSyGoh7Qui4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

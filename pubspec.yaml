@@ -1,6 +1,7 @@
 name: el7erafe
 description: "Software Solution for fixing the gap between the users and technicians."
 publish_to: 'none'
+version: 1.0.0+2
 
 environment:
   sdk: '>=3.0.0 <4.0.0' 
@@ -35,6 +36,7 @@ dependencies:
   geolocator: ^14.0.2
   flutter_image_compress: ^2.3.0
   path_provider: ^2.1.2
+  firebase_core: ^4.5.0
 
 cupertino_icons: ^1.0.8
 
