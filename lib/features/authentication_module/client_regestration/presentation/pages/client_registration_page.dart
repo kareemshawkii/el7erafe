@@ -43,6 +43,7 @@ class ClientRegistrationView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final double keyboardPadding = MediaQuery.of(context).viewInsets.bottom;
+
     return Scaffold(
       resizeToAvoidBottomInset: true,
       body: BlocListener<ClientRegistrationCubit, ClientRegistrationState>(
@@ -83,87 +84,92 @@ class ClientRegistrationView extends StatelessWidget {
           onTap: () => FocusScope.of(context).unfocus(),
           child: Stack(
             children: [
-              Align(
-                alignment: Alignment.topCenter,
-                child: Container(
-                    padding: EdgeInsets.only(top: 68.h, bottom: 68.h),
-                    color: const Color(0xFF3775FA),
-                    width: double.infinity,
-                    height: double.infinity,
-                    child: Align(
-                      alignment: Alignment.topCenter,
-                      child: SizedBox(
-                        height: 131.h,
-                        width: 131.w,
-                        child: Image.asset('images/Logo.png', fit: BoxFit.fill),
-                      ),
-                    )),
+              Container(
+                width: double.infinity,
+                height: double.infinity,
+                color: const Color(0xFF3775FA),
               ),
-              Align(
-                  alignment: Alignment.bottomCenter,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(44.r),
-                      topRight: Radius.circular(44.r),
-                    ),
-                    child: TweenAnimationBuilder<double>(
-                      tween: Tween(begin: 0.0, end: 1.0),
-                      duration: const Duration(milliseconds: 600),
-                      curve: Curves.easeOutCubic,
-                      builder: (context, value, child) {
-                        return Transform.translate(
-                          offset: Offset(0, 200 * (1 - value)),
-                          child: Opacity(
-                            opacity: value,
-                            child: child,
-                          ),
-                        );
-                      },
-                      child: Container(
-                        height: 629.h,
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          color: Color(0xFFFDFDFD),
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(44.r),
-                            topRight: Radius.circular(44.r),
-                          ),
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                height: 250.h,
+                child: Center(
+                  child: SizedBox(
+                    height: 150.h,
+                    width: 150.w,
+                    child: Image.asset('images/Logo.png', fit: BoxFit.fill),
+                  ),
+                ),
+              ),
+              Positioned(
+                top: 230.h,
+                bottom: 0,
+                left: 0,
+                right: 0,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(44.r),
+                    topRight: Radius.circular(44.r),
+                  ),
+                  child: TweenAnimationBuilder<double>(
+                    tween: Tween(begin: 0.0, end: 1.0),
+                    duration: const Duration(milliseconds: 600),
+                    curve: Curves.easeOutCubic,
+                    builder: (context, value, child) {
+                      return Transform.translate(
+                        offset: Offset(0, 200 * (1 - value)),
+                        child: Opacity(
+                          opacity: value,
+                          child: child,
                         ),
-                        child: SingleChildScrollView(
-                          padding: EdgeInsets.fromLTRB(
-                              16.w, 44.h, 16.w, 44.h + keyboardPadding),
-                          physics: const ClampingScrollPhysics(),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text.rich(
-                                TextSpan(
-                                  style: GoogleFonts.cairo(
-                                    fontSize: 20.sp,
-                                    fontWeight: FontWeight.w600,
-                                    color: const Color(0xFF232222),
-                                    height: 1.5,
-                                  ),
-                                  children: <TextSpan>[
-                                    TextSpan(text: "خلينا نعمل حساب"),
-                                    TextSpan(
-                                      text: " مستخدم جديد",
-                                      style: const TextStyle(
-                                        color: Colors.blueAccent,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ],
+                      );
+                    },
+                    child: Container(
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFDFDFD),
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(44.r),
+                          topRight: Radius.circular(44.r),
+                        ),
+                      ),
+                      child: SingleChildScrollView(
+                        padding: EdgeInsets.fromLTRB(
+                            16.w, 44.h, 16.w, 44.h + keyboardPadding),
+                        physics: const ClampingScrollPhysics(),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text.rich(
+                              TextSpan(
+                                style: GoogleFonts.cairo(
+                                  fontSize: 20.sp,
+                                  fontWeight: FontWeight.w600,
+                                  color: const Color(0xFF232222),
+                                  height: 1.5,
                                 ),
+                                children: const <TextSpan>[
+                                  TextSpan(text: "خلينا نعمل حساب"),
+                                  TextSpan(
+                                    text: " مستخدم جديد",
+                                    style: TextStyle(
+                                      color: Colors.blueAccent,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
                               ),
-                              SizedBox(height: 24.h),
-                              const ClientRegistrationForm(),
-                            ],
-                          ),
+                            ),
+                            SizedBox(height: 24.h),
+                            const ClientRegistrationForm(),
+                          ],
                         ),
                       ),
                     ),
-                  )),
+                  ),
+                ),
+              ),
             ],
           ),
         ),

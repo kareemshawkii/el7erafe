@@ -100,24 +100,29 @@ class _ResetPasswordPageState extends State<ResetPasswordView> {
           onTap: () => FocusScope.of(context).unfocus(),
           child: Stack(
             children: [
-              Align(
-                alignment: Alignment.topCenter,
-                child: Container(
-                    padding: EdgeInsets.only(top: 68.h, bottom: 68.h),
-                    color: const Color(0xFF3775FA),
-                    width: double.infinity,
-                    height: double.infinity,
-                    child: Align(
-                      alignment: Alignment.topCenter,
-                      child: SizedBox(
-                        height: 131.h,
-                        width: 131.w,
-                        child: Image.asset('images/Logo.png', fit: BoxFit.fill),
-                      ),
-                    )),
+              Container(
+                width: double.infinity,
+                height: double.infinity,
+                color: const Color(0xFF3775FA),
               ),
-              Align(
-                alignment: Alignment.bottomCenter,
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                height: 250.h,
+                child: Center(
+                  child: SizedBox(
+                    height: 150.h,
+                    width: 150.w,
+                    child: Image.asset('images/Logo.png', fit: BoxFit.fill),
+                  ),
+                ),
+              ),
+              Positioned(
+                top: 230.h,
+                bottom: 0,
+                left: 0,
+                right: 0,
                 child: ClipRRect(
                   borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(44.r),
@@ -137,7 +142,6 @@ class _ResetPasswordPageState extends State<ResetPasswordView> {
                       );
                     },
                     child: Container(
-                      height: 629.h,
                       width: double.infinity,
                       decoration: BoxDecoration(
                         color: const Color(0xFFFDFDFD),
@@ -149,6 +153,7 @@ class _ResetPasswordPageState extends State<ResetPasswordView> {
                       child: SingleChildScrollView(
                         padding: EdgeInsets.fromLTRB(
                             16.w, 44.h, 16.w, 44.h + keyboardPadding),
+                        physics: const ClampingScrollPhysics(),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
@@ -231,7 +236,7 @@ class _ResetPasswordPageState extends State<ResetPasswordView> {
                                             return 'من فضلك دخل كلمة السر';
                                           }
                                           if (!RegExp(
-                                                  r'^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{10,})')
+                                                  r'''^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[~!@#$%^&*()_\-+=\[\]{}|\\:;"<>,.?/`'])(?=.{10,})''')
                                               .hasMatch(value)) {
                                             return 'كلمة السر لازم تحتوي على حرف كبير، رقم، رمز وطولها 10 أحرف على الأقل';
                                           }
@@ -275,7 +280,7 @@ class _ResetPasswordPageState extends State<ResetPasswordView> {
                                             SizedBox(height: 8.h),
                                             _buildValidationCheckItem(
                                               text:
-                                                  '(A-Z) حرف كابيتال واحد على الأقل ',
+                                                  'حرف كابيتال واحد على الأقل (A-Z) ',
                                               isValid: state.hasCapitalLetter,
                                             ),
                                             SizedBox(height: 8.h),
@@ -286,7 +291,7 @@ class _ResetPasswordPageState extends State<ResetPasswordView> {
                                             SizedBox(height: 8.h),
                                             _buildValidationCheckItem(
                                               text:
-                                                  '(!@#) رمز خاص واحد على الأقل ',
+                                                  'رمز خاص واحد على الأقل (!@#) ',
                                               isValid: state.hasSpecialChar,
                                             ),
                                           ],
@@ -351,7 +356,7 @@ class _ResetPasswordPageState extends State<ResetPasswordView> {
                                             return 'من فضلك دخل كلمه السر مره تانيه للتأكيد';
                                           }
                                           if (!RegExp(
-                                                  r'^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{10,})')
+                                                  r'''^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[~!@#$%^&*()_\-+=\[\]{}|\\:;"<>,.?/`'])(?=.{10,})''')
                                               .hasMatch(value)) {
                                             return 'كلمة السر لازم تحتوي على حرف كبير، رقم، رمز وطولها 10 أحرف على الأقل';
                                           }

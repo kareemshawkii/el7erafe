@@ -35,6 +35,7 @@ class LoginView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final double keyboardPadding = MediaQuery.of(context).viewInsets.bottom;
+
     return Scaffold(
       resizeToAvoidBottomInset: true,
       body: BlocListener<LoginCubit, LoginState>(
@@ -61,14 +62,13 @@ class LoginView extends StatelessWidget {
               if (!context.mounted) return;
               Navigator.pushAndRemoveUntil(
                 context,
-                SlideRightRouteWithBuild(
-                    builder: (_) => const TechHomePage()),
+                SlideRightRouteWithBuild(builder: (_) => const TechHomePage()),
                 (route) => false,
               );
             } else {
               if (!context.mounted) return;
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
+                const SnackBar(
                   content: Text('حصلت مشكله غير متوقعه جرب تسجل تاني',
                       textDirection: TextDirection.rtl),
                   backgroundColor: Colors.red,
@@ -215,24 +215,29 @@ class LoginView extends StatelessWidget {
           onTap: () => FocusScope.of(context).unfocus(),
           child: Stack(
             children: [
-              Align(
-                alignment: Alignment.topCenter,
-                child: Container(
-                    padding: EdgeInsets.only(top: 68.h, bottom: 68.h),
-                    color: const Color(0xFF3775FA),
-                    width: double.infinity,
-                    height: double.infinity,
-                    child: Align(
-                      alignment: Alignment.topCenter,
-                      child: SizedBox(
-                        height: 131.h,
-                        width: 131.w,
-                        child: Image.asset('images/Logo.png', fit: BoxFit.fill),
-                      ),
-                    )),
+              Container(
+                width: double.infinity,
+                height: double.infinity,
+                color: const Color(0xFF3775FA),
               ),
-              Align(
-                alignment: Alignment.bottomCenter,
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                height: 250.h,
+                child: Center(
+                  child: SizedBox(
+                    height: 150.h,
+                    width: 150.w,
+                    child: Image.asset('images/Logo.png', fit: BoxFit.fill),
+                  ),
+                ),
+              ),
+              Positioned(
+                top: 230.h,
+                bottom: 0,
+                left: 0,
+                right: 0,
                 child: ClipRRect(
                   borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(44.r),
@@ -252,7 +257,6 @@ class LoginView extends StatelessWidget {
                       );
                     },
                     child: Container(
-                      height: 629.h,
                       width: double.infinity,
                       decoration: BoxDecoration(
                         color: const Color(0xFFFDFDFD),

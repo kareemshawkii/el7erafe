@@ -98,7 +98,7 @@ class OnBoardingPage extends StatelessWidget {
                                     BorderRadius.circular(isActive ? 4.r : 8.r),
                               ),
                             );
-                          }),
+                          }).reversed.toList(),
                         ),
                         Container(
                           height: 182.h,

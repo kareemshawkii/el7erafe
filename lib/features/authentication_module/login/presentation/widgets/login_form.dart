@@ -5,6 +5,7 @@ import 'package:el7erafe/features/authentication_module/forget_password/presenta
 import 'package:el7erafe/features/authentication_module/select_type/presentation/cubit/select_type_cubit.dart';
 import 'package:el7erafe/features/authentication_module/select_type/presentation/pages/select_type.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -62,10 +63,14 @@ class _LoginFormState extends State<LoginForm> {
               autovalidateMode: AutovalidateMode.onUserInteraction,
               textAlign: TextAlign.right,
               keyboardType: TextInputType.phone,
+              inputFormatters: [
+                FilteringTextInputFormatter.digitsOnly,
+                LengthLimitingTextInputFormatter(11),
+              ],
               decoration: InputDecoration(
                 prefixIcon: Icon(
                   Iconsax.call,
-                  color: Color(0xFF727070),
+                  color: const Color(0xFF727070),
                   size: 18.r,
                 ),
                 hintText: '01X XXX XXXX',
@@ -88,10 +93,12 @@ class _LoginFormState extends State<LoginForm> {
                 ),
               ),
               validator: (value) {
-                if (value == null || value.isEmpty) {
+                final cleanValue = value?.trim() ?? '';
+
+                if (cleanValue.isEmpty) {
                   return 'من فضلك دخل رقم التليفون';
                 }
-                if (!RegExp(r'^01[0125][0-9]{8}$').hasMatch(value)) {
+                if (!RegExp(r'^01[0125][0-9]{8}$').hasMatch(cleanValue)) {
                   return 'من فضلك دخل رقم التليفون صحيح';
                 }
                 return null;

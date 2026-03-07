@@ -74,8 +74,8 @@ class ServiceItemCardState extends State<ServiceItemCard> {
             children: [
               CachedNetworkImage(
                 imageUrl: widget.service.imageUrl,
-                width: 60.w,
-                height: 60.h,
+                width: 80.w,
+                height: 80.h,
                 placeholder: (context, url) => Shimmer.fromColors(
                   baseColor: Colors.grey[300]!,
                   highlightColor: Colors.grey[100]!,
@@ -95,7 +95,7 @@ class ServiceItemCardState extends State<ServiceItemCard> {
                 child: Text(
                   widget.service.name,
                   style: GoogleFonts.cairo(
-                    fontSize: 14.sp,
+                    fontSize: 15.sp,
                     fontWeight: _isPressed ? FontWeight.bold : FontWeight.w600,
                     color:
                         _isPressed ? const Color(0xFF3775FA) : Colors.black87,

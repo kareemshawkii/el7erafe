@@ -308,8 +308,11 @@ class _TechProfilePageViewState extends State<TechProfilePageView> {
                     ),
                   ),
                 ),
-                Align(
-                  alignment: Alignment.bottomCenter,
+                Positioned(
+                  top: 200.h, 
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
                   child: ClipRRect(
                     borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(44.r),
@@ -326,7 +329,6 @@ class _TechProfilePageViewState extends State<TechProfilePageView> {
                         );
                       },
                       child: Container(
-                        height: 560.h,
                         width: double.infinity,
                         decoration: BoxDecoration(
                           color: const Color(0xFFFDFDFD),

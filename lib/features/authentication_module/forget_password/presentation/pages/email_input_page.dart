@@ -5,6 +5,7 @@ import 'package:el7erafe/features/authentication_module/forget_password/presenta
 import 'package:el7erafe/features/authentication_module/forget_password/presentation/cubit/forget_otp_cubit.dart';
 import 'package:el7erafe/features/authentication_module/forget_password/presentation/pages/forget_otp_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -27,7 +28,7 @@ class EmailInputView extends StatelessWidget {
   void _onSendPressed(BuildContext context) {
     FocusScope.of(context).unfocus();
     if (_formKey.currentState!.validate()) {
-      context.read<EmailInputCubit>().sendEmail(_emailController.text);
+      context.read<EmailInputCubit>().sendEmail(_emailController.text.trim());
     }
   }
 
@@ -64,7 +65,7 @@ class EmailInputView extends StatelessWidget {
                     otpForgetRepository:
                         RepositoryProvider.of<OtpForgetRepository>(context),
                   ),
-                  child: ForgetOtpPage(email: _emailController.text),
+                  child: ForgetOtpPage(email: _emailController.text.trim()),
                 ),
               ),
             );
@@ -74,24 +75,29 @@ class EmailInputView extends StatelessWidget {
           onTap: () => FocusScope.of(context).unfocus(),
           child: Stack(
             children: [
-              Align(
-                alignment: Alignment.topCenter,
-                child: Container(
-                    padding: EdgeInsets.only(top: 68.h, bottom: 68.h),
-                    color: const Color(0xFF3775FA),
-                    width: double.infinity,
-                    height: double.infinity,
-                    child: Align(
-                      alignment: Alignment.topCenter,
-                      child: SizedBox(
-                        height: 131.h,
-                        width: 131.w,
-                        child: Image.asset('images/Logo.png', fit: BoxFit.fill),
-                      ),
-                    )),
+              Container(
+                width: double.infinity,
+                height: double.infinity,
+                color: const Color(0xFF3775FA),
               ),
-              Align(
-                alignment: Alignment.bottomCenter,
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                height: 250.h,
+                child: Center(
+                  child: SizedBox(
+                    height: 150.h,
+                    width: 150.w,
+                    child: Image.asset('images/Logo.png', fit: BoxFit.fill),
+                  ),
+                ),
+              ),
+              Positioned(
+                top: 230.h,
+                bottom: 0,
+                left: 0,
+                right: 0,
                 child: ClipRRect(
                   borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(44.r),
@@ -111,7 +117,6 @@ class EmailInputView extends StatelessWidget {
                       );
                     },
                     child: Container(
-                      height: 629.h,
                       width: double.infinity,
                       decoration: BoxDecoration(
                         color: const Color(0xFFFDFDFD),
@@ -123,6 +128,7 @@ class EmailInputView extends StatelessWidget {
                       child: SingleChildScrollView(
                         padding: EdgeInsets.fromLTRB(
                             16.w, 44.h, 16.w, 44.h + keyboardPadding),
+                        physics: const ClampingScrollPhysics(),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
@@ -163,6 +169,12 @@ class EmailInputView extends StatelessWidget {
                                   autovalidateMode:
                                       AutovalidateMode.onUserInteraction,
                                   textAlign: TextAlign.right,
+                                  keyboardType: TextInputType.emailAddress,
+                                  inputFormatters: [
+                                    FilteringTextInputFormatter.deny(
+                                        RegExp(r'\s')),
+                                    LengthLimitingTextInputFormatter(50),
+                                  ],
                                   decoration: InputDecoration(
                                     prefixIcon: Icon(
                                       Icons.email,
@@ -195,15 +207,16 @@ class EmailInputView extends StatelessWidget {
                                     ),
                                   ),
                                   validator: (value) {
-                                    if (value == null || value.isEmpty) {
+                                    final cleanValue = value?.trim() ?? '';
+                                    if (cleanValue.isEmpty) {
                                       return 'من فضلك دخل البريد الإلكتروني';
                                     }
                                     if (!RegExp(
                                             r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
-                                        .hasMatch(value)) {
+                                        .hasMatch(cleanValue)) {
                                       return 'من فضلك دخل بريد إلكتروني صحيح';
                                     }
-                                    if (value.length > 50) {
+                                    if (cleanValue.length > 50) {
                                       return 'البريد الإلكتروني لازم يكون أقل من 50 حرف';
                                     }
                                     return null;

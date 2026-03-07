@@ -7,6 +7,7 @@ import 'package:el7erafe/features/authentication_module/login/data/repositories/
 import 'package:el7erafe/features/authentication_module/login/presentation/cubit/login_cubit.dart';
 import 'package:el7erafe/features/authentication_module/login/presentation/pages/login_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -69,10 +70,13 @@ class _ClientRegistrationFormState extends State<ClientRegistrationForm> {
               controller: _nameController,
               autovalidateMode: AutovalidateMode.onUserInteraction,
               textAlign: TextAlign.right,
+              inputFormatters: [
+                LengthLimitingTextInputFormatter(50),
+              ],
               decoration: InputDecoration(
                 prefixIcon: Icon(
                   Icons.person_2_outlined,
-                  color: Color(0xFF727070),
+                  color: const Color(0xFF727070),
                   size: 18.r,
                 ),
                 hintText: 'ادخل اسمك ثنائي ',
@@ -95,18 +99,21 @@ class _ClientRegistrationFormState extends State<ClientRegistrationForm> {
                 ),
               ),
               validator: (value) {
-                if (value == null || value.isEmpty) {
+                final cleanValue = value?.trim() ?? '';
+                if (cleanValue.isEmpty) {
                   return 'من فضلك دخل اسمك الثنائي';
                 }
-                if (!RegExp(r'^([A-Za-z\u0600-\u06FF\s]+)$').hasMatch(value)) {
+                if (!RegExp(r'^([A-Za-z\u0600-\u06FF\s]+)$')
+                    .hasMatch(cleanValue)) {
                   return 'الاسم لازم يكون حروف عربية أو إنجليزية فقط';
                 }
                 if (!RegExp(
                         r'^[A-Za-z\u0600-\u06FF]+\s+[A-Za-z\u0600-\u06FF]+$')
-                    .hasMatch(value)) {
+                    .hasMatch(cleanValue)) {
                   return 'الرجاء إدخال الاسم الأول والأخير (مثال: كريم شوقي)';
                 }
-                if (value.length < 3 || value.length > 50) {
+
+                if (cleanValue.length < 3 || cleanValue.length > 50) {
                   return 'الاسم لازم يكون بين 3 و 50 حرف';
                 }
                 return null;
@@ -176,10 +183,15 @@ class _ClientRegistrationFormState extends State<ClientRegistrationForm> {
               controller: _emailController,
               autovalidateMode: AutovalidateMode.onUserInteraction,
               textAlign: TextAlign.right,
+              keyboardType: TextInputType.emailAddress,
+              inputFormatters: [
+                FilteringTextInputFormatter.deny(RegExp(r'\s')),
+                LengthLimitingTextInputFormatter(50),
+              ],
               decoration: InputDecoration(
                 prefixIcon: Icon(
                   Icons.email,
-                  color: Color(0xFF727070),
+                  color: const Color(0xFF727070),
                   size: 18.r,
                 ),
                 hintText: 'name@domain.com',
@@ -202,16 +214,21 @@ class _ClientRegistrationFormState extends State<ClientRegistrationForm> {
                 ),
               ),
               validator: (value) {
-                if (value == null || value.isEmpty) {
+                final cleanValue = value?.trim() ?? '';
+
+                if (cleanValue.isEmpty) {
                   return 'من فضلك دخل البريد الإلكتروني';
                 }
+
                 if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
-                    .hasMatch(value)) {
+                    .hasMatch(cleanValue)) {
                   return 'من فضلك دخل بريد إلكتروني صحيح';
                 }
-                if (value.length > 50) {
+
+                if (cleanValue.length > 50) {
                   return 'البريد الإلكتروني لازم يكون أقل من 50 حرف';
                 }
+
                 return null;
               },
             ),
@@ -270,10 +287,11 @@ class _ClientRegistrationFormState extends State<ClientRegistrationForm> {
                   return 'من فضلك دخل كلمة السر';
                 }
                 if (!RegExp(
-                        r'^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{10,})')
+                        r'''^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[~!@#$%^&*()_\-+=\[\]{}|\\:;"<>,.?/`'])(?=.{10,})''')
                     .hasMatch(value)) {
                   return 'كلمة السر لازم تحتوي على حرف كبير، رقم، رمز وطولها 10 أحرف على الأقل';
                 }
+
                 if (value.length < 10 || value.length > 32) {
                   return 'كلمة السر لازم تكون بين 10 و 32 حرف';
                 }
@@ -290,7 +308,7 @@ class _ClientRegistrationFormState extends State<ClientRegistrationForm> {
               style: GoogleFonts.cairo(
                   fontSize: 13.sp,
                   fontWeight: FontWeight.w400,
-                  color: Color(0xFF727070))),
+                  color: const Color(0xFF727070))),
           SizedBox(height: 12.h),
           BlocBuilder<PasswordStrengthCubit, PasswordStrengthState>(
             builder: (context, state) {
@@ -302,7 +320,7 @@ class _ClientRegistrationFormState extends State<ClientRegistrationForm> {
                   ),
                   SizedBox(height: 8.h),
                   _buildValidationCheckItem(
-                    text: '(A-Z) حرف كابيتال واحد على الأقل ',
+                    text: 'حرف كابيتال واحد على الأقل (A-Z) ',
                     isValid: state.hasCapitalLetter,
                   ),
                   SizedBox(height: 8.h),
@@ -312,7 +330,7 @@ class _ClientRegistrationFormState extends State<ClientRegistrationForm> {
                   ),
                   SizedBox(height: 8.h),
                   _buildValidationCheckItem(
-                    text: '(!@#) رمز خاص واحد على الأقل ',
+                    text: 'رمز خاص واحد على الأقل (!@#) ',
                     isValid: state.hasSpecialChar,
                   ),
                 ],
@@ -374,7 +392,7 @@ class _ClientRegistrationFormState extends State<ClientRegistrationForm> {
                   return 'من فضلك دخل كلمه السر مره تانيه للتأكيد';
                 }
                 if (!RegExp(
-                        r'^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{10,})')
+                        r'''^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[~!@#$%^&*()_\-+=\[\]{}|\\:;"<>,.?/`'])(?=.{10,})''')
                     .hasMatch(value)) {
                   return 'كلمة السر لازم تحتوي على حرف كبير، رقم، رمز وطولها 10 أحرف على الأقل';
                 }

@@ -1171,12 +1171,16 @@ class _SensitiveUpdateFlowSheetState extends State<_SensitiveUpdateFlowSheet> {
                   child: ElevatedButton(
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
+                        final cleanNewValue = _newValueController.text.trim();
+
                         if (widget.isForPhone) {
-                          context.read<TechProfileCubit>().finalizePhoneChange(
-                              widget.token, _newValueController.text);
+                          context
+                              .read<TechProfileCubit>()
+                              .finalizePhoneChange(widget.token, cleanNewValue);
                         } else {
-                          context.read<TechProfileCubit>().sendOtpToNewEmail(
-                              widget.token, _newValueController.text);
+                          context
+                              .read<TechProfileCubit>()
+                              .sendOtpToNewEmail(widget.token, cleanNewValue);
                         }
                       }
                     },
@@ -1274,8 +1278,8 @@ class _SensitiveUpdateFlowSheetState extends State<_SensitiveUpdateFlowSheet> {
                   if (_otpController.text.isNotEmpty) {
                     context.read<TechProfileCubit>().verifyNewEmail(
                           widget.token,
-                          _newValueController.text,
-                          _otpController.text,
+                          _newValueController.text.trim(),
+                          _otpController.text.trim(),
                         );
                   }
                 },
@@ -1423,7 +1427,7 @@ class _SensitiveUpdateFlowSheetState extends State<_SensitiveUpdateFlowSheet> {
                       context.read<TechProfileCubit>().verifyFirstOtp(
                             widget.token,
                             _currentEmail,
-                            _otpController.text,
+                            _otpController.text.trim(),
                             isForPhone: widget.isForPhone,
                           );
                     }
@@ -1453,6 +1457,15 @@ class _SensitiveUpdateFlowSheetState extends State<_SensitiveUpdateFlowSheet> {
       controller: controller,
       style: GoogleFonts.cairo(color: const Color(0xFF2D2D2D)),
       keyboardType: isPhone ? TextInputType.phone : TextInputType.emailAddress,
+      inputFormatters: isPhone
+          ? [
+              FilteringTextInputFormatter.digitsOnly,
+              LengthLimitingTextInputFormatter(11),
+            ]
+          : [
+              FilteringTextInputFormatter.deny(RegExp(r'\s')),
+              LengthLimitingTextInputFormatter(50),
+            ],
       decoration: InputDecoration(
           filled: true,
           fillColor: Colors.white,
@@ -1473,17 +1486,22 @@ class _SensitiveUpdateFlowSheetState extends State<_SensitiveUpdateFlowSheet> {
           contentPadding:
               EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h)),
       validator: (value) {
-        if (value == null || value.isEmpty) return "هذا الحقل مطلوب";
-        if (confirmController != null && value != confirmController.text) {
+        final cleanValue = value?.trim() ?? '';
+
+        if (cleanValue.isEmpty) return "هذا الحقل مطلوب";
+
+        if (confirmController != null &&
+            cleanValue != confirmController.text.trim()) {
           return "القيم غير متطابقة";
         }
 
         if (isPhone) {
-          if (value.length < 11 || value.length > 11) {
+          if (!RegExp(r'^01[0125][0-9]{8}$').hasMatch(cleanValue)) {
             return "رقم الهاتف غير صحيح";
           }
         } else {
-          if (!value.contains('@') || !value.contains('.')) {
+          if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+              .hasMatch(cleanValue)) {
             return "البريد الإلكتروني غير صحيح";
           }
         }

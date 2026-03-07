@@ -10,6 +10,7 @@ import 'package:el7erafe/features/authentication_module/technician_regestration/
 import 'package:el7erafe/features/authentication_module/technician_regestration/presentation/cubit/technician_registration_state.dart';
 import 'package:el7erafe/features/authentication_module/technician_regestration/presentation/widgets/location_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart'; 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -132,10 +133,10 @@ class _TechnicianRegistrationFormState
 
     if (_formKey.currentState!.validate()) {
       context.read<TechnicianRegistrationCubit>().register(
-            _nameController.text,
-            _phoneController.text,
-            _emailController.text,
-            _passwordController.text,
+            _nameController.text.trim(), 
+            _phoneController.text.trim(),
+            _emailController.text.trim(),
+            _passwordController.text, 
             profileImage!,
             frontIdImage!,
             backIdImage!,
@@ -181,6 +182,9 @@ class _TechnicianRegistrationFormState
                       controller: _nameController,
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                       textAlign: TextAlign.right,
+                      inputFormatters: [
+                        LengthLimitingTextInputFormatter(50),
+                      ],
                       decoration: InputDecoration(
                         prefixIcon: Icon(
                           Icons.person_2_outlined,
@@ -210,20 +214,22 @@ class _TechnicianRegistrationFormState
                         ),
                       ),
                       validator: (value) {
-                        if (value == null || value.isEmpty) {
+                        final cleanValue = value?.trim() ?? '';
+                        
+                        if (cleanValue.isEmpty) {
                           return 'من فضلك دخل اسمك الثنائي';
                         }
                         if (!RegExp(r'^([A-Za-z\u0600-\u06FF\s]+)$')
-                            .hasMatch(value)) {
+                            .hasMatch(cleanValue)) {
                           return 'الاسم لازم يكون حروف عربية أو إنجليزية فقط';
                         }
                         if (!RegExp(
                                 r'^[A-Za-z\u0600-\u06FF]+\s+[A-Za-z\u0600-\u06FF]+$')
-                            .hasMatch(value)) {
+                            .hasMatch(cleanValue)) {
                           return 'الرجاء إدخال الاسم الأول والأخير (مثال: كريم شوقي)';
                         }
-                        if (value.length > 50) {
-                          return 'الاسم لازم يكون أقل من 50 حرف';
+                        if (cleanValue.length < 3 || cleanValue.length > 50) {
+                          return 'الاسم لازم يكون بين 3 و 50 حرف';
                         }
                         return null;
                       },
@@ -243,6 +249,10 @@ class _TechnicianRegistrationFormState
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                       textAlign: TextAlign.right,
                       keyboardType: TextInputType.phone,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
+                        LengthLimitingTextInputFormatter(11),
+                      ],
                       decoration: InputDecoration(
                         prefixIcon: Icon(
                           Iconsax.call,
@@ -272,10 +282,11 @@ class _TechnicianRegistrationFormState
                         ),
                       ),
                       validator: (value) {
-                        if (value == null || value.isEmpty) {
+                        final cleanValue = value?.trim() ?? '';
+                        if (cleanValue.isEmpty) {
                           return 'من فضلك دخل رقم التليفون';
                         }
-                        if (!RegExp(r'^01[0125][0-9]{8}$').hasMatch(value)) {
+                        if (!RegExp(r'^01[0125][0-9]{8}$').hasMatch(cleanValue)) {
                           return 'من فضلك دخل رقم التليفون صحيح';
                         }
                         return null;
@@ -295,6 +306,11 @@ class _TechnicianRegistrationFormState
                       controller: _emailController,
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                       textAlign: TextAlign.right,
+                      keyboardType: TextInputType.emailAddress,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.deny(RegExp(r'\s')), 
+                        LengthLimitingTextInputFormatter(50),
+                      ],
                       decoration: InputDecoration(
                         prefixIcon: Icon(
                           Icons.email,
@@ -324,14 +340,15 @@ class _TechnicianRegistrationFormState
                         ),
                       ),
                       validator: (value) {
-                        if (value == null || value.isEmpty) {
+                        final cleanValue = value?.trim() ?? '';
+                        if (cleanValue.isEmpty) {
                           return 'من فضلك دخل البريد الإلكتروني';
                         }
                         if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
-                            .hasMatch(value)) {
+                            .hasMatch(cleanValue)) {
                           return 'من فضلك دخل بريد إلكتروني صحيح';
                         }
-                        if (value.length > 50) {
+                        if (cleanValue.length > 50) {
                           return 'البريد الإلكتروني لازم يكون أقل من 50 حرف';
                         }
                         return null;
@@ -649,7 +666,7 @@ class _TechnicianRegistrationFormState
                             return 'من فضلك دخل كلمة السر';
                           }
                           if (!RegExp(
-                                  r'^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{10,})')
+                                  r'''^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[~!@#$%^&*()_\-+=\[\]{}|\\:;"<>,.?/`'])(?=.{10,})''')
                               .hasMatch(value)) {
                             return 'كلمة السر لازم تحتوي على حرف كبير، رقم، رمز وطولها 10 أحرف على الأقل';
                           }
@@ -683,7 +700,7 @@ class _TechnicianRegistrationFormState
                             ),
                             SizedBox(height: 8.h),
                             _buildValidationCheckItem(
-                              text: '(A-Z) حرف كابيتال واحد على الأقل ',
+                              text: 'حرف كابيتال واحد على الأقل (A-Z) ',
                               isValid: state.hasCapitalLetter,
                             ),
                             SizedBox(height: 8.h),
@@ -693,7 +710,7 @@ class _TechnicianRegistrationFormState
                             ),
                             SizedBox(height: 8.h),
                             _buildValidationCheckItem(
-                              text: '(!@#) رمز خاص واحد على الأقل ',
+                              text: 'رمز خاص واحد على الأقل (!@#) ',
                               isValid: state.hasSpecialChar,
                             ),
                           ],
@@ -759,7 +776,7 @@ class _TechnicianRegistrationFormState
                             return 'من فضلك دخل كلمه السر مره تانيه للتأكيد';
                           }
                           if (!RegExp(
-                                  r'^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{10,})')
+                                  r'''^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[~!@#$%^&*()_\-+=\[\]{}|\\:;"<>,.?/`'])(?=.{10,})''')
                               .hasMatch(value)) {
                             return 'كلمة السر لازم تحتوي على حرف كبير، رقم، رمز وطولها 10 أحرف على الأقل';
                           }

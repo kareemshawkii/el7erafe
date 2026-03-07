@@ -6,7 +6,7 @@ class PasswordStrengthCubit extends Cubit<PasswordStrengthState> {
 
   final RegExp _capitalLetterRegex = RegExp(r'[A-Z]');
   final RegExp _numberRegex = RegExp(r'[0-9]');
-  final RegExp _specialCharRegex = RegExp(r'[!@#$%^&*(),.?":{}|<>]');
+  final RegExp _specialCharRegex = RegExp(r'''[~!@#$%^&*()_\-+=\[\]{}|\\:;"<>,.?/`']''');
 
   void validatePassword(String password) {
     final bool hasMinLength = password.length >= 10;

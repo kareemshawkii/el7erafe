@@ -140,7 +140,7 @@ class _MyAppState extends State<MyApp> {
         RepositoryProvider(create: (context) => ProfileRepository()),
         RepositoryProvider(create: (context) => TechnicianRequestRepository()),
       ],
-      child: ScreenUtilInit(
+      child:ScreenUtilInit(
         designSize: const Size(393, 852),
         minTextAdapt: true,
         splitScreenMode: true,
@@ -156,6 +156,7 @@ class _MyAppState extends State<MyApp> {
               textTheme: GoogleFonts.cairoTextTheme(),
               useMaterial3: true,
             ),
+            navigatorObservers: [UnfocusNavigatorObserver()],
             builder: (context, child) {
               final mediaQueryData = MediaQuery.of(context);
               final textScaler = mediaQueryData.textScaler;
@@ -163,14 +164,23 @@ class _MyAppState extends State<MyApp> {
                 minScaleFactor: 0.9,
                 maxScaleFactor: 1.0,
               );
-
-              return Directionality(
-                textDirection: TextDirection.rtl,
-                child: MediaQuery(
-                  data: mediaQueryData.copyWith(
-                    textScaler: clampedTextScaler,
+              return GestureDetector(
+                onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+                behavior: HitTestBehavior.opaque, 
+                child: Directionality(
+                  textDirection: TextDirection.rtl,
+                  child: MediaQuery(
+                    data: mediaQueryData.copyWith(
+                      textScaler: clampedTextScaler,
+                    ),
+                    child: SafeArea(
+                      top: false, 
+                      bottom: true, 
+                      left: false,
+                      right: false,
+                      child: child!,
+                    ),
                   ),
-                  child: child!,
                 ),
               );
             },
@@ -179,5 +189,19 @@ class _MyAppState extends State<MyApp> {
         },
       ),
     );
+  }
+}
+
+class UnfocusNavigatorObserver extends NavigatorObserver {
+  @override
+  void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    super.didPush(route, previousRoute);
+    FocusManager.instance.primaryFocus?.unfocus();
+  }
+
+  @override
+  void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    super.didPop(route, previousRoute);
+    FocusManager.instance.primaryFocus?.unfocus();
   }
 }
