@@ -11,6 +11,7 @@ import 'package:el7erafe/features/client_flow/client_home/presentation/cubit/cli
 import 'package:el7erafe/features/client_flow/client_home/presentation/cubit/client_home_state.dart';
 import 'package:el7erafe/features/client_flow/client_home/presentation/pages/service_items.dart';
 import 'package:el7erafe/features/client_flow/client_profile/presentation/pages/client_profile_page.dart';
+import 'package:el7erafe/features/client_flow/reservation_history/presentation/presentation/reservation_history_page.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -358,7 +359,7 @@ class _ClientHomePageViewState extends State<ClientHomePageView> {
 
     final List<Widget> pages = [
       homeContent,
-      const Center(child: Text("Booking History")),
+      ReservationHistoryPage(),
       ClientProfilePage(name: userName, token: token),
     ];
 
