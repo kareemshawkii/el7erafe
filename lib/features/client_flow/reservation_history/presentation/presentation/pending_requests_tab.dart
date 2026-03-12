@@ -13,6 +13,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:lottie/lottie.dart';
 
 class PendingRequestsTab extends StatelessWidget {
   const PendingRequestsTab({super.key});
@@ -62,8 +63,20 @@ class PendingRequestsView extends StatelessWidget {
       },
       builder: (context, state) {
         if (state is PendingRequestsLoading) {
-          return const Center(
-              child: CircularProgressIndicator(color: Color(0xFF3775FA)));
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Lottie.asset(
+                  'assets/icon/loading.json',
+                  width: 200.w,
+                  height: 200.h,
+                  repeat: true,
+                  animate: true,
+                ),
+              ],
+            ),
+          );
         } else if (state is PendingRequestsError) {
           return Center(
               child: Text(state.error,
