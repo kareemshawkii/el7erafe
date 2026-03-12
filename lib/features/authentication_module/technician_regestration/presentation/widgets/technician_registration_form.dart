@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 import 'package:el7erafe/core/utils/animated_navigaton_with_build.dart';
 import 'package:el7erafe/features/authentication_module/client_regestration/presentation/cubit/password_strength_cubit.dart';
@@ -10,14 +9,12 @@ import 'package:el7erafe/features/authentication_module/technician_regestration/
 import 'package:el7erafe/features/authentication_module/technician_regestration/presentation/cubit/technician_registration_state.dart';
 import 'package:el7erafe/features/authentication_module/technician_regestration/presentation/widgets/location_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart'; 
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:el7erafe/features/authentication_module/technician_regestration/presentation/widgets/image_picker.dart';
-import 'package:dropdown_button2/dropdown_button2.dart';
-import 'package:http/http.dart' as http;
 
 class TechnicianRegistrationForm extends StatefulWidget {
   const TechnicianRegistrationForm({super.key});
@@ -29,7 +26,6 @@ class TechnicianRegistrationForm extends StatefulWidget {
 
 class _TechnicianRegistrationFormState
     extends State<TechnicianRegistrationForm> {
-  final ValueNotifier<String?> _serviceNotifier = ValueNotifier<String?>(null);
   final _formKey = GlobalKey<FormState>();
   bool _isPasswordObscured = true;
   bool _isConfirmPasswordObscured = true;
@@ -44,8 +40,6 @@ class _TechnicianRegistrationFormState
   File? criminalRecordImage;
   String? _selectedGovernorate;
   String? _selectedCity;
-  bool isLoading = false;
-  List<String> services = [];
   String? selectedService;
 
   @override
@@ -60,37 +54,7 @@ class _TechnicianRegistrationFormState
   @override
   void initState() {
     super.initState();
-    _fetchServices();
-  }
-
-  Future<void> _fetchServices() async {
-    List<String> data = await getServices();
-    if (mounted) {
-      setState(() {
-        services = data;
-        isLoading = false;
-      });
-    }
-  }
-
-  Future<List<String>> getServices() async {
-    var url = Uri.parse(
-        'https://el7rafe-gma4hrg0e9epfsc0.uaenorth-01.azurewebsites.net/api/public/services');
-    try {
-      var response = await http.get(url);
-      if (response.statusCode == 200) {
-        var responseBody = jsonDecode(response.body);
-        if (responseBody is Map<String, dynamic> &&
-            responseBody.containsKey('services')) {
-          if (responseBody['services'] is List) {
-            return List<String>.from(responseBody['services']);
-          }
-        }
-      }
-    } catch (e) {
-      return [];
-    }
-    return [];
+    context.read<TechnicianRegistrationCubit>().loadServices();
   }
 
   void _onRegisterPressed() {
@@ -133,10 +97,10 @@ class _TechnicianRegistrationFormState
 
     if (_formKey.currentState!.validate()) {
       context.read<TechnicianRegistrationCubit>().register(
-            _nameController.text.trim(), 
+            _nameController.text.trim(),
             _phoneController.text.trim(),
             _emailController.text.trim(),
-            _passwordController.text, 
+            _passwordController.text,
             profileImage!,
             frontIdImage!,
             backIdImage!,
@@ -158,7 +122,7 @@ class _TechnicianRegistrationFormState
           Container(
               padding: EdgeInsets.fromLTRB(8.w, 12.h, 8.w, 12.h),
               decoration: BoxDecoration(
-                border: Border.all(color: Color(0xFFE2DFDF), width: 1.w),
+                border: Border.all(color: const Color(0xFFE2DFDF), width: 1.w),
                 borderRadius: BorderRadius.circular(16.r),
               ),
               child: Column(
@@ -168,7 +132,7 @@ class _TechnicianRegistrationFormState
                       style: GoogleFonts.cairo(
                           fontSize: 15.sp,
                           fontWeight: FontWeight.w500,
-                          color: Color(0xFF3775FA))),
+                          color: const Color(0xFF3775FA))),
                   SizedBox(height: 16.h),
                   Text('الاسم',
                       style: GoogleFonts.cairo(
@@ -188,7 +152,7 @@ class _TechnicianRegistrationFormState
                       decoration: InputDecoration(
                         prefixIcon: Icon(
                           Icons.person_2_outlined,
-                          color: Color(0xFF727070),
+                          color: const Color(0xFF727070),
                           size: 18.r,
                         ),
                         hintText: 'ادخل اسمك ثنائي ',
@@ -215,7 +179,6 @@ class _TechnicianRegistrationFormState
                       ),
                       validator: (value) {
                         final cleanValue = value?.trim() ?? '';
-                        
                         if (cleanValue.isEmpty) {
                           return 'من فضلك دخل اسمك الثنائي';
                         }
@@ -256,7 +219,7 @@ class _TechnicianRegistrationFormState
                       decoration: InputDecoration(
                         prefixIcon: Icon(
                           Iconsax.call,
-                          color: Color(0xFF727070),
+                          color: const Color(0xFF727070),
                           size: 18.r,
                         ),
                         hintText: '01X XXX XXXX',
@@ -286,7 +249,8 @@ class _TechnicianRegistrationFormState
                         if (cleanValue.isEmpty) {
                           return 'من فضلك دخل رقم التليفون';
                         }
-                        if (!RegExp(r'^01[0125][0-9]{8}$').hasMatch(cleanValue)) {
+                        if (!RegExp(r'^01[0125][0-9]{8}$')
+                            .hasMatch(cleanValue)) {
                           return 'من فضلك دخل رقم التليفون صحيح';
                         }
                         return null;
@@ -308,13 +272,13 @@ class _TechnicianRegistrationFormState
                       textAlign: TextAlign.right,
                       keyboardType: TextInputType.emailAddress,
                       inputFormatters: [
-                        FilteringTextInputFormatter.deny(RegExp(r'\s')), 
+                        FilteringTextInputFormatter.deny(RegExp(r'\s')),
                         LengthLimitingTextInputFormatter(50),
                       ],
                       decoration: InputDecoration(
                         prefixIcon: Icon(
                           Icons.email,
-                          color: Color(0xFF727070),
+                          color: const Color(0xFF727070),
                           size: 18.r,
                         ),
                         hintText: 'name@domain.com',
@@ -402,81 +366,75 @@ class _TechnicianRegistrationFormState
                           fontWeight: FontWeight.w400,
                           color: Colors.black)),
                   SizedBox(height: 8.h),
-                  Directionality(
-                      textDirection: TextDirection.rtl,
-                      child: SizedBox(
+                  BlocBuilder<TechnicianRegistrationCubit,
+                      TechnicianRegistrationState>(
+                    buildWhen: (previous, current) {
+                      return current is TechnicianRegServicesLoaded ||
+                          current is TechnicianRegServicesFailure ||
+                          current is TechnicianRegLoading;
+                    },
+                    builder: (context, state) {
+                      if (state is TechnicianRegServicesLoaded) {
+                        return Directionality(
+                          textDirection: TextDirection.rtl,
+                          child: SizedBox(
+                            width: 165.w,
+                            child: ServicePickerHelper(
+                              services: state.services,
+                              hintText: 'اختار حرفتك',
+                              onServiceSelected: (String? val) {
+                                setState(() {
+                                  selectedService = val;
+                                });
+                              },
+                            ),
+                          ),
+                        );
+                      } else if (state is TechnicianRegLoading) {
+                        return SizedBox(
                           width: 165.w,
-                          child: DropdownButtonFormField2<String>(
-                            valueListenable: _serviceNotifier,
-                            isExpanded: true,
-                            onChanged: isLoading
-                                ? null
-                                : (newValue) {
-                                    setState(() {
-                                      selectedService = newValue;
-                                      _serviceNotifier.value = newValue;
-                                    });
-                                  },
-                            decoration: InputDecoration(
-                              enabledBorder: OutlineInputBorder(
-                                borderSide:
-                                    const BorderSide(color: Color(0xFFE2DFDF)),
-                                borderRadius: BorderRadius.circular(12.r),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide:
-                                    const BorderSide(color: Color(0xFF3775FA)),
-                                borderRadius: BorderRadius.circular(12.r),
-                              ),
-                              contentPadding: EdgeInsets.all(8.r),
-                              hintText: isLoading
-                                  ? "جارٍ تحميل الحرف..."
-                                  : "اختار حرفتك",
+                          child: Container(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 12.w, vertical: 12.h),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              border:
+                                  Border.all(color: const Color(0xFFE2DFDF)),
+                              borderRadius: BorderRadius.circular(12.r),
                             ),
-                            dropdownStyleData: DropdownStyleData(
-                              maxHeight: 200.h,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(12.r),
-                                color: Colors.white,
-                              ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                SizedBox(
+                                  width: 16.r,
+                                  height: 16.r,
+                                  child: const CircularProgressIndicator(
+                                      strokeWidth: 2),
+                                ),
+                                SizedBox(width: 8.w),
+                                Text(
+                                  'جارٍ التحميل...',
+                                  style: GoogleFonts.cairo(
+                                      fontSize: 14.sp,
+                                      color: Colors.grey.shade600),
+                                ),
+                              ],
                             ),
-                            menuItemStyleData: MenuItemStyleData(
-                              padding: EdgeInsets.symmetric(horizontal: 16.w),
-                            ),
-                            items: isLoading
-                                ? [
-                                    DropdownItem<String>(
-                                      value: null,
-                                      enabled: false,
-                                      child: const Center(
-                                        child: SizedBox(
-                                          width: 24,
-                                          height: 24,
-                                          child: CircularProgressIndicator(
-                                              strokeWidth: 3),
-                                        ),
-                                      ),
-                                    ),
-                                  ]
-                                : services.map((service) {
-                                    return DropdownItem<String>(
-                                      value: service,
-                                      child: Align(
-                                        alignment: Alignment.centerRight,
-                                        child: Text(
-                                          service,
-                                          style: GoogleFonts.cairo(
-                                            fontSize: 15.sp,
-                                            color: Colors.black,
-                                            fontWeight: FontWeight.w400,
-                                          ),
-                                          overflow: TextOverflow.ellipsis,
-                                          textDirection: TextDirection.rtl,
-                                        ),
-                                      ),
-                                    );
-                                  }).toList(),
-                          ))),
+                          ),
+                        );
+                      } else if (state is TechnicianRegServicesFailure) {
+                        return SizedBox(
+                          width: 165.w,
+                          child: Text(
+                            'حدث خطأ، حاول مرة أخرى',
+                            style: GoogleFonts.cairo(
+                                color: Colors.red, fontSize: 12.sp),
+                          ),
+                        );
+                      }
+                      return const SizedBox.shrink();
+                    },
+                  ),
                   SizedBox(height: 16.h),
                   Text('صوره شخصيه',
                       style: GoogleFonts.cairo(
@@ -500,7 +458,7 @@ class _TechnicianRegistrationFormState
           Container(
               padding: EdgeInsets.fromLTRB(8.w, 12.h, 8.w, 12.h),
               decoration: BoxDecoration(
-                border: Border.all(color: Color(0xFFE2DFDF), width: 1.w),
+                border: Border.all(color: const Color(0xFFE2DFDF), width: 1.w),
                 borderRadius: BorderRadius.circular(16.r),
               ),
               child: Column(
@@ -510,13 +468,13 @@ class _TechnicianRegistrationFormState
                         style: GoogleFonts.cairo(
                             fontSize: 16.sp,
                             fontWeight: FontWeight.w400,
-                            color: Color(0xFF3775FA))),
+                            color: const Color(0xFF3775FA))),
                     SizedBox(height: 16.h),
                     Text('بطاقتك الشخصية',
                         style: GoogleFonts.cairo(
                             fontSize: 17.sp,
                             fontWeight: FontWeight.w600,
-                            color: Color(0xFF000000))),
+                            color: const Color(0xFF000000))),
                     SizedBox(height: 16.h),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -566,7 +524,7 @@ class _TechnicianRegistrationFormState
                         style: GoogleFonts.cairo(
                             fontSize: 17.sp,
                             fontWeight: FontWeight.w600,
-                            color: Color(0xFF000000))),
+                            color: const Color(0xFF000000))),
                     SizedBox(height: 16.h),
                     Column(
                       mainAxisAlignment: MainAxisAlignment.start,
@@ -598,7 +556,7 @@ class _TechnicianRegistrationFormState
           Container(
               padding: EdgeInsets.fromLTRB(8.w, 12.h, 8.w, 12.h),
               decoration: BoxDecoration(
-                border: Border.all(color: Color(0xFFE2DFDF), width: 1.w),
+                border: Border.all(color: const Color(0xFFE2DFDF), width: 1.w),
                 borderRadius: BorderRadius.circular(16.r),
               ),
               child: Column(
@@ -608,7 +566,7 @@ class _TechnicianRegistrationFormState
                         style: GoogleFonts.cairo(
                             fontSize: 15.sp,
                             fontWeight: FontWeight.w500,
-                            color: Color(0xFF3775FA))),
+                            color: const Color(0xFF3775FA))),
                     SizedBox(height: 16.h),
                     Text('كلمة السر',
                         style: GoogleFonts.cairo(
@@ -688,7 +646,7 @@ class _TechnicianRegistrationFormState
                         style: GoogleFonts.cairo(
                             fontSize: 13.sp,
                             fontWeight: FontWeight.w400,
-                            color: Color(0xFF727070))),
+                            color: const Color(0xFF727070))),
                     SizedBox(height: 12.h),
                     BlocBuilder<PasswordStrengthCubit, PasswordStrengthState>(
                       builder: (context, state) {
@@ -796,14 +754,17 @@ class _TechnicianRegistrationFormState
             child: BlocBuilder<TechnicianRegistrationCubit,
                 TechnicianRegistrationState>(
               builder: (context, state) {
-                final isLoading = state is TechnicianRegLoading;
+                bool isLoading = false;
+                if (state is TechnicianRegLoading) {
+                  isLoading = true;
+                }
                 return Container(
                     width: double.infinity,
                     height: 40.h,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(12.r),
                       border: Border.all(
-                        color: Color(0xFF3775FA),
+                        color: const Color(0xFF3775FA),
                         width: 1.w,
                       ),
                     ),
@@ -851,7 +812,7 @@ class _TechnicianRegistrationFormState
                       builder: (context) => BlocProvider(
                         create: (context) => LoginCubit(
                             authRepository: context.read<AuthRepository>()),
-                        child: LoginPage(),
+                        child: const LoginPage(),
                       ),
                     ),
                     (route) => false,
@@ -893,4 +854,115 @@ Widget _buildValidationCheckItem(
       ),
     ],
   );
+}
+
+class ServicePickerHelper extends StatefulWidget {
+  final List<String> services;
+  final String hintText;
+  final ValueChanged<String?> onServiceSelected;
+
+  const ServicePickerHelper({
+    super.key,
+    required this.services,
+    required this.hintText,
+    required this.onServiceSelected,
+  });
+
+  @override
+  State<ServicePickerHelper> createState() => _ServicePickerHelperState();
+}
+
+class _ServicePickerHelperState extends State<ServicePickerHelper> {
+  String? _selectedService;
+
+  void _showCustomDropdown(BuildContext context) {
+    FocusScope.of(context).unfocus();
+
+    final RenderBox renderBox = context.findRenderObject() as RenderBox;
+    final size = renderBox.size;
+    final offset = renderBox.localToGlobal(Offset.zero);
+    final screenSize = MediaQuery.of(context).size;
+
+    showMenu(
+      context: context,
+      color: Colors.white,
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
+      constraints: BoxConstraints(
+        minWidth: size.width,
+        maxWidth: size.width,
+        maxHeight: 250.h,
+      ),
+      position: RelativeRect.fromLTRB(
+        offset.dx,
+        offset.dy + size.height + 4,
+        screenSize.width - offset.dx - size.width,
+        screenSize.height - offset.dy,
+      ),
+      items: widget.services.map((item) {
+        return PopupMenuItem(
+          value: item,
+          child: Align(
+            alignment: Alignment.centerRight,
+            child: Text(
+              item,
+              style: GoogleFonts.cairo(
+                fontSize: 14.sp,
+                color: Colors.black,
+                fontWeight: FontWeight.w500,
+              ),
+              textAlign: TextAlign.right,
+              overflow: TextOverflow.ellipsis,
+              textDirection: TextDirection.rtl,
+            ),
+          ),
+        );
+      }).toList(),
+    ).then((value) {
+      if (value != null) {
+        setState(() {
+          _selectedService = value;
+        });
+        widget.onServiceSelected(value);
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Builder(builder: (fieldBuildContext) {
+      return GestureDetector(
+        onTap: () => _showCustomDropdown(fieldBuildContext),
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            border: Border.all(color: const Color(0xFFE2DFDF)),
+            borderRadius: BorderRadius.circular(12.r),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Icon(Iconsax.arrow_bottom,
+                  size: 16.r, color: Colors.grey.shade600),
+              SizedBox(width: 12.w),
+              Expanded(
+                child: Text(
+                  _selectedService ?? widget.hintText,
+                  style: GoogleFonts.cairo(
+                    fontSize: 14.sp,
+                    color: _selectedService == null
+                        ? Colors.grey.shade600
+                        : Colors.black,
+                  ),
+                  textAlign: TextAlign.right,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    });
+  }
 }

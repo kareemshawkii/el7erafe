@@ -10,6 +10,15 @@ class TechnicianRegistrationCubit extends Cubit<TechnicianRegistrationState> {
   TechnicianRegistrationCubit({required this.technicianRegRepository})
       : super(TechnicianRegInitial());
 
+  Future<void> loadServices() async {
+    emit(TechnicianRegLoading());
+    final result = await technicianRegRepository.getServices();
+    result.fold(
+      (failure) => emit(TechnicianRegServicesFailure(error: failure.message)),
+      (services) => emit(TechnicianRegServicesLoaded(services: services)),
+    );
+  }
+
   Future<void> register(
       String name,
       String phone,

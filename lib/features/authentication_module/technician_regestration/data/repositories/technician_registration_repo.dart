@@ -13,6 +13,25 @@ class TechnicianRegRepository {
   final String _baseUrl =
       "https://el7rafe-gma4hrg0e9epfsc0.uaenorth-01.azurewebsites.net";
 
+  Future<Either<Failure, List<String>>> getServices() async {
+    final Uri url = Uri.parse('$_baseUrl/api/public/services');
+    try {
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        var responseBody = jsonDecode(response.body);
+        if (responseBody is Map<String, dynamic> &&
+            responseBody.containsKey('services')) {
+          if (responseBody['services'] is List) {
+            return Right(List<String>.from(responseBody['services']));
+          }
+        }
+      }
+      return Left(Failure("خطأ في استرجاع قائمة الحرف"));
+    } catch (e) {
+      return Left(Failure("الرجاء التحقق من اتصالك بالانترنت"));
+    }
+  }
+
   Future<Either<Failure, String>> registerTechnician(
       TechnicianRegistrationRequestModel requestModel) async {
     final Uri registerUrl = Uri.parse('$_baseUrl/api/auth/register/technician');

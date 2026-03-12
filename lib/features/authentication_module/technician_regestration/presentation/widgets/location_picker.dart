@@ -1,8 +1,9 @@
 import 'dart:convert';
-import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:iconsax/iconsax.dart';
 
 enum Language { arabic, english }
 
@@ -13,7 +14,8 @@ class Governorate {
   final String nameAr;
   final List<City> cities;
 
-  Governorate({required this.nameEn, required this.nameAr, this.cities = const []});
+  Governorate(
+      {required this.nameEn, required this.nameAr, this.cities = const []});
 
   factory Governorate.fromJson(Map<String, dynamic> json) {
     var cityList = json['cities'] as List? ?? [];
@@ -48,9 +50,6 @@ class EgyptGovernoratePicker extends StatefulWidget {
   final Language language;
   final bool showCities;
   final Layout layout;
-  final TextStyle? selectedItemStyle;
-  final BoxDecoration? dropdownDecoration;
-  final BoxDecoration? disabledDropdownDecoration;
   final String governorateDropdownLabel;
   final String cityDropdownLabel;
   final String assetDataPath;
@@ -64,9 +63,6 @@ class EgyptGovernoratePicker extends StatefulWidget {
     this.language = Language.arabic,
     this.showCities = true,
     this.layout = Layout.vertical,
-    this.selectedItemStyle,
-    this.dropdownDecoration,
-    this.disabledDropdownDecoration,
     this.governorateDropdownLabel = "Governorate",
     this.cityDropdownLabel = "City",
     this.assetDataPath = "assets/data/egypt_data.json",
@@ -81,21 +77,12 @@ class _EgyptGovernoratePickerState extends State<EgyptGovernoratePicker> {
   List<City> _cities = [];
 
   Governorate? _selectedGovernorate;
-
-  final ValueNotifier<Governorate?> _govNotifier = ValueNotifier<Governorate?>(null);
-  final ValueNotifier<City?> _cityNotifier = ValueNotifier<City?>(null);
+  City? _selectedCity;
 
   @override
   void initState() {
     super.initState();
     _loadGovernorates();
-  }
-
-  @override
-  void dispose() {
-    _govNotifier.dispose();
-    _cityNotifier.dispose();
-    super.dispose();
   }
 
   Future<void> _loadGovernorates() async {
@@ -167,14 +154,13 @@ class _EgyptGovernoratePickerState extends State<EgyptGovernoratePicker> {
     }
     setState(() {
       _selectedGovernorate = gov;
-      _govNotifier.value = gov;
+      _selectedCity = null;
       _cities = gov.cities;
       _cities.sort((a, b) {
         return widget.language == Language.arabic
             ? a.nameAr.compareTo(b.nameAr)
             : a.nameEn.compareTo(b.nameEn);
       });
-      _cityNotifier.value = null;
     });
   }
 
@@ -184,7 +170,102 @@ class _EgyptGovernoratePickerState extends State<EgyptGovernoratePicker> {
       widget.onCityChanged?.call(_getCityName(city));
     }
     setState(() {
-      _cityNotifier.value = city;
+      _selectedCity = city;
+    });
+  }
+
+  void _showCustomDropdown({
+    required BuildContext context,
+    required List<dynamic> items,
+    required Function(dynamic) onItemSelected,
+    required String Function(dynamic) getItemName,
+  }) {
+    FocusScope.of(context).unfocus();
+
+    final RenderBox renderBox = context.findRenderObject() as RenderBox;
+    final size = renderBox.size;
+    final offset = renderBox.localToGlobal(Offset.zero);
+    final screenSize = MediaQuery.of(context).size;
+
+    showMenu(
+      context: context,
+      color: Colors.white,
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
+      constraints: BoxConstraints(
+        minWidth: size.width,
+        maxWidth: size.width,
+        maxHeight: 250.h,
+      ),
+      position: RelativeRect.fromLTRB(
+        offset.dx,
+        offset.dy + size.height + 4,
+        screenSize.width - offset.dx - size.width,
+        screenSize.height - offset.dy,
+      ),
+      items: items.map((item) {
+        return PopupMenuItem(
+          value: item,
+          child: Align(
+            alignment: Alignment.centerRight,
+            child: Text(
+              getItemName(item),
+              style: GoogleFonts.cairo(
+                fontSize: 14.sp,
+                color: Colors.black,
+                fontWeight: FontWeight.w500,
+              ),
+              textAlign: TextAlign.right,
+              overflow: TextOverflow.ellipsis,
+              textDirection: TextDirection.rtl,
+            ),
+          ),
+        );
+      }).toList(),
+    ).then((value) {
+      if (value != null) {
+        onItemSelected(value);
+      }
+    });
+  }
+
+  Widget _buildDropdownField({
+    required String hintText,
+    required String? value,
+    required Function(BuildContext) onTap,
+    bool isEnabled = true,
+  }) {
+    return Builder(builder: (fieldBuildContext) {
+      return GestureDetector(
+        onTap: isEnabled ? () => onTap(fieldBuildContext) : null,
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 12.h),
+          decoration: BoxDecoration(
+            color: isEnabled ? Colors.white : Colors.grey.shade100,
+            border: Border.all(color: const Color(0xFFE2DFDF)),
+            borderRadius: BorderRadius.circular(12.r),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Icon(Iconsax.arrow_bottom,
+                  size: 16.r, color: Colors.grey.shade600),
+              SizedBox(width: 12.w),
+              Expanded(
+                child: Text(
+                  value ?? hintText,
+                  style: GoogleFonts.cairo(
+                    fontSize: 14.sp,
+                    color: value == null ? Colors.grey.shade600 : Colors.black,
+                  ),
+                  textAlign: TextAlign.right,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
     });
   }
 
@@ -198,131 +279,83 @@ class _EgyptGovernoratePickerState extends State<EgyptGovernoratePicker> {
   Widget _buildVerticalLayout() {
     return Column(
       children: [
-        _buildGovernorateDropdown(),
+        _buildDropdownField(
+          hintText: widget.governorateDropdownLabel.tr(widget.language),
+          value: _selectedGovernorate != null
+              ? _getGovernorateName(_selectedGovernorate!)
+              : null,
+          onTap: (ctx) {
+            _showCustomDropdown(
+              context: ctx,
+              items: _governorates,
+              onItemSelected: (item) =>
+                  _onGovernorateSelected(item as Governorate),
+              getItemName: (item) => _getGovernorateName(item as Governorate),
+            );
+          },
+        ),
         if (widget.showCities) SizedBox(height: 16.0.h),
-        if (widget.showCities) _buildCityDropdown(),
+        if (widget.showCities)
+          _buildDropdownField(
+            hintText: widget.cityDropdownLabel.tr(widget.language),
+            value: _selectedCity != null ? _getCityName(_selectedCity!) : null,
+            isEnabled: _selectedGovernorate != null,
+            onTap: (ctx) {
+              if (_selectedGovernorate != null) {
+                _showCustomDropdown(
+                  context: ctx,
+                  items: _cities,
+                  onItemSelected: (item) => _onCitySelected(item as City),
+                  getItemName: (item) => _getCityName(item as City),
+                );
+              }
+            },
+          ),
       ],
     );
   }
 
   Widget _buildHorizontalLayout() {
-    return Column(
+    return Row(
       children: [
-        Row(
-          children: [
-            Expanded(child: _buildGovernorateDropdown()),
-            if (widget.showCities) SizedBox(width: 16.0.w),
-            if (widget.showCities) Expanded(child: _buildCityDropdown()),
-          ],
+        Expanded(
+          child: _buildDropdownField(
+            hintText: widget.governorateDropdownLabel.tr(widget.language),
+            value: _selectedGovernorate != null
+                ? _getGovernorateName(_selectedGovernorate!)
+                : null,
+            onTap: (ctx) {
+              _showCustomDropdown(
+                context: ctx,
+                items: _governorates,
+                onItemSelected: (item) =>
+                    _onGovernorateSelected(item as Governorate),
+                getItemName: (item) => _getGovernorateName(item as Governorate),
+              );
+            },
+          ),
         ),
+        if (widget.showCities) SizedBox(width: 16.0.w),
+        if (widget.showCities)
+          Expanded(
+            child: _buildDropdownField(
+              hintText: widget.cityDropdownLabel.tr(widget.language),
+              value:
+                  _selectedCity != null ? _getCityName(_selectedCity!) : null,
+              isEnabled: _selectedGovernorate != null,
+              onTap: (ctx) {
+                if (_selectedGovernorate != null) {
+                  _showCustomDropdown(
+                    context: ctx,
+                    items: _cities,
+                    onItemSelected: (item) => _onCitySelected(item as City),
+                    getItemName: (item) => _getCityName(item as City),
+                  );
+                }
+              },
+            ),
+          ),
       ],
-    );
-  }
-
-  Widget _buildGovernorateDropdown() {
-    return Directionality(
-      textDirection: TextDirection.rtl,
-      child: DropdownButtonFormField2<Governorate>(
-        valueListenable: _govNotifier,
-        alignment: AlignmentDirectional.centerEnd,
-        hint: Align(
-          alignment: Alignment.centerRight,
-          child: Text(
-            widget.governorateDropdownLabel.tr(widget.language),
-            style: TextStyle(
-              color: Colors.grey.shade600,
-              fontSize: 14.sp,
-            ),
-          ),
-        ),
-        decoration: InputDecoration(
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.0.r)),
-          contentPadding: EdgeInsets.all(8.r),
-          enabledBorder: OutlineInputBorder(
-            borderSide: const BorderSide(color: Color(0xFFE2DFDF)),
-            borderRadius: BorderRadius.circular(12.0.r),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderSide: const BorderSide(color: Color(0xFF3775FA)),
-            borderRadius: BorderRadius.circular(12.0.r),
-          ),
-        ),
-        dropdownStyleData: DropdownStyleData(
-          isOverButton: false,
-          offset: const Offset(0, -5),
-          maxHeight: 250.h,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12.0.r),
-            color: Colors.white,
-          ),
-        ),
-        menuItemStyleData: MenuItemStyleData(
-          padding: EdgeInsets.symmetric(horizontal: 16.w),
-        ),
-        isExpanded: true,
-        items: _governorates.map((Governorate gov) {
-          return DropdownItem<Governorate>(
-              value: gov,
-              child: Align(
-                alignment: Alignment.centerRight,
-                child: Text(
-                  _getGovernorateName(gov),
-                  style: widget.selectedItemStyle,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ));
-        }).toList(),
-        onChanged: (val) => _onGovernorateSelected(val),
-      ),
-    );
-  }
-
-  Widget _buildCityDropdown() {
-    bool isGovSelected = _selectedGovernorate != null;
-
-    return Directionality(
-      textDirection: TextDirection.rtl,
-      child: DropdownButtonFormField2<City>(
-        valueListenable: _cityNotifier,
-        items: _cities.map((City city) {
-          return DropdownItem<City>(
-            value: city,
-            child: Align(
-              alignment: Alignment.centerRight,
-              child: Text(
-                _getCityName(city),
-                style: widget.selectedItemStyle,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-          );
-        }).toList(),
-        onChanged: isGovSelected ? (val) => _onCitySelected(val) : null,
-        decoration: InputDecoration(
-          hintText: widget.cityDropdownLabel.tr(widget.language),
-          contentPadding: EdgeInsets.symmetric(vertical: 8.h),
-          enabledBorder: OutlineInputBorder(
-            borderSide: const BorderSide(color: Color(0xFFE2DFDF)),
-            borderRadius: BorderRadius.circular(12.0.r),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderSide: const BorderSide(color: Color(0xFF3775FA)),
-            borderRadius: BorderRadius.circular(12.0.r),
-          ),
-        ),
-        dropdownStyleData: DropdownStyleData(
-          maxHeight: 250.h,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12.0.r),
-            color: Colors.white,
-          ),
-        ),
-        menuItemStyleData: MenuItemStyleData(
-          padding: EdgeInsets.symmetric(horizontal: 16.w),
-        ),
-        isExpanded: true,
-        hint: Text(widget.cityDropdownLabel.tr(widget.language)),
-      ),
     );
   }
 }
