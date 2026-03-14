@@ -184,7 +184,7 @@ class AvailableRequestCard extends StatelessWidget {
                 Expanded(
                   flex: 2,
                   child: SizedBox(
-                    height: 48.h,
+                    height: 40.h,
                     child: ElevatedButton(
                       onPressed: () {},
                       style: ElevatedButton.styleFrom(
@@ -216,7 +216,7 @@ class AvailableRequestCard extends StatelessWidget {
                 Expanded(
                   flex: 1,
                   child: SizedBox(
-                    height: 48.h,
+                    height: 40.h,
                     child: OutlinedButton(
                       onPressed: () {
                         Navigator.pop(context);
