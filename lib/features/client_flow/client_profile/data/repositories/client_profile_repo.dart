@@ -254,7 +254,6 @@ class ProfileRepository {
       return Left(("حصل خطأ غير متوقع. يرجى التأكد من اتصالك بالإنترنت."));
     }
   }
-  
 
   Future<Either<String, String>> finalizePhoneChange(
       String token, String newPhone) async {

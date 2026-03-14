@@ -174,10 +174,12 @@ class PendingRequestsView extends StatelessWidget {
         ),
       ],
       primaryButtonText: 'كل العروض',
+      primaryButtonIcon: Icons.list,
       onPrimaryPressed: () {
         // Navigate to All Offers Page passing request.requestId
       },
       secondaryButtonText: 'إلغاء الطلب',
+      secondaryButtonIcon: Iconsax.close_circle,
       onSecondaryPressed: () {
         // Trigger cancel API
       },
@@ -232,8 +234,16 @@ class PendingRequestsView extends StatelessWidget {
           leftLabel: hasOffer ? request.techTimeInterval! : '--',
           leftIcon: Icons.access_time,
         ),
+        if (request.numberOfDays != null && request.numberOfDays != 1) ...[
+          SizedBox(height: 12.h),
+          _DetailRow(
+            rightLabel: 'مدة التنفيذ : ${request.numberOfDays} يوم',
+            rightIcon: Icons.schedule_outlined,
+          ),
+        ],
       ],
       primaryButtonText: hasOffer ? 'قبول العرض' : 'تفاصيل الطلب',
+      primaryButtonIcon: hasOffer ? Iconsax.tick_circle : Iconsax.document_text,
       onPrimaryPressed: () {
         if (hasOffer) {
           // Trigger Accept Offer API
@@ -242,6 +252,7 @@ class PendingRequestsView extends StatelessWidget {
         }
       },
       secondaryButtonText: hasOffer ? 'رفض العرض' : 'إلغاء الطلب',
+      secondaryButtonIcon: Iconsax.close_circle,
       onSecondaryPressed: () {
         if (hasOffer) {
           // Trigger Reject Offer API
@@ -278,16 +289,20 @@ class _BaseRequestCard extends StatelessWidget {
   final Widget header;
   final List<Widget> details;
   final String primaryButtonText;
+  final IconData primaryButtonIcon;
   final VoidCallback onPrimaryPressed;
   final String secondaryButtonText;
+  final IconData secondaryButtonIcon;
   final VoidCallback onSecondaryPressed;
 
   const _BaseRequestCard({
     required this.header,
     required this.details,
     required this.primaryButtonText,
+    required this.primaryButtonIcon,
     required this.onPrimaryPressed,
     required this.secondaryButtonText,
+    required this.secondaryButtonIcon,
     required this.onSecondaryPressed,
   });
 
@@ -308,7 +323,7 @@ class _BaseRequestCard extends StatelessWidget {
           Divider(color: const Color(0xFFE2DFDF), thickness: 1.h),
           SizedBox(height: 8.h),
           ...details,
-          SizedBox(height: 16.h),
+          SizedBox(height: 20.h),
           Row(
             textDirection: TextDirection.rtl,
             children: [
@@ -323,12 +338,21 @@ class _BaseRequestCard extends StatelessWidget {
                           borderRadius: BorderRadius.circular(12.r)),
                       elevation: 0,
                     ),
-                    child: Text(
-                      primaryButtonText,
-                      style: GoogleFonts.cairo(
-                          fontSize: 15.sp,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      textDirection: TextDirection.rtl,
+                      children: [
+                        Icon(primaryButtonIcon,
+                            color: Colors.white, size: 15.sp),
+                        SizedBox(width: 4.w),
+                        Text(
+                          primaryButtonText,
+                          style: GoogleFonts.cairo(
+                              fontSize: 15.sp,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white),
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -344,12 +368,21 @@ class _BaseRequestCard extends StatelessWidget {
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12.r)),
                     ),
-                    child: Text(
-                      secondaryButtonText,
-                      style: GoogleFonts.cairo(
-                          fontSize: 15.sp,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      textDirection: TextDirection.rtl,
+                      children: [
+                        Icon(secondaryButtonIcon,
+                            color: Colors.black, size: 15.sp),
+                        SizedBox(width: 4.w),
+                        Text(
+                          secondaryButtonText,
+                          style: GoogleFonts.cairo(
+                              fontSize: 15.sp,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black),
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -365,14 +398,14 @@ class _BaseRequestCard extends StatelessWidget {
 class _DetailRow extends StatelessWidget {
   final String rightLabel;
   final IconData rightIcon;
-  final String leftLabel;
-  final IconData leftIcon;
+  final String? leftLabel;
+  final IconData? leftIcon;
 
   const _DetailRow({
     required this.rightLabel,
     required this.rightIcon,
-    required this.leftLabel,
-    required this.leftIcon,
+    this.leftLabel,
+    this.leftIcon,
   });
 
   @override
@@ -401,24 +434,26 @@ class _DetailRow extends StatelessWidget {
           ),
         ),
         Expanded(
-          child: Row(
-            textDirection: TextDirection.rtl,
-            children: [
-              Icon(leftIcon, size: 16.r, color: Colors.black),
-              SizedBox(width: 8.w),
-              Expanded(
-                child: Text(
-                  leftLabel,
-                  style: GoogleFonts.cairo(
-                      fontSize: 14.sp,
-                      color: Colors.black,
-                      fontWeight: FontWeight.w500),
-                  overflow: TextOverflow.ellipsis,
+          child: leftLabel != null && leftLabel!.isNotEmpty && leftIcon != null
+              ? Row(
                   textDirection: TextDirection.rtl,
-                ),
-              ),
-            ],
-          ),
+                  children: [
+                    Icon(leftIcon, size: 16.r, color: Colors.black),
+                    SizedBox(width: 8.w),
+                    Expanded(
+                      child: Text(
+                        leftLabel!,
+                        style: GoogleFonts.cairo(
+                            fontSize: 14.sp,
+                            color: Colors.black,
+                            fontWeight: FontWeight.w500),
+                        overflow: TextOverflow.ellipsis,
+                        textDirection: TextDirection.rtl,
+                      ),
+                    ),
+                  ],
+                )
+              : const SizedBox.shrink(),
         ),
       ],
     );

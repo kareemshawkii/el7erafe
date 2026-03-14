@@ -10,29 +10,38 @@ class TechProfileCubit extends Cubit<TechProfileState> {
 
   TechProfileCubit(this._repo) : super(ProfileInitial());
 
+  void _safeEmit(TechProfileState state) {
+    if (!isClosed) {
+      emit(state);
+    }
+  }
+
   void _handleError(String error) {
     if (error == "401") {
-      emit(ProfileUnauth("انتهت صلاحية الجلسة، الرجاء تسجيل الدخول مرة أخرى."));
+      _safeEmit(ProfileUnauth("انتهت صلاحية الجلسة، الرجاء تسجيل الدخول مرة أخرى."));
     } else {
-      emit(ProfileError(error));
+      _safeEmit(ProfileError(error));
     }
   }
 
   void loadProfile(String token, String defaultName) async {
-    emit(ProfileLoading());
+    _safeEmit(ProfileLoading());
 
     String localImage = await AuthLocalStorage().getUserProfileImage() ?? "";
     if (localImage.isNotEmpty) {
-      emit(ProfileLoaded(imageUrl: localImage));
+      _safeEmit(ProfileLoaded(imageUrl: localImage));
     }
 
     final result = await _repo.getProfileData(token);
+    if (isClosed) return; 
+
     result.fold(
       (error) {
         if (error == "401") {
-          emit(ProfileUnauth("انتهت صلاحية الجلسة، الرجاء تسجيل الدخول مرة أخرى."));
+          _safeEmit(ProfileUnauth(
+              "انتهت صلاحية الجلسة، الرجاء تسجيل الدخول مرة أخرى."));
         } else {
-          if (localImage.isEmpty) emit(ProfileError(error));
+          if (localImage.isEmpty) _safeEmit(ProfileError(error));
         }
       },
       (TechnicianProfileModel profileModel) async {
@@ -40,24 +49,28 @@ class TechProfileCubit extends Cubit<TechProfileState> {
         if (freshImageUrl.isNotEmpty && freshImageUrl != localImage) {
           await AuthLocalStorage().saveUserProfileImage(freshImageUrl);
         }
-        emit(ProfileLoaded(imageUrl: freshImageUrl, profile: profileModel));
+        if (!isClosed) { 
+          _safeEmit(ProfileLoaded(imageUrl: freshImageUrl, profile: profileModel));
+        }
       },
     );
   }
 
   void deleteAccount(String token) async {
     final result = await _repo.deleteAccount(token);
+    if (isClosed) return;
     result.fold(
       (error) => _handleError(error),
-      (success) => emit(ProfileActionSuccess("تم حذف الحساب بنجاح")),
+      (success) => _safeEmit(ProfileActionSuccess("تم حذف الحساب بنجاح")),
     );
   }
 
   void logout(String token) async {
     final result = await _repo.logout(token);
+    if (isClosed) return;
     result.fold(
       (error) => _handleError(error),
-      (success) => emit(ProfileActionSuccess("تم تسجيل الخروج بنجاح")),
+      (success) => _safeEmit(ProfileActionSuccess("تم تسجيل الخروج بنجاح")),
     );
   }
 
@@ -68,31 +81,31 @@ class TechProfileCubit extends Cubit<TechProfileState> {
     File? profileImage,
     List<File>? newPortfolioImages,
     List<String>? deletedPortfolioImages,
-    int currentPortfolioCount = 0, 
+    int currentPortfolioCount = 0,
   }) async {
-    
     if (aboutMe != null && aboutMe.length > 200) {
-      emit(ProfileError("النبذة الشخصية يجب ألا تتجاوز 200 حرف."));
+      _safeEmit(ProfileError("النبذة الشخصية يجب ألا تتجاوز 200 حرف."));
       return;
     }
 
-    int finalImageCount = currentPortfolioCount + 
-        (newPortfolioImages?.length ?? 0) - 
+    int finalImageCount = currentPortfolioCount +
+        (newPortfolioImages?.length ?? 0) -
         (deletedPortfolioImages?.length ?? 0);
 
     if (finalImageCount > 20) {
-      emit(ProfileError("لا يمكن أن يتجاوز عدد صور معرض الأعمال 20 صورة."));
+      _safeEmit(ProfileError("لا يمكن أن يتجاوز عدد صور معرض الأعمال 20 صورة."));
       return;
     }
 
     if (profileImage != null) {
       if (!profileImage.existsSync()) {
-        emit(ProfileError("ملف الصورة الشخصية غير موجود."));
+        _safeEmit(ProfileError("ملف الصورة الشخصية غير موجود."));
         return;
       }
       final int fileSize = profileImage.lengthSync();
-      if (fileSize == 0 || fileSize > 1 * 1024 * 1024) { 
-        emit(ProfileError("حجم الصورة الشخصية يجب أن يكون بين 1 بايت و 1 ميجابايت."));
+      if (fileSize == 0 || fileSize > 1 * 1024 * 1024) {
+        _safeEmit(ProfileError(
+            "حجم الصورة الشخصية يجب أن يكون بين 1 بايت و 1 ميجابايت."));
         return;
       }
     }
@@ -100,14 +113,14 @@ class TechProfileCubit extends Cubit<TechProfileState> {
     if (newPortfolioImages != null) {
       for (var img in newPortfolioImages) {
         if (!img.existsSync() || img.lengthSync() == 0) {
-          emit(ProfileError("إحدى صور معرض الأعمال غير صالحة."));
+          _safeEmit(ProfileError("إحدى صور معرض الأعمال غير صالحة."));
           return;
         }
       }
     }
 
-    emit(ProfileBasicUpdateLoading());
-    
+    _safeEmit(ProfileBasicUpdateLoading());
+
     final result = await _repo.updateBasicProfile(
       token: token,
       name: name,
@@ -116,59 +129,73 @@ class TechProfileCubit extends Cubit<TechProfileState> {
       newPortfolioImages: newPortfolioImages,
       deletedPortfolioImages: deletedPortfolioImages,
     );
-    
+
+    if (isClosed) return;
     result.fold(
       (error) => _handleError(error),
-      (data) => emit(FieldUpdateSuccess("تم تحديث البيانات الأساسية بنجاح", newName: name)),
+      (data) => _safeEmit(FieldUpdateSuccess("تم تحديث البيانات الأساسية بنجاح",
+          newName: name)),
     );
   }
 
-  void sendFirstOtp(String token, String email, {required bool isForPhone}) async {
-    emit(ProfileLoading());
+  void sendFirstOtp(String token, String email,
+      {required bool isForPhone}) async {
+    _safeEmit(ProfileLoading());
     final result = await _repo.sendFirstOtp(token, email);
+    if (isClosed) return;
     result.fold(
       (error) => _handleError(error),
-      (success) => emit(FirstOtpSent(isForPhone: isForPhone)),
+      (success) => _safeEmit(FirstOtpSent(isForPhone: isForPhone)),
     );
   }
 
-  void verifyFirstOtp(String token, String email, String otp, {required bool isForPhone}) async {
-    emit(ProfileLoading());
+  void verifyFirstOtp(String token, String email, String otp,
+      {required bool isForPhone}) async {
+    _safeEmit(ProfileLoading());
     final result = await _repo.verifyFirstOtp(token, email, otp);
+    if (isClosed) return;
     result.fold(
       (error) => _handleError(error),
-      (success) => emit(FirstOtpVerified(isForPhone: isForPhone)),
+      (success) => _safeEmit(FirstOtpVerified(isForPhone: isForPhone)),
     );
   }
 
   void sendOtpToNewEmail(String token, String newEmail) async {
-    emit(ProfileLoading());
+    _safeEmit(ProfileLoading());
     final result = await _repo.sendOtpToNewEmail(token, newEmail);
+    if (isClosed) return;
     result.fold(
       (error) => _handleError(error),
-      (success) => emit(NewEmailOtpSent()),
+      (success) => _safeEmit(NewEmailOtpSent()),
     );
   }
 
   void verifyNewEmail(String token, String email, String newOtpCode) async {
-    emit(ProfileLoading());
+    _safeEmit(ProfileLoading());
     final result = await _repo.verifyNewEmail(token, email, newOtpCode);
+    if (isClosed) return;
     result.fold(
       (error) => _handleError(error),
-      (success) => emit(FieldUpdateSuccess("تم تحديث البريد الإلكتروني بنجاح إلى $email", newEmail: email)),
+      (success) => _safeEmit(FieldUpdateSuccess(
+          "تم تحديث البريد الإلكتروني بنجاح إلى $email",
+          newEmail: email)),
     );
   }
 
   void finalizePhoneChange(String token, String newPhone) async {
-    emit(ProfileLoading());
+    _safeEmit(ProfileLoading());
     final result = await _repo.finalizePhoneChange(token, newPhone);
+    if (isClosed) return;
     result.fold(
       (error) => _handleError(error),
-      (successMessage) => emit(FieldUpdateSuccess("تم تحديث رقم الهاتف بنجاح إلى $newPhone", newPhone: newPhone)),
+      (successMessage) => _safeEmit(FieldUpdateSuccess(
+          "تم تحديث رقم الهاتف بنجاح إلى $newPhone",
+          newPhone: newPhone)),
     );
   }
 
-  void resetUpdateFlowState(String currentImageUrl, [TechnicianProfileModel? profile]) {
-    emit(ProfileLoaded(imageUrl: currentImageUrl, profile: profile));
+  void resetUpdateFlowState(String currentImageUrl,
+      [TechnicianProfileModel? profile]) {
+    _safeEmit(ProfileLoaded(imageUrl: currentImageUrl, profile: profile));
   }
 }

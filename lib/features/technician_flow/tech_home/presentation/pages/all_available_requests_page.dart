@@ -36,7 +36,7 @@ class AllAvailableRequestsPage extends StatelessWidget {
       body: BlocBuilder<AvailableRequestsCubit, AvailableRequestsState>(
         builder: (context, state) {
           if (state is AvailableRequestsLoaded) {
-            final requests = state.requests;
+            final requests = state.requests.reversed.toList();
             if (requests.isEmpty) {
               return Center(
                 child: Text(
@@ -68,7 +68,7 @@ class AllAvailableRequestsPage extends StatelessWidget {
                 padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
                 itemCount: requests.length,
                 itemBuilder: (context, index) {
-                  return AvailableRequestCard(request: requests[requests.length - 1 - index]);
+                  return AvailableRequestCard(request: requests[index]);
                 },
               ),
             );

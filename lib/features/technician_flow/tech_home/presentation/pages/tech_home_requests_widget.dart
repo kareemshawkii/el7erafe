@@ -7,6 +7,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:el7erafe/core/utils/animated_navigaton_with_build.dart';
+import 'package:lottie/lottie.dart';
 import 'available_request_card.dart';
 
 class TechHomeRequestsWidget extends StatelessWidget {
@@ -17,8 +18,20 @@ class TechHomeRequestsWidget extends StatelessWidget {
     return BlocBuilder<AvailableRequestsCubit, AvailableRequestsState>(
       builder: (context, state) {
         if (state is AvailableRequestsLoading) {
-          return const Center(
-              child: CircularProgressIndicator(color: Color(0xFF3775FA)));
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Lottie.asset(
+                  'assets/icon/loading.json',
+                  width: 200.w,
+                  height: 200.h,
+                  repeat: true,
+                  animate: true,
+                ),
+              ],
+            ),
+          );
         } else if (state is AvailableRequestsError) {
           return Center(
             child: Text(
@@ -27,8 +40,8 @@ class TechHomeRequestsWidget extends StatelessWidget {
             ),
           );
         } else if (state is AvailableRequestsLoaded) {
-          final requests = state.requests;
-          final displayRequests = requests.reversed.take(2).toList();
+          final requests = state.requests.reversed.toList();
+          final displayRequests = requests.take(2).toList();
 
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -125,10 +138,10 @@ class TechHomeRequestsWidget extends StatelessWidget {
                     },
                   ),
                 ),
-                Divider(
-                  color: Colors.grey.shade300,
-                  thickness: 1.h,
-                ),
+              Divider(
+                color: Colors.grey.shade300,
+                thickness: 1.h,
+              ),
             ],
           );
         }

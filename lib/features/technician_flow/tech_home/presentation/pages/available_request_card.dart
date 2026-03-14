@@ -6,6 +6,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:el7erafe/core/utils/animated_navigaton_with_build.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:shimmer/shimmer.dart';
 
 class AvailableRequestCard extends StatelessWidget {
   final AvailableRequestModel request;
@@ -35,21 +36,129 @@ class AvailableRequestCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
+              textDirection: TextDirection.rtl,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
+                Icon(Icons.home_repair_service_outlined,
+                    size: 20.r, color: const Color(0xFF3775FA)),
+                SizedBox(width: 8.w),
+                Flexible(
+                  flex: 1,
+                  child: Text(
+                    request.serviceType ?? 'خدمة غير محددة',
+                    style: GoogleFonts.cairo(
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                    textDirection: TextDirection.rtl,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                SizedBox(width: 8.w),
+                Container(
+                  width: 1.w,
+                  height: 14.h,
+                  color: Colors.grey.shade400,
+                ),
+                SizedBox(width: 8.w),
+                Expanded(
+                  flex: 2,
+                  child: Text(
+                    request.description ?? 'لا يوجد وصف',
+                    style: GoogleFonts.cairo(
+                      fontSize: 13.sp,
+                      color: Colors.grey.shade600,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.right,
+                    textDirection: TextDirection.rtl,
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 12.h),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              textDirection: TextDirection.rtl,
+              children: [
+                Expanded(
+                  child: Row(
+                    textDirection: TextDirection.rtl,
+                    children: [
+                      ClipOval(
+                        child: CachedNetworkImage(
+                          imageUrl: request.clientImage ??
+                              'https://i.pinimg.com/736x/23/d1/3a/23d13a1dbad6a60319413ec2512aed29.jpg',
+                          width: 32.w,
+                          height: 32.h,
+                          fit: BoxFit.cover,
+                          imageBuilder: (context, imageProvider) => Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(16.r),
+                              image: DecorationImage(
+                                  image: imageProvider, fit: BoxFit.cover),
+                            ),
+                          ),
+                          placeholder: (_, __) => Shimmer.fromColors(
+                            baseColor: Colors.grey.shade300,
+                            highlightColor: Colors.grey.shade100,
+                            child: Container(
+                              width: 32.w,
+                              height: 32.h,
+                              decoration: BoxDecoration(
+                                color: Colors.grey.shade300,
+                                borderRadius: BorderRadius.circular(16.r),
+                              ),
+                            ),
+                          ),
+                          errorWidget: (_, __, ___) => Container(
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade200,
+                              borderRadius: BorderRadius.circular(16.r),
+                            ),
+                            child: const Icon(Icons.person, size: 16),
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 8.w),
+                      Expanded(
+                        child: Text(
+                          request.clientName ?? 'عميل',
+                          style: GoogleFonts.cairo(
+                            fontSize: 13.sp,
+                            color: Colors.grey.shade800,
+                            fontWeight: FontWeight.w600,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                          textDirection: TextDirection.rtl,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(width: 8.w),
                 Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  textDirection: TextDirection.rtl,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.home_repair_service_outlined,
-                        size: 20.r, color: const Color(0xFF3775FA)),
-                    SizedBox(width: 8.w),
-                    Text(
-                      request.serviceType ?? 'خدمة غير محددة',
-                      style: GoogleFonts.cairo(
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
+                    Icon(Icons.location_on_outlined,
+                        size: 16.r, color: Colors.black),
+                    SizedBox(width: 4.w),
+                    Container(
+                      constraints: BoxConstraints(maxWidth: 100.w),
+                      child: Text(
+                        request.city ?? 'عنوان غير محدد',
+                        style: GoogleFonts.cairo(
+                          fontSize: 12.sp,
+                          color: Colors.grey.shade800,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        textDirection: TextDirection.rtl,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                   ],
@@ -58,88 +167,23 @@ class AvailableRequestCard extends StatelessWidget {
             ),
             SizedBox(height: 12.h),
             Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(children: [
-                  Text(
-                    'وصف الطلب:  ',
-                    style: GoogleFonts.cairo(
-                      fontSize: 13.sp,
-                      color: Colors.black,
-                      fontWeight: FontWeight.w600,
-                    ),
-                    textDirection: TextDirection.rtl,
-                  ),
-                  SizedBox(
-                    width: 150.w,
-                    child: Text(
-                      request.description ?? 'لا يوجد وصف',
-                      style: GoogleFonts.cairo(
-                        fontSize: 13.sp,
-                        color: Colors.grey.shade600,
-                        fontWeight: FontWeight.w500,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      textAlign: TextAlign.right,
-                      textDirection: TextDirection.rtl,
-                    ),
-                  )
-                ]),
-                Row(
-                  children: [
-                    Icon(Icons.location_on_outlined,
-                        size: 16.r, color: Colors.black),
-                    SizedBox(width: 4.w),
-                    Text(
-                      request.city ?? 'عنوان غير محدد',
-                      style: GoogleFonts.cairo(
-                        fontSize: 12.sp,
-                        color: Colors.grey.shade800,
-                        fontWeight: FontWeight.w600,
-                      ),
-                      textDirection: TextDirection.rtl,
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            SizedBox(height: 16.h),
-            Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               textDirection: TextDirection.rtl,
               children: [
                 Row(
                   textDirection: TextDirection.rtl,
                   children: [
-                    ClipOval(
-                      child: CachedNetworkImage(
-                        imageUrl: request.clientImage ??
-                            'https://i.pinimg.com/736x/23/d1/3a/23d13a1dbad6a60319413ec2512aed29.jpg',
-                        width: 32.w,
-                        height: 32.h,
-                        fit: BoxFit.cover,
-                        placeholder: (_, __) =>
-                            Container(color: Colors.grey.shade200),
-                        errorWidget: (_, __, ___) => Container(
-                            color: Colors.grey.shade200,
-                            child: const Icon(Icons.person)),
+                    Icon(Icons.calendar_today_outlined,
+                        size: 16.r, color: Colors.black),
+                    SizedBox(width: 4.w),
+                    Text(
+                      request.day ?? '--/--/----',
+                      style: GoogleFonts.cairo(
+                        fontSize: 12.sp,
+                        color: Colors.grey.shade800,
+                        fontWeight: FontWeight.w600,
                       ),
-                    ),
-                    SizedBox(width: 8.w),
-                    SizedBox(
-                      width: 58.w,
-                      child: Text(
-                        request.clientName ?? 'عميل',
-                        style: GoogleFonts.cairo(
-                          fontSize: 13.sp,
-                          color: Colors.grey.shade800,
-                          fontWeight: FontWeight.w600,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                        textDirection: TextDirection.rtl,
-                      ),
+                      textDirection: TextDirection.rtl,
                     ),
                   ],
                 ),
@@ -159,26 +203,9 @@ class AvailableRequestCard extends StatelessWidget {
                     ),
                   ],
                 ),
-                Row(
-                  textDirection: TextDirection.rtl,
-                  children: [
-                    Icon(Icons.calendar_today_outlined,
-                        size: 16.r, color: Colors.black),
-                    SizedBox(width: 4.w),
-                    Text(
-                      request.day ?? '--/--/----',
-                      style: GoogleFonts.cairo(
-                        fontSize: 12.sp,
-                        color: Colors.grey.shade800,
-                        fontWeight: FontWeight.w600,
-                      ),
-                      textDirection: TextDirection.rtl,
-                    ),
-                  ],
-                ),
               ],
             ),
-            SizedBox(height: 16.h),
+            SizedBox(height: 20.h),
             Row(
               children: [
                 Expanded(

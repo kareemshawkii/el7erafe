@@ -13,6 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shimmer_ai/shimmer_ai.dart';
 
 class TechProfilePage extends StatelessWidget {
   final String? name;
@@ -236,11 +237,15 @@ class _TechProfilePageViewState extends State<TechProfilePageView> {
                               ),
                               child: ClipOval(
                                 child: _displayImage.isEmpty
-                                    ? const Center(
-                                        child: CircularProgressIndicator(
-                                          color: Colors.white,
-                                          strokeWidth: 3,
-                                        ),
+                                    ? Container(
+                                        width: 100.w,
+                                        height: 100.h,
+                                        color: Colors.white,
+                                      ).withShimmerAi(
+                                        loading: true,
+                                        width: 100,
+                                        height: 100,
+                                        borderRadius: 50,
                                       )
                                     : Image.network(
                                         _displayImage,
@@ -252,28 +257,15 @@ class _TechProfilePageViewState extends State<TechProfilePageView> {
                                           if (loadingProgress == null) {
                                             return child;
                                           }
-                                          return Center(
-                                            child: CircularProgressIndicator(
-                                              color: _primaryBlue,
-                                              strokeWidth: 3,
-                                              value: loadingProgress
-                                                          .expectedTotalBytes !=
-                                                      null
-                                                  ? loadingProgress
-                                                          .cumulativeBytesLoaded /
-                                                      (loadingProgress
-                                                              .expectedTotalBytes ??
-                                                          1)
-                                                  : null,
-                                            ),
-                                          );
-                                        },
-                                        errorBuilder:
-                                            (context, error, stackTrace) {
-                                          return const Icon(
-                                            Icons.person,
-                                            size: 50,
-                                            color: Colors.grey,
+                                          return Container(
+                                            width: 100.w,
+                                            height: 100.h,
+                                            color: Colors.white,
+                                          ).withShimmerAi(
+                                            loading: true,
+                                            width: 100,
+                                            height: 100,
+                                            borderRadius: 50,
                                           );
                                         },
                                       ),
@@ -309,7 +301,7 @@ class _TechProfilePageViewState extends State<TechProfilePageView> {
                   ),
                 ),
                 Positioned(
-                  top: 200.h, 
+                  top: 200.h,
                   bottom: 0,
                   left: 0,
                   right: 0,
@@ -368,8 +360,8 @@ class _TechProfilePageViewState extends State<TechProfilePageView> {
                                           ),
                                         );
                                         if (_displayImage.isNotEmpty) {
-                                          await NetworkImage(_displayImage)
-                                              .evict();
+                                          await CachedNetworkImage
+                                              .evictFromCache(_displayImage);
                                         }
                                         await _loadLocalData();
                                         profileCubit.loadProfile(
@@ -618,19 +610,24 @@ class _TechProfilePageViewState extends State<TechProfilePageView> {
                     onTap: () => _showImageGallery(context, images),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(8.r),
-                      child: CachedNetworkImage(
-                        imageUrl: images[index],
+                      child: Image.network(
+                        images[index],
                         width: 80.w,
                         height: 60.h,
                         fit: BoxFit.cover,
-                        placeholder: (context, url) =>
-                            Container(color: Colors.grey.shade200),
-                        errorWidget: (context, url, error) => Container(
-                          width: 80.w,
-                          color: Colors.grey.shade200,
-                          child: Icon(Icons.image_not_supported,
-                              color: Colors.grey),
-                        ),
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return Container(
+                            width: 80.w,
+                            height: 60.h,
+                            color: Colors.white,
+                          ).withShimmerAi(
+                            loading: true,
+                            width: 80,
+                            height: 60,
+                            borderRadius: 8,
+                          );
+                        },
                       ),
                     ),
                   );
@@ -702,21 +699,20 @@ class _TechProfilePageViewState extends State<TechProfilePageView> {
                         ),
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(12.r),
-                          child: CachedNetworkImage(
-                            imageUrl: images[index],
+                          child: Image.network(
+                            images[index],
                             fit: BoxFit.cover,
-                            placeholder: (context, url) => Container(
-                              color: Colors.grey.shade200,
-                              child: Center(
-                                child:
-                                    CircularProgressIndicator(strokeWidth: 2.w),
-                              ),
-                            ),
-                            errorWidget: (context, url, error) => Container(
-                              color: Colors.grey.shade200,
-                              child: Icon(Icons.broken_image,
-                                  color: Colors.grey, size: 40.r),
-                            ),
+                            loadingBuilder: (context, child, loadingProgress) {
+                              if (loadingProgress == null) return child;
+                              return Container(
+                                color: Colors.white,
+                              ).withShimmerAi(
+                                loading: true,
+                                width: double.infinity,
+                                height: double.infinity,
+                                borderRadius: 12,
+                              );
+                            },
                           ),
                         ),
                       );

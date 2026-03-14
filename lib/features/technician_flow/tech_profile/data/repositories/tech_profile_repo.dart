@@ -113,8 +113,7 @@ class TechProfileRepository {
         request.fields['Name'] = name;
       }
 
-        request.fields['AboutMe'] = aboutMe!;
-      
+      request.fields['AboutMe'] = aboutMe!;
 
       if (profileImage != null) {
         request.files.add(

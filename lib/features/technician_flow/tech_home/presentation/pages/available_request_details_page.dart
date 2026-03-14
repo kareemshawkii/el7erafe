@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:shimmer_ai/shimmer_ai.dart';
 
 class AvailableRequestDetailsPage extends StatelessWidget {
   final AvailableRequestModel request;
@@ -64,13 +65,15 @@ class AvailableRequestDetailsPage extends StatelessWidget {
                               loadingBuilder:
                                   (context, child, loadingProgress) {
                                 if (loadingProgress == null) return child;
-                                return const Center(
-                                    child: CircularProgressIndicator(
-                                        color: Color(0xFF3775FA)));
+                                return Container(
+                                  color: Colors.white,
+                                ).withShimmerAi(
+                                  loading: true,
+                                  width: double.infinity,
+                                  height: double.infinity,
+                                  borderRadius: 16,
+                                );
                               },
-                              errorBuilder: (_, __, ___) => Container(
-                                  color: Colors.grey.shade200,
-                                  child: const Icon(Icons.image, size: 50)),
                             ),
                           ),
                         ),
@@ -85,7 +88,7 @@ class AvailableRequestDetailsPage extends StatelessWidget {
                       'اسحب لليمين واليسار لرؤية باقي الصور',
                       style: GoogleFonts.cairo(
                         fontSize: 14.sp,
-                        color: Color(0xFF3775FA),
+                        color: const Color(0xFF3775FA),
                         fontWeight: FontWeight.w600,
                       ),
                       textDirection: TextDirection.rtl,
@@ -169,11 +172,20 @@ class AvailableRequestDetailsPage extends StatelessWidget {
                               width: 40.w,
                               height: 40.h,
                               fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) => Container(
+                              loadingBuilder:
+                                  (context, child, loadingProgress) {
+                                if (loadingProgress == null) return child;
+                                return Container(
                                   width: 40.w,
                                   height: 40.h,
-                                  color: Colors.grey.shade200,
-                                  child: const Icon(Icons.person)),
+                                  color: Colors.white,
+                                ).withShimmerAi(
+                                  loading: true,
+                                  width: 40,
+                                  height: 40,
+                                  borderRadius: 20,
+                                );
+                              },
                             ),
                           ),
                           SizedBox(width: 12.w),
@@ -353,13 +365,22 @@ class AvailableRequestDetailsPage extends StatelessWidget {
                                           width: 80.w,
                                           height: 80.h,
                                           fit: BoxFit.cover,
-                                          errorBuilder: (_, __, ___) =>
-                                              Container(
-                                                  width: 80.w,
-                                                  height: 80.h,
-                                                  color: Colors.grey.shade200,
-                                                  child:
-                                                      const Icon(Icons.image)),
+                                          loadingBuilder: (context, child,
+                                              loadingProgress) {
+                                            if (loadingProgress == null) {
+                                              return child;
+                                            }
+                                            return Container(
+                                              width: 80.w,
+                                              height: 80.h,
+                                              color: Colors.white,
+                                            ).withShimmerAi(
+                                              loading: true,
+                                              width: 80,
+                                              height: 80,
+                                              borderRadius: 8,
+                                            );
+                                          },
                                         ),
                                       ),
                                     );

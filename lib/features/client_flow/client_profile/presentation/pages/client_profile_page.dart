@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shimmer_ai/shimmer_ai.dart';
 
 class ClientProfilePage extends StatelessWidget {
   final String? name;
@@ -223,11 +224,15 @@ class _ClientProfilePageViewState extends State<ClientProfilePageView> {
                               ),
                               child: ClipOval(
                                 child: _displayImage.isEmpty
-                                    ? const Center(
-                                        child: CircularProgressIndicator(
-                                          color: Colors.white,
-                                          strokeWidth: 3,
-                                        ),
+                                    ? Container(
+                                        width: 100.w,
+                                        height: 100.h,
+                                        color: Colors.white,
+                                      ).withShimmerAi(
+                                        loading: true,
+                                        width: 100,
+                                        height: 100,
+                                        borderRadius: 50,
                                       )
                                     : Image.network(
                                         _displayImage,
@@ -239,28 +244,15 @@ class _ClientProfilePageViewState extends State<ClientProfilePageView> {
                                           if (loadingProgress == null) {
                                             return child;
                                           }
-                                          return Center(
-                                            child: CircularProgressIndicator(
-                                              color: _primaryBlue,
-                                              strokeWidth: 3,
-                                              value: loadingProgress
-                                                          .expectedTotalBytes !=
-                                                      null
-                                                  ? loadingProgress
-                                                          .cumulativeBytesLoaded /
-                                                      (loadingProgress
-                                                              .expectedTotalBytes ??
-                                                          1)
-                                                  : null,
-                                            ),
-                                          );
-                                        },
-                                        errorBuilder:
-                                            (context, error, stackTrace) {
-                                          return const Icon(
-                                            Icons.person,
-                                            size: 50,
-                                            color: Colors.grey,
+                                          return Container(
+                                            width: 100.w,
+                                            height: 100.h,
+                                            color: Colors.white,
+                                          ).withShimmerAi(
+                                            loading: true,
+                                            width: 100,
+                                            height: 100,
+                                            borderRadius: 50,
                                           );
                                         },
                                       ),
@@ -296,7 +288,7 @@ class _ClientProfilePageViewState extends State<ClientProfilePageView> {
                   ),
                 ),
                 Positioned(
-                  top: 200.h, 
+                  top: 200.h,
                   bottom: 0,
                   left: 0,
                   right: 0,
@@ -351,10 +343,6 @@ class _ClientProfilePageViewState extends State<ClientProfilePageView> {
                                             ),
                                           ),
                                         );
-                                        if (_displayImage.isNotEmpty) {
-                                          await NetworkImage(_displayImage)
-                                              .evict();
-                                        }
                                         await _loadLocalData();
                                         profileCubit.loadProfile(
                                             widget.token ?? "", userName);
