@@ -68,7 +68,7 @@ class AllAvailableRequestsPage extends StatelessWidget {
                 padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
                 itemCount: requests.length,
                 itemBuilder: (context, index) {
-                  return AvailableRequestCard(request: requests[index]);
+                  return AvailableRequestCard(request: requests[requests.length - 1 - index]);
                 },
               ),
             );

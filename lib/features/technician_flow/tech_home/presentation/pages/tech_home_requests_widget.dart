@@ -28,7 +28,7 @@ class TechHomeRequestsWidget extends StatelessWidget {
           );
         } else if (state is AvailableRequestsLoaded) {
           final requests = state.requests;
-          final displayRequests = requests.take(2).toList();
+          final displayRequests = requests.reversed.take(2).toList();
 
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -125,7 +125,6 @@ class TechHomeRequestsWidget extends StatelessWidget {
                     },
                   ),
                 ),
-                SizedBox(height: 12.h),
                 Divider(
                   color: Colors.grey.shade300,
                   thickness: 1.h,
