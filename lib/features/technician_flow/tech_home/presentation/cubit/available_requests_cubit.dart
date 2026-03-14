@@ -28,7 +28,7 @@ class AvailableRequestsCubit extends Cubit<AvailableRequestsState> {
               if (index != -1) {
                 currentList[index] = singleData;
               } else {
-                currentList.insert(0, singleData);
+                currentList.add(singleData);
               }
               emit(AvailableRequestsLoaded(currentList));
             } else {

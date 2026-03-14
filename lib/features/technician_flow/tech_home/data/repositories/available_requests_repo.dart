@@ -76,9 +76,14 @@ class AvailableRequestsRepo {
       void handleNewData(List<dynamic>? parameters) {
         if (parameters != null && parameters.isNotEmpty) {
           final rawData = parameters.first;
-          if (rawData is Map<String, dynamic>) {
-            final parsedSingle = AvailableRequestModel.fromJson(rawData);
-            onNewRequestReceived(parsedSingle);
+          if (rawData is Map) {
+            try {
+              final Map<String, dynamic> typedMap = Map<String, dynamic>.from(rawData);
+              final parsedSingle = AvailableRequestModel.fromJson(typedMap);
+              onNewRequestReceived(parsedSingle);
+            } catch (e) {
+              throw Exception("فشل في معالجة البيانات الواردة: ${e.toString()}");
+            }
           }
         }
       }
