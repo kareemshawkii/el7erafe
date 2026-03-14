@@ -1,3 +1,4 @@
+import 'package:el7erafe/features/technician_flow/tech_home/data/repositories/available_requests_repo.dart';
 import 'package:el7erafe/features/technician_flow/tech_home/presentation/pages/tech_home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -139,8 +140,9 @@ class _MyAppState extends State<MyApp> {
         RepositoryProvider(create: (context) => ServiceRequestRepository()),
         RepositoryProvider(create: (context) => ProfileRepository()),
         RepositoryProvider(create: (context) => TechnicianRequestRepository()),
+        RepositoryProvider(create: (context) => AvailableRequestsRepo()),
       ],
-      child:ScreenUtilInit(
+      child: ScreenUtilInit(
         designSize: const Size(393, 852),
         minTextAdapt: true,
         splitScreenMode: true,
@@ -166,7 +168,7 @@ class _MyAppState extends State<MyApp> {
               );
               return GestureDetector(
                 onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-                behavior: HitTestBehavior.opaque, 
+                behavior: HitTestBehavior.opaque,
                 child: Directionality(
                   textDirection: TextDirection.rtl,
                   child: MediaQuery(
@@ -174,8 +176,8 @@ class _MyAppState extends State<MyApp> {
                       textScaler: clampedTextScaler,
                     ),
                     child: SafeArea(
-                      top: false, 
-                      bottom: true, 
+                      top: false,
+                      bottom: true,
                       left: false,
                       right: false,
                       child: child!,
