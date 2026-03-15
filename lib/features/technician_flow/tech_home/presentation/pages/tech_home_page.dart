@@ -10,6 +10,7 @@ import 'package:el7erafe/features/technician_flow/tech_home/presentation/cubit/a
 import 'package:el7erafe/features/technician_flow/tech_home/presentation/cubit/available_requests_state.dart';
 import 'package:el7erafe/features/technician_flow/tech_home/presentation/cubit/tech_home_cubit.dart';
 import 'package:el7erafe/features/technician_flow/tech_profile/presentation/pages/tech_profile_page.dart';
+import 'package:el7erafe/features/technician_flow/tech_schedule/presentation/pages/tech_schedule_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -254,7 +255,7 @@ class _TechHomePageViewState extends State<TechHomePageView> {
 
     final List<Widget> pages = [
       homeContent,
-      const Center(child: Text("schedule History")),
+      TechSchedulePage(token: token),
       TechProfilePage(name: userName, token: token),
     ];
 
