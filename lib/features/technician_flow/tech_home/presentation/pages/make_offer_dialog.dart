@@ -169,7 +169,7 @@ class _MakeOfferDialogState extends State<MakeOfferDialog> {
 
     context.read<AvailableRequestsCubit>().submitOffer(
           requestId: widget.requestId,
-          fees: double.parse(_feesController.text.trim()),
+          fees: int.parse(_feesController.text.trim()),
           fromTime: _formatTimeForApi(_fromTime!),
           toTime: _formatTimeForApi(_toTime!),
           numberOfDays: _needsMultipleDays ? _selectedDays : null,

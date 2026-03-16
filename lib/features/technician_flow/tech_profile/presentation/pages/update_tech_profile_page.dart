@@ -66,7 +66,6 @@ class _TechUpdateProfilePageState extends State<TechUpdateProfilePage> {
     _emailDisplayController.text = widget.initialEmail ?? "";
   }
 
-  // Crash-proof URL Parser
   String _getValidImageUrl(String? url) {
     if (url == null ||
         url.trim().isEmpty ||
@@ -453,14 +452,6 @@ class _TechUpdateProfilePageState extends State<TechUpdateProfilePage> {
                                             child: CircularProgressIndicator(
                                               color: Color(0xFF3775FA),
                                             ),
-                                          );
-                                        },
-                                        errorBuilder:
-                                            (context, error, stackTrace) {
-                                          return const Icon(
-                                            Icons.person,
-                                            size: 60,
-                                            color: Colors.grey,
                                           );
                                         },
                                       );

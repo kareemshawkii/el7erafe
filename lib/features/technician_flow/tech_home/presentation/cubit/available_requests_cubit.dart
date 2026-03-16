@@ -57,7 +57,7 @@ class AvailableRequestsCubit extends Cubit<AvailableRequestsState> {
 
   void submitOffer({
     required int requestId,
-    required double fees,
+    required int fees,
     required String fromTime,
     required String toTime,
     int? numberOfDays,

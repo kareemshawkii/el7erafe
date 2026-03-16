@@ -8,7 +8,7 @@ class PendingRequestModel {
   final String? techName;
   final String? techImage;
   final String day;
-  final double? fees;
+  final int? fees;
   final int? offerId;
   final int? numberOfDays;
 
@@ -37,8 +37,8 @@ class PendingRequestModel {
       serviceType: json['serviceType'] ?? '',
       techName: json['techName'],
       techImage: json['techImage'],
-      day: _formatArabicDate(json['day']), 
-      fees: json['fees'] != null ? double.parse(json['fees'].toString()) : null,
+      day: _formatArabicDate(json['day']),
+      fees: json['fees'] != null ? int.parse(json['fees'].toString()) : null,
       offerId: json['offerId'],
       numberOfDays: json['numberOfDays'],
     );
@@ -46,10 +46,10 @@ class PendingRequestModel {
 
   static String _formatArabicDate(dynamic rawDate) {
     if (rawDate == null || rawDate.toString().isEmpty) return '';
-    
+
     try {
       DateTime parsedDate = DateTime.parse(rawDate.toString());
-      
+
       const List<String> arabicDays = [
         'الاثنين',
         'الثلاثاء',
@@ -59,17 +59,16 @@ class PendingRequestModel {
         'السبت',
         'الأحد'
       ];
-      
+
       String dayName = arabicDays[parsedDate.weekday - 1];
-      
+
       String dd = parsedDate.day.toString().padLeft(2, '0');
       String mm = parsedDate.month.toString().padLeft(2, '0');
       String yyyy = parsedDate.year.toString();
 
       return '$dayName $dd-$mm-$yyyy';
-      
     } catch (e) {
-      return rawDate.toString(); 
+      return rawDate.toString();
     }
   }
 }

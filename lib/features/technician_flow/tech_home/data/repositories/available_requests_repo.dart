@@ -117,7 +117,7 @@ class AvailableRequestsRepo {
 
   Future<Either<String, String>> submitOffer({
     required int requestId,
-    required double fees,
+    required int fees,
     required String fromTime,
     required String toTime,
     int? numberOfDays,

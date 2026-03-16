@@ -75,7 +75,6 @@ class _TechProfilePageViewState extends State<TechProfilePageView> {
     _loadLocalData();
   }
 
-  // Crash-proof URL Parser
   String _getValidImageUrl(String? url) {
     if (url == null ||
         url.trim().isEmpty ||
@@ -337,11 +336,6 @@ class _TechProfilePageViewState extends State<TechProfilePageView> {
                                             borderRadius: 50,
                                           );
                                         },
-                                        errorBuilder: (_, __, ___) => Container(
-                                          color: Colors.white,
-                                          child: const Icon(Icons.person,
-                                              color: Colors.grey, size: 50),
-                                        ),
                                       ),
                               ),
                             ),
@@ -428,8 +422,7 @@ class _TechProfilePageViewState extends State<TechProfilePageView> {
                                                         ? state.profile?.name ??
                                                             userName
                                                         : userName,
-                                                currentImageUrl:
-                                                    safeAvatarUrl, // Pass the safe URL here
+                                                currentImageUrl: safeAvatarUrl,
                                                 token: widget.token ?? "",
                                                 initialAboutMe: _aboutMe,
                                                 initialPortfolioImages:
@@ -446,7 +439,6 @@ class _TechProfilePageViewState extends State<TechProfilePageView> {
                                             ),
                                           ),
                                         );
-                                        // Safely clear cache
                                         try {
                                           if (safeAvatarUrl.isNotEmpty) {
                                             await CachedNetworkImage
@@ -837,7 +829,6 @@ class _TechProfilePageViewState extends State<TechProfilePageView> {
 
   Widget _buildImageItem(
       BuildContext context, List<String> images, int index, double? width) {
-    // Safely parse the URL for the portfolio image
     String safePortUrl = _getValidImageUrl(images[index]);
 
     return GestureDetector(
@@ -865,12 +856,6 @@ class _TechProfilePageViewState extends State<TechProfilePageView> {
                   width: width,
                   height: 80,
                   borderRadius: 8,
-                ),
-                errorWidget: (_, __, ___) => Container(
-                  width: width,
-                  height: 80.h,
-                  color: Colors.grey.shade200,
-                  child: const Icon(Icons.image, color: Colors.grey),
                 ),
               ),
       ),
@@ -953,11 +938,6 @@ class _TechProfilePageViewState extends State<TechProfilePageView> {
                                     width: double.infinity,
                                     height: double.infinity,
                                     borderRadius: 12,
-                                  ),
-                                  errorWidget: (_, __, ___) => Container(
-                                    color: Colors.grey.shade200,
-                                    child: const Icon(Icons.image,
-                                        color: Colors.grey),
                                   ),
                                 ),
                         ),
