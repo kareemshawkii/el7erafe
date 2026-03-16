@@ -55,6 +55,52 @@ class AvailableRequestsCubit extends Cubit<AvailableRequestsState> {
     }
   }
 
+  void submitOffer({
+    required int requestId,
+    required double fees,
+    required String fromTime,
+    required String toTime,
+    int? numberOfDays,
+  }) async {
+    final currentState = state;
+    emit(AvailableRequestsLoading());
+
+    final result = await repository.submitOffer(
+      requestId: requestId,
+      fees: fees,
+      fromTime: fromTime,
+      toTime: toTime,
+      numberOfDays: numberOfDays,
+    );
+
+    result.fold(
+      (error) {
+        if (!isClosed) {
+          if (error == "401") {
+            emit(AvailableRequestsUnauthorized());
+          } else {
+            emit(MakeOfferError(error));
+            if (currentState is AvailableRequestsLoaded) {
+              emit(AvailableRequestsLoaded(currentState.requests));
+            }
+          }
+        }
+      },
+      (successMessage) {
+        if (!isClosed) {
+          emit(MakeOfferSuccess(successMessage));
+          if (currentState is AvailableRequestsLoaded) {
+            final currentList =
+                List<AvailableRequestModel>.from(currentState.requests);
+            currentList
+                .removeWhere((element) => element.requestId == requestId);
+            emit(AvailableRequestsLoaded(currentList));
+          }
+        }
+      },
+    );
+  }
+
   @override
   Future<void> close() {
     repository.disconnect();

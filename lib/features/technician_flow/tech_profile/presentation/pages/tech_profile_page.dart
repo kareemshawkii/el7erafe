@@ -15,6 +15,7 @@ import 'package:el7erafe/features/technician_flow/tech_profile/presentation/cubi
 import 'package:el7erafe/features/technician_flow/tech_profile/presentation/pages/edit_schedule_sheet.dart';
 import 'package:el7erafe/features/technician_flow/tech_profile/presentation/pages/update_tech_profile_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -72,6 +73,21 @@ class _TechProfilePageViewState extends State<TechProfilePageView> {
   void initState() {
     super.initState();
     _loadLocalData();
+  }
+
+  // Crash-proof URL Parser
+  String _getValidImageUrl(String? url) {
+    if (url == null ||
+        url.trim().isEmpty ||
+        url.trim().toLowerCase() == 'null') {
+      return "";
+    }
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      return url;
+    }
+    const baseUrl =
+        'https://el7rafe-gma4hrg0e9epfsc0.uaenorth-01.azurewebsites.net';
+    return url.startsWith('/') ? '$baseUrl$url' : '$baseUrl/$url';
   }
 
   void _navigateToLogin(BuildContext context, String message) {
@@ -250,6 +266,8 @@ class _TechProfilePageViewState extends State<TechProfilePageView> {
         bool showWarning = _hasFetchedProfileOnce &&
             (_aboutMe.isEmpty || _portfolioImages.isEmpty);
 
+        String safeAvatarUrl = _getValidImageUrl(_displayImage);
+
         return Directionality(
           textDirection: TextDirection.rtl,
           child: Scaffold(
@@ -259,9 +277,7 @@ class _TechProfilePageViewState extends State<TechProfilePageView> {
                 Align(
                   alignment: Alignment.topCenter,
                   child: Container(
-                    padding: EdgeInsets.only(
-                      top: 50.h,
-                    ),
+                    padding: EdgeInsets.only(top: 50.h),
                     color: _primaryBlue,
                     width: double.infinity,
                     height: 300.h,
@@ -292,19 +308,16 @@ class _TechProfilePageViewState extends State<TechProfilePageView> {
                                     Border.all(color: Colors.white, width: 4.w),
                               ),
                               child: ClipOval(
-                                child: _displayImage.isEmpty
+                                child: safeAvatarUrl.isEmpty
                                     ? Container(
                                         width: 100.w,
                                         height: 100.h,
                                         color: Colors.white,
-                                      ).withShimmerAi(
-                                        loading: true,
-                                        width: 100,
-                                        height: 100,
-                                        borderRadius: 50,
+                                        child: const Icon(Icons.person,
+                                            color: Colors.grey, size: 50),
                                       )
                                     : Image.network(
-                                        _displayImage,
+                                        safeAvatarUrl,
                                         fit: BoxFit.cover,
                                         width: 100.w,
                                         height: 100.h,
@@ -324,6 +337,11 @@ class _TechProfilePageViewState extends State<TechProfilePageView> {
                                             borderRadius: 50,
                                           );
                                         },
+                                        errorBuilder: (_, __, ___) => Container(
+                                          color: Colors.white,
+                                          child: const Icon(Icons.person,
+                                              color: Colors.grey, size: 50),
+                                        ),
                                       ),
                               ),
                             ),
@@ -405,11 +423,13 @@ class _TechProfilePageViewState extends State<TechProfilePageView> {
                                                 BlocProvider.value(
                                               value: profileCubit,
                                               child: TechUpdateProfilePage(
-                                                initialName: state
-                                                        is ProfileLoaded
-                                                    ? state.profile?.name ?? ""
-                                                    : userName,
-                                                currentImageUrl: _displayImage,
+                                                initialName:
+                                                    state is ProfileLoaded
+                                                        ? state.profile?.name ??
+                                                            userName
+                                                        : userName,
+                                                currentImageUrl:
+                                                    safeAvatarUrl, // Pass the safe URL here
                                                 token: widget.token ?? "",
                                                 initialAboutMe: _aboutMe,
                                                 initialPortfolioImages:
@@ -426,13 +446,15 @@ class _TechProfilePageViewState extends State<TechProfilePageView> {
                                             ),
                                           ),
                                         );
-                                        if (_displayImage.isNotEmpty) {
-                                          await CachedNetworkImage
-                                              .evictFromCache(_displayImage);
-                                        }
+                                        // Safely clear cache
+                                        try {
+                                          if (safeAvatarUrl.isNotEmpty) {
+                                            await CachedNetworkImage
+                                                .evictFromCache(safeAvatarUrl);
+                                          }
+                                        } catch (_) {}
+
                                         await _loadLocalData();
-                                        profileCubit.loadProfile(
-                                            widget.token ?? "", userName);
                                       },
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor:
@@ -626,9 +648,9 @@ class _TechProfilePageViewState extends State<TechProfilePageView> {
                                       trailing: SizedBox(
                                         width: 50.w,
                                         height: 20.h,
-                                        child: Switch(
+                                        child: CupertinoSwitch(
                                           value: _notificationsEnabled,
-                                          activeThumbColor: _primaryBlue,
+                                          activeColor: _primaryBlue,
                                           onChanged: (val) => setState(() =>
                                               _notificationsEnabled = val),
                                         ),
@@ -815,35 +837,42 @@ class _TechProfilePageViewState extends State<TechProfilePageView> {
 
   Widget _buildImageItem(
       BuildContext context, List<String> images, int index, double? width) {
+    // Safely parse the URL for the portfolio image
+    String safePortUrl = _getValidImageUrl(images[index]);
+
     return GestureDetector(
       onTap: () => _showImageGallery(context, images),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(8.r),
-        child: Image.network(
-          images[index],
-          width: width,
-          height: 80.h,
-          fit: BoxFit.cover,
-          loadingBuilder: (context, child, loadingProgress) {
-            if (loadingProgress == null) return child;
-            return Container(
-              width: width,
-              height: 80.h,
-              color: Colors.white,
-            ).withShimmerAi(
-              loading: true,
-              width: width,
-              height: 80,
-              borderRadius: 8,
-            );
-          },
-          errorBuilder: (_, __, ___) => Container(
-            width: width,
-            height: 80.h,
-            color: Colors.grey.shade200,
-            child: const Icon(Icons.image, color: Colors.grey),
-          ),
-        ),
+        child: safePortUrl.isEmpty
+            ? Container(
+                width: width,
+                height: 80.h,
+                color: Colors.grey.shade200,
+                child: const Icon(Icons.image, color: Colors.grey),
+              )
+            : CachedNetworkImage(
+                imageUrl: safePortUrl,
+                width: width,
+                height: 80.h,
+                fit: BoxFit.cover,
+                placeholder: (context, url) => Container(
+                  width: width,
+                  height: 80.h,
+                  color: Colors.white,
+                ).withShimmerAi(
+                  loading: true,
+                  width: width,
+                  height: 80,
+                  borderRadius: 8,
+                ),
+                errorWidget: (_, __, ___) => Container(
+                  width: width,
+                  height: 80.h,
+                  color: Colors.grey.shade200,
+                  child: const Icon(Icons.image, color: Colors.grey),
+                ),
+              ),
       ),
     );
   }
@@ -897,6 +926,8 @@ class _TechProfilePageViewState extends State<TechProfilePageView> {
                     ),
                     itemCount: images.length,
                     itemBuilder: (context, index) {
+                      String safePortUrl = _getValidImageUrl(images[index]);
+
                       return Container(
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(12.r),
@@ -907,21 +938,28 @@ class _TechProfilePageViewState extends State<TechProfilePageView> {
                         ),
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(12.r),
-                          child: Image.network(
-                            images[index],
-                            fit: BoxFit.cover,
-                            loadingBuilder: (context, child, loadingProgress) {
-                              if (loadingProgress == null) return child;
-                              return Container(
-                                color: Colors.white,
-                              ).withShimmerAi(
-                                loading: true,
-                                width: double.infinity,
-                                height: double.infinity,
-                                borderRadius: 12,
-                              );
-                            },
-                          ),
+                          child: safePortUrl.isEmpty
+                              ? Container(
+                                  color: Colors.grey.shade200,
+                                  child: const Icon(Icons.image,
+                                      color: Colors.grey))
+                              : CachedNetworkImage(
+                                  imageUrl: safePortUrl,
+                                  fit: BoxFit.cover,
+                                  placeholder: (context, url) => Container(
+                                    color: Colors.white,
+                                  ).withShimmerAi(
+                                    loading: true,
+                                    width: double.infinity,
+                                    height: double.infinity,
+                                    borderRadius: 12,
+                                  ),
+                                  errorWidget: (_, __, ___) => Container(
+                                    color: Colors.grey.shade200,
+                                    child: const Icon(Icons.image,
+                                        color: Colors.grey),
+                                  ),
+                                ),
                         ),
                       );
                     },

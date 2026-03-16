@@ -1,7 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:el7erafe/features/technician_flow/tech_home/data/models/available_request_model.dart';
+import 'package:el7erafe/features/technician_flow/tech_home/data/repositories/available_requests_repo.dart';
+import 'package:el7erafe/features/technician_flow/tech_home/presentation/cubit/available_requests_cubit.dart';
 import 'package:el7erafe/features/technician_flow/tech_home/presentation/pages/available_request_details_page.dart';
+import 'package:el7erafe/features/technician_flow/tech_home/presentation/pages/make_offer_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:el7erafe/core/utils/animated_navigaton_with_build.dart';
@@ -213,7 +217,96 @@ class AvailableRequestCard extends StatelessWidget {
                   child: SizedBox(
                     height: 40.h,
                     child: ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        showGeneralDialog(
+                          context: context,
+                          barrierDismissible: true,
+                          barrierLabel: 'MakeOfferDialog',
+                          barrierColor: Colors.black54,
+                          transitionDuration: const Duration(milliseconds: 400),
+                          pageBuilder:
+                              (context, animation, secondaryAnimation) {
+                            return BlocProvider(
+                              create: (_) => AvailableRequestsCubit(
+                                  repository: AvailableRequestsRepo()),
+                              child: MakeOfferDialog(
+                                requestId: request.requestId,
+                                clientTimeInterval: request.clientTimeInterval,
+                              ),
+                            );
+                          },
+                          transitionBuilder:
+                              (context, animation, secondaryAnimation, child) {
+                            return ScaleTransition(
+                              scale:
+                                  Tween<double>(begin: 0.8, end: 1.0).animate(
+                                CurvedAnimation(
+                                  parent: animation,
+                                  curve: Curves.easeOutBack,
+                                ),
+                              ),
+                              child: FadeTransition(
+                                opacity: animation,
+                                child: child,
+                              ),
+                            );
+                          },
+                        ).then((result) {
+                          if (result == true) {
+                            if (!context.mounted) return;
+                            showDialog(
+                              context: context,
+                              builder: (context) => Directionality(
+                                textDirection: TextDirection.rtl,
+                                child: AlertDialog(
+                                  backgroundColor: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius:
+                                          BorderRadius.circular(16.r)),
+                                  title: Row(
+                                    children: [
+                                      Icon(Icons.check_circle,
+                                          color: Colors.green, size: 28.r),
+                                      SizedBox(width: 8.w),
+                                      Text(
+                                        "مهمة ناجحة",
+                                        style: GoogleFonts.cairo(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 18.sp,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  content: Text(
+                                    "تم تقديم العرض بنجاح!",
+                                    style: GoogleFonts.cairo(
+                                      fontSize: 15.sp,
+                                      color: Colors.black87,
+                                    ),
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                      child: Text(
+                                        "حسناً",
+                                        style: GoogleFonts.cairo(
+                                          color: const Color(0xFF3775FA),
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                            context
+                                .read<AvailableRequestsCubit>()
+                                .fetchAvailableRequests();
+                          }
+                        });
+                      },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF3775FA),
                         shape: RoundedRectangleBorder(

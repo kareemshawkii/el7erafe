@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:dartz/dartz.dart';
 import 'package:el7erafe/core/services/local_storage/auth_local_storage.dart';
 import 'package:el7erafe/features/technician_flow/tech_home/data/models/available_request_model.dart';
 import 'package:signalr_netcore/signalr_client.dart';
@@ -78,11 +79,13 @@ class AvailableRequestsRepo {
           final rawData = parameters.first;
           if (rawData is Map) {
             try {
-              final Map<String, dynamic> typedMap = Map<String, dynamic>.from(rawData);
+              final Map<String, dynamic> typedMap =
+                  Map<String, dynamic>.from(rawData);
               final parsedSingle = AvailableRequestModel.fromJson(typedMap);
               onNewRequestReceived(parsedSingle);
             } catch (e) {
-              throw Exception("فشل في معالجة البيانات الواردة: ${e.toString()}");
+              throw Exception(
+                  "فشل في معالجة البيانات الواردة: ${e.toString()}");
             }
           }
         }
@@ -109,6 +112,50 @@ class AvailableRequestsRepo {
     if (_hubConnection != null &&
         _hubConnection!.state == HubConnectionState.Connected) {
       await _hubConnection!.stop();
+    }
+  }
+
+  Future<Either<String, String>> submitOffer({
+    required int requestId,
+    required double fees,
+    required String fromTime,
+    required String toTime,
+    int? numberOfDays,
+  }) async {
+    final token = await _authLocal.getToken();
+    if (token == null || token.isEmpty) {
+      return const Left("401");
+    }
+    try {
+      final response = await http.post(
+        Uri.parse('$_baseUrl/api/tech/make-offer'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          "requestId": requestId,
+          "fees": fees,
+          "fromTime": fromTime,
+          "toTime": toTime,
+          "numberOfDays": numberOfDays,
+        }),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        return const Right("تم تقديم العرض بنجاح");
+      } else if (response.statusCode == 401) {
+        AuthLocalStorage authLocalStorage = AuthLocalStorage();
+        await authLocalStorage.clearSession();
+        return const Left("401");
+      } else {
+        final decoded = jsonDecode(response.body);
+        return Left(
+            decoded['errorMessage'] ?? "فشل تقديم العرض، حاول مرة أخرى.");
+      }
+    } catch (e) {
+      return const Left(
+          "يوجد خطأ في الاتصال بالإنترنت. الرجاء التحقق من اتصالك.");
     }
   }
 }

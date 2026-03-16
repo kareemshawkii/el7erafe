@@ -17,3 +17,15 @@ final class AvailableRequestsError extends AvailableRequestsState {
 }
 
 final class AvailableRequestsUnauthorized extends AvailableRequestsState {}
+
+final class MakeOfferLoading extends AvailableRequestsState {}
+
+final class MakeOfferSuccess extends AvailableRequestsState {
+  final String message;
+  MakeOfferSuccess(this.message);
+}
+
+final class MakeOfferError extends AvailableRequestsState {
+  final String error;
+  MakeOfferError(this.error);
+}

@@ -130,8 +130,11 @@ class TechProfileCubit extends Cubit<TechProfileState> {
 
     result.fold(
       (error) => _handleError(error),
-      (data) => _safeEmit(FieldUpdateSuccess("تم تحديث البيانات الأساسية بنجاح",
-          newName: name)),
+      (data) {
+        loadProfile(token, name ?? "مستخدم");
+        _safeEmit(FieldUpdateSuccess("تم تحديث البيانات الأساسية بنجاح",
+            newName: name));
+      },
     );
   }
 

@@ -66,6 +66,21 @@ class _TechUpdateProfilePageState extends State<TechUpdateProfilePage> {
     _emailDisplayController.text = widget.initialEmail ?? "";
   }
 
+  // Crash-proof URL Parser
+  String _getValidImageUrl(String? url) {
+    if (url == null ||
+        url.trim().isEmpty ||
+        url.trim().toLowerCase() == 'null') {
+      return "";
+    }
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      return url;
+    }
+    const baseUrl =
+        'https://el7rafe-gma4hrg0e9epfsc0.uaenorth-01.azurewebsites.net';
+    return url.startsWith('/') ? '$baseUrl$url' : '$baseUrl/$url';
+  }
+
   @override
   void dispose() {
     _nameController.dispose();
@@ -242,6 +257,12 @@ class _TechUpdateProfilePageState extends State<TechUpdateProfilePage> {
                     itemCount: allImages.length,
                     itemBuilder: (context, index) {
                       final item = allImages[index];
+
+                      String? safeNetworkUrl;
+                      if (item is String) {
+                        safeNetworkUrl = _getValidImageUrl(item);
+                      }
+
                       return Container(
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(12.r),
@@ -253,23 +274,28 @@ class _TechUpdateProfilePageState extends State<TechUpdateProfilePage> {
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(12.r),
                           child: item is String
-                              ? CachedNetworkImage(
-                                  imageUrl: item,
-                                  fit: BoxFit.cover,
-                                  placeholder: (context, url) => Container(
-                                    color: Colors.grey.shade200,
-                                    child: Center(
-                                      child: CircularProgressIndicator(
-                                          strokeWidth: 2.w),
-                                    ),
-                                  ),
-                                  errorWidget: (context, url, error) =>
-                                      Container(
-                                    color: Colors.grey.shade200,
-                                    child: Icon(Icons.broken_image,
-                                        color: Colors.grey, size: 40.r),
-                                  ),
-                                )
+                              ? (safeNetworkUrl!.isEmpty
+                                  ? Container(
+                                      color: Colors.grey.shade200,
+                                      child: const Icon(Icons.image,
+                                          color: Colors.grey))
+                                  : CachedNetworkImage(
+                                      imageUrl: safeNetworkUrl,
+                                      fit: BoxFit.cover,
+                                      placeholder: (context, url) => Container(
+                                        color: Colors.grey.shade200,
+                                        child: Center(
+                                          child: CircularProgressIndicator(
+                                              strokeWidth: 2.w),
+                                        ),
+                                      ),
+                                      errorWidget: (context, url, error) =>
+                                          Container(
+                                        color: Colors.grey.shade200,
+                                        child: Icon(Icons.broken_image,
+                                            color: Colors.grey, size: 40.r),
+                                      ),
+                                    ))
                               : Image.file(
                                   item as File,
                                   fit: BoxFit.cover,
@@ -395,6 +421,7 @@ class _TechUpdateProfilePageState extends State<TechUpdateProfilePage> {
                         width: 100.w,
                         height: 100.h,
                         decoration: BoxDecoration(
+                          color: Colors.white,
                           shape: BoxShape.circle,
                           border: Border.all(color: Colors.white, width: 3.w),
                         ),
@@ -410,19 +437,21 @@ class _TechUpdateProfilePageState extends State<TechUpdateProfilePage> {
                                       imageToDisplay = state.imageUrl;
                                     }
 
-                                    if (imageToDisplay.isNotEmpty) {
+                                    String safeAvatarUrl =
+                                        _getValidImageUrl(imageToDisplay);
+
+                                    if (safeAvatarUrl.isNotEmpty) {
                                       return Image.network(
-                                        imageToDisplay,
+                                        safeAvatarUrl,
                                         fit: BoxFit.cover,
                                         loadingBuilder:
                                             (context, child, loadingProgress) {
                                           if (loadingProgress == null) {
                                             return child;
                                           }
-
                                           return const Center(
                                             child: CircularProgressIndicator(
-                                              color: Colors.white,
+                                              color: Color(0xFF3775FA),
                                             ),
                                           );
                                         },
@@ -799,7 +828,8 @@ class _TechUpdateProfilePageState extends State<TechUpdateProfilePage> {
               bool isNetwork = imgIndex < _existingPortfolioImages.length;
 
               if (isNetwork) {
-                imageItem = _existingPortfolioImages[imgIndex];
+                imageItem =
+                    _getValidImageUrl(_existingPortfolioImages[imgIndex]);
               } else {
                 imageItem = _newPortfolioImages[
                     imgIndex - _existingPortfolioImages.length];
@@ -814,17 +844,26 @@ class _TechUpdateProfilePageState extends State<TechUpdateProfilePage> {
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(8.r),
                         child: isNetwork
-                            ? CachedNetworkImage(
-                                imageUrl: imageItem,
-                                height: 104.h,
-                                width: 100.w,
-                                fit: BoxFit.cover,
-                                placeholder: (context, url) =>
-                                    Container(color: Colors.grey.shade200),
-                                errorWidget: (context, url, error) => Container(
+                            ? (imageItem.toString().isEmpty
+                                ? Container(
+                                    height: 104.h,
+                                    width: 100.w,
                                     color: Colors.grey.shade200,
-                                    child:
-                                        Icon(Icons.error, color: Colors.grey)))
+                                    child: const Icon(Icons.image,
+                                        color: Colors.grey))
+                                : CachedNetworkImage(
+                                    imageUrl: imageItem,
+                                    height: 104.h,
+                                    width: 100.w,
+                                    fit: BoxFit.cover,
+                                    placeholder: (context, url) =>
+                                        Container(color: Colors.grey.shade200),
+                                    errorWidget: (context, url, error) =>
+                                        Container(
+                                            color: Colors.grey.shade200,
+                                            child: const Icon(
+                                                Icons.broken_image,
+                                                color: Colors.grey))))
                             : Image.file(imageItem,
                                 height: 104.h, width: 100.w, fit: BoxFit.cover),
                       ),
