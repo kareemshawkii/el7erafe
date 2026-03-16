@@ -3,14 +3,24 @@ import 'dart:io';
 import 'package:dartz/dartz.dart';
 import 'package:http/http.dart' as http;
 import 'package:el7erafe/core/services/local_storage/auth_local_storage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfileRepository {
   final String _baseUrl =
       'https://el7rafe-gma4hrg0e9epfsc0.uaenorth-01.azurewebsites.net';
+  final String _cacheKey = 'client_profile_cache';
 
   Future<Either<String, Map<String, dynamic>>> getProfileData(
       String token) async {
     try {
+      final prefs = await SharedPreferences.getInstance();
+      final cachedData = prefs.getString(_cacheKey);
+
+      if (cachedData != null) {
+        final data = json.decode(cachedData);
+        return Right(data);
+      }
+
       final response = await http.get(
         Uri.parse('$_baseUrl/api/cf/profile'),
         headers: {
@@ -24,6 +34,8 @@ class ProfileRepository {
         await AuthLocalStorage().saveEmail(data['email']);
         await AuthLocalStorage().savePhoneNumber(data['phoneNumber']);
         await AuthLocalStorage().saveUserProfileImage(data['imageURL'] ?? "");
+
+        await prefs.setString(_cacheKey, response.body);
         return Right(data);
       } else if (response.statusCode == 401) {
         AuthLocalStorage authLocalStorage = AuthLocalStorage();
@@ -52,6 +64,8 @@ class ProfileRepository {
 
       if (response.statusCode == 200 || response.statusCode == 204) {
         await AuthLocalStorage().clearSession();
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.remove(_cacheKey);
         return const Right("تم حذف الحساب بنجاح");
       } else if (response.statusCode == 401) {
         AuthLocalStorage authLocalStorage = AuthLocalStorage();
@@ -78,6 +92,8 @@ class ProfileRepository {
 
       if (response.statusCode == 200) {
         await AuthLocalStorage().clearSession();
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.remove(_cacheKey);
         return const Right("تم تسجيل الخروج بنجاح");
       } else if (response.statusCode == 401) {
         AuthLocalStorage authLocalStorage = AuthLocalStorage();
@@ -121,7 +137,9 @@ class ProfileRepository {
         if (imageFile != null) {
           await AuthLocalStorage().deleteUserProfileImage();
         }
-        return Right("تم تحديث البيانات بنجاح");
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.remove(_cacheKey);
+        return const Right("تم تحديث البيانات بنجاح");
       } else if (response.statusCode == 401) {
         AuthLocalStorage authLocalStorage = AuthLocalStorage();
         await authLocalStorage.clearSession();
@@ -179,7 +197,7 @@ class ProfileRepository {
         }),
       );
       if (response.statusCode == 200 || response.statusCode == 201) {
-        return Right('تم التحقق من الكود بنجاح');
+        return const Right('تم التحقق من الكود بنجاح');
       } else if (response.statusCode == 400) {
         return Left((jsonDecode(response.body)['errorMessage']));
       } else if (response.statusCode == 401) {
@@ -187,10 +205,12 @@ class ProfileRepository {
         await authLocalStorage.clearSession();
         return const Left("401");
       } else {
-        return Left(("حصل خطأ غير متوقع. يرجى المحاولة مرة أخرى لاحقًا."));
+        return const Left(
+            ("حصل خطأ غير متوقع. يرجى المحاولة مرة أخرى لاحقًا."));
       }
     } catch (e) {
-      return Left(("حصل خطأ غير متوقع. يرجى التأكد من اتصالك بالإنترنت."));
+      return const Left(
+          ("حصل خطأ غير متوقع. يرجى التأكد من اتصالك بالإنترنت."));
     }
   }
 
@@ -240,7 +260,9 @@ class ProfileRepository {
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        return Right('تم التحقق من الكود بنجاح');
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.remove(_cacheKey);
+        return const Right('تم التحقق من الكود بنجاح');
       } else if (response.statusCode == 400) {
         return Left((jsonDecode(response.body)['errorMessage']));
       } else if (response.statusCode == 401) {
@@ -248,10 +270,12 @@ class ProfileRepository {
         await authLocalStorage.clearSession();
         return const Left("401");
       } else {
-        return Left(("حصل خطأ غير متوقع. يرجى المحاولة مرة أخرى لاحقًا."));
+        return const Left(
+            ("حصل خطأ غير متوقع. يرجى المحاولة مرة أخرى لاحقًا."));
       }
     } catch (e) {
-      return Left(("حصل خطأ غير متوقع. يرجى التأكد من اتصالك بالإنترنت."));
+      return const Left(
+          ("حصل خطأ غير متوقع. يرجى التأكد من اتصالك بالإنترنت."));
     }
   }
 
@@ -270,6 +294,8 @@ class ProfileRepository {
         }),
       );
       if (response.statusCode == 200) {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.remove(_cacheKey);
         return const Right('تم تحديث رقم الهاتف بنجاح.');
       } else if (response.statusCode == 400) {
         return Left(jsonDecode(response.body)['errorMessage']);
