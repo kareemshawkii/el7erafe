@@ -120,21 +120,16 @@ class TechProfileRepository {
     try {
       final Uri url = Uri.parse('$_baseUrl/api/tech/profile_update');
 
-      bool hasMediaOrName = (name != null && name.isNotEmpty) ||
-          profileImage != null ||
+      bool hasMedia = profileImage != null ||
           (newPortfolioImages != null && newPortfolioImages.isNotEmpty) ||
           (deletedPortfolioImages != null && deletedPortfolioImages.isNotEmpty);
 
-      if (hasMediaOrName) {
-        var request1 = http.MultipartRequest('PATCH', url);
-        request1.headers['Authorization'] = 'Bearer $token';
-
-        if (name != null && name.isNotEmpty) {
-          request1.fields['Name'] = name;
-        }
+      if (hasMedia) {
+        var mediaRequest = http.MultipartRequest('PATCH', url);
+        mediaRequest.headers['Authorization'] = 'Bearer $token';
 
         if (profileImage != null) {
-          request1.files.add(
+          mediaRequest.files.add(
             await http.MultipartFile.fromPath(
                 'ProfileImage', profileImage.path),
           );
@@ -142,7 +137,7 @@ class TechProfileRepository {
 
         if (newPortfolioImages != null && newPortfolioImages.isNotEmpty) {
           for (var imageFile in newPortfolioImages) {
-            request1.files.add(
+            mediaRequest.files.add(
               await http.MultipartFile.fromPath(
                   'NewPortifolioImages', imageFile.path),
             );
@@ -152,15 +147,15 @@ class TechProfileRepository {
         if (deletedPortfolioImages != null &&
             deletedPortfolioImages.isNotEmpty) {
           for (var deletedImage in deletedPortfolioImages) {
-            request1.files.add(
+            mediaRequest.files.add(
               http.MultipartFile.fromString(
                   'DeletedPortifolioImages', deletedImage),
             );
           }
         }
 
-        var streamedResponse1 = await request1.send();
-        var response1 = await http.Response.fromStream(streamedResponse1);
+        var mediaResponse = await mediaRequest.send();
+        var response1 = await http.Response.fromStream(mediaResponse);
 
         if (response1.statusCode == 401) {
           AuthLocalStorage authLocalStorage = AuthLocalStorage();
@@ -176,12 +171,12 @@ class TechProfileRepository {
       }
 
       if (aboutMe != null) {
-        var request2 = http.MultipartRequest('PATCH', url);
-        request2.headers['Authorization'] = 'Bearer $token';
-        request2.fields['AboutMe'] = aboutMe;
+        var aboutMeRequest = http.MultipartRequest('PATCH', url);
+        aboutMeRequest.headers['Authorization'] = 'Bearer $token';
+        aboutMeRequest.fields['AboutMe'] = aboutMe;
 
-        var streamedResponse2 = await request2.send();
-        var response2 = await http.Response.fromStream(streamedResponse2);
+        var aboutMeResponse = await aboutMeRequest.send();
+        var response2 = await http.Response.fromStream(aboutMeResponse);
 
         if (response2.statusCode == 401) {
           AuthLocalStorage authLocalStorage = AuthLocalStorage();
@@ -197,12 +192,31 @@ class TechProfileRepository {
       }
 
       if (name != null && name.isNotEmpty) {
+        var nameRequest = http.MultipartRequest('PATCH', url);
+        nameRequest.headers['Authorization'] = 'Bearer $token';
+        nameRequest.fields['Name'] = name;
+
+        var nameResponse = await nameRequest.send();
+        var response3 = await http.Response.fromStream(nameResponse);
+
+        if (response3.statusCode == 401) {
+          AuthLocalStorage authLocalStorage = AuthLocalStorage();
+          await authLocalStorage.clearSession();
+          return const Left("401");
+        } else if (response3.statusCode != 200 && response3.statusCode != 204) {
+          return Left(
+            (jsonDecode(response3.body)
+                    as Map<String, dynamic>)['errorMessage'] ??
+                "فشل تحديث الاسم.",
+          );
+        }
+
         await AuthLocalStorage().saveUserName(name);
       }
+
       if (profileImage != null) {
         await AuthLocalStorage().deleteUserProfileImage();
       }
-
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove(_cacheKey);
 

@@ -3,7 +3,6 @@ import 'package:el7erafe/features/technician_flow/tech_profile/data/repositories
 import 'package:el7erafe/features/technician_flow/tech_profile/data/models/technician_profile_model.dart';
 import 'package:el7erafe/features/technician_flow/tech_profile/presentation/cubit/tech_profile_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:el7erafe/core/services/local_storage/auth_local_storage.dart';
 
 class TechProfileCubit extends Cubit<TechProfileState> {
   final TechProfileRepository _repo;
@@ -18,7 +17,8 @@ class TechProfileCubit extends Cubit<TechProfileState> {
 
   void _handleError(String error) {
     if (error == "401") {
-      _safeEmit(ProfileUnauth("انتهت صلاحية الجلسة، الرجاء تسجيل الدخول مرة أخرى."));
+      _safeEmit(
+          ProfileUnauth("انتهت صلاحية الجلسة، الرجاء تسجيل الدخول مرة أخرى."));
     } else {
       _safeEmit(ProfileError(error));
     }
@@ -27,13 +27,9 @@ class TechProfileCubit extends Cubit<TechProfileState> {
   void loadProfile(String token, String defaultName) async {
     _safeEmit(ProfileLoading());
 
-    String localImage = await AuthLocalStorage().getUserProfileImage() ?? "";
-    if (localImage.isNotEmpty) {
-      _safeEmit(ProfileLoaded(imageUrl: localImage));
-    }
-
     final result = await _repo.getProfileData(token);
-    if (isClosed) return; 
+
+    if (isClosed) return;
 
     result.fold(
       (error) {
@@ -41,16 +37,13 @@ class TechProfileCubit extends Cubit<TechProfileState> {
           _safeEmit(ProfileUnauth(
               "انتهت صلاحية الجلسة، الرجاء تسجيل الدخول مرة أخرى."));
         } else {
-          if (localImage.isEmpty) _safeEmit(ProfileError(error));
+          _safeEmit(ProfileError(error));
         }
       },
-      (TechnicianProfileModel profileModel) async {
-        String freshImageUrl = profileModel.profileImage;
-        if (freshImageUrl.isNotEmpty && freshImageUrl != localImage) {
-          await AuthLocalStorage().saveUserProfileImage(freshImageUrl);
-        }
-        if (!isClosed) { 
-          _safeEmit(ProfileLoaded(imageUrl: freshImageUrl, profile: profileModel));
+      (TechnicianProfileModel profileModel) {
+        if (!isClosed) {
+          _safeEmit(ProfileLoaded(
+              imageUrl: profileModel.profileImage, profile: profileModel));
         }
       },
     );
@@ -59,6 +52,7 @@ class TechProfileCubit extends Cubit<TechProfileState> {
   void deleteAccount(String token) async {
     final result = await _repo.deleteAccount(token);
     if (isClosed) return;
+
     result.fold(
       (error) => _handleError(error),
       (success) => _safeEmit(ProfileActionSuccess("تم حذف الحساب بنجاح")),
@@ -68,6 +62,7 @@ class TechProfileCubit extends Cubit<TechProfileState> {
   void logout(String token) async {
     final result = await _repo.logout(token);
     if (isClosed) return;
+
     result.fold(
       (error) => _handleError(error),
       (success) => _safeEmit(ProfileActionSuccess("تم تسجيل الخروج بنجاح")),
@@ -93,7 +88,8 @@ class TechProfileCubit extends Cubit<TechProfileState> {
         (deletedPortfolioImages?.length ?? 0);
 
     if (finalImageCount > 20) {
-      _safeEmit(ProfileError("لا يمكن أن يتجاوز عدد صور معرض الأعمال 20 صورة."));
+      _safeEmit(
+          ProfileError("لا يمكن أن يتجاوز عدد صور معرض الأعمال 20 صورة."));
       return;
     }
 
@@ -131,6 +127,7 @@ class TechProfileCubit extends Cubit<TechProfileState> {
     );
 
     if (isClosed) return;
+
     result.fold(
       (error) => _handleError(error),
       (data) => _safeEmit(FieldUpdateSuccess("تم تحديث البيانات الأساسية بنجاح",
@@ -142,7 +139,9 @@ class TechProfileCubit extends Cubit<TechProfileState> {
       {required bool isForPhone}) async {
     _safeEmit(ProfileLoading());
     final result = await _repo.sendFirstOtp(token, email);
+
     if (isClosed) return;
+
     result.fold(
       (error) => _handleError(error),
       (success) => _safeEmit(FirstOtpSent(isForPhone: isForPhone)),
@@ -153,7 +152,9 @@ class TechProfileCubit extends Cubit<TechProfileState> {
       {required bool isForPhone}) async {
     _safeEmit(ProfileLoading());
     final result = await _repo.verifyFirstOtp(token, email, otp);
+
     if (isClosed) return;
+
     result.fold(
       (error) => _handleError(error),
       (success) => _safeEmit(FirstOtpVerified(isForPhone: isForPhone)),
@@ -163,7 +164,9 @@ class TechProfileCubit extends Cubit<TechProfileState> {
   void sendOtpToNewEmail(String token, String newEmail) async {
     _safeEmit(ProfileLoading());
     final result = await _repo.sendOtpToNewEmail(token, newEmail);
+
     if (isClosed) return;
+
     result.fold(
       (error) => _handleError(error),
       (success) => _safeEmit(NewEmailOtpSent()),
@@ -173,7 +176,9 @@ class TechProfileCubit extends Cubit<TechProfileState> {
   void verifyNewEmail(String token, String email, String newOtpCode) async {
     _safeEmit(ProfileLoading());
     final result = await _repo.verifyNewEmail(token, email, newOtpCode);
+
     if (isClosed) return;
+
     result.fold(
       (error) => _handleError(error),
       (success) => _safeEmit(FieldUpdateSuccess(
@@ -185,7 +190,9 @@ class TechProfileCubit extends Cubit<TechProfileState> {
   void finalizePhoneChange(String token, String newPhone) async {
     _safeEmit(ProfileLoading());
     final result = await _repo.finalizePhoneChange(token, newPhone);
+
     if (isClosed) return;
+
     result.fold(
       (error) => _handleError(error),
       (successMessage) => _safeEmit(FieldUpdateSuccess(

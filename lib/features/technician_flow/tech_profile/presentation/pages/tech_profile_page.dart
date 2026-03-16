@@ -405,12 +405,23 @@ class _TechProfilePageViewState extends State<TechProfilePageView> {
                                                 BlocProvider.value(
                                               value: profileCubit,
                                               child: TechUpdateProfilePage(
-                                                initialName: userName,
+                                                initialName: state
+                                                        is ProfileLoaded
+                                                    ? state.profile?.name ?? ""
+                                                    : userName,
                                                 currentImageUrl: _displayImage,
                                                 token: widget.token ?? "",
                                                 initialAboutMe: _aboutMe,
                                                 initialPortfolioImages:
                                                     _portfolioImages,
+                                                initialEmail: state
+                                                        is ProfileLoaded
+                                                    ? state.profile?.email ?? ""
+                                                    : "",
+                                                initialPhone: state
+                                                        is ProfileLoaded
+                                                    ? state.profile?.phone ?? ""
+                                                    : "",
                                               ),
                                             ),
                                           ),

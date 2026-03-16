@@ -9,7 +9,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:path_provider/path_provider.dart';
-
 import 'package:el7erafe/core/services/local_storage/auth_local_storage.dart';
 import 'package:el7erafe/features/technician_flow/tech_profile/presentation/cubit/tech_profile_cubit.dart';
 import 'package:el7erafe/features/technician_flow/tech_profile/presentation/cubit/tech_profile_state.dart';
@@ -22,6 +21,8 @@ class TechUpdateProfilePage extends StatefulWidget {
   final String token;
   final String initialAboutMe;
   final List<String> initialPortfolioImages;
+  final String? initialPhone;
+  final String? initialEmail;
 
   const TechUpdateProfilePage({
     super.key,
@@ -30,6 +31,8 @@ class TechUpdateProfilePage extends StatefulWidget {
     required this.token,
     this.initialAboutMe = "",
     this.initialPortfolioImages = const [],
+    this.initialPhone,
+    this.initialEmail,
   });
 
   @override
@@ -59,18 +62,8 @@ class _TechUpdateProfilePageState extends State<TechUpdateProfilePage> {
     _nameController.text = widget.initialName;
     _aboutMeController.text = widget.initialAboutMe;
     _existingPortfolioImages = List.from(widget.initialPortfolioImages);
-    _loadStoredContactData();
-  }
-
-  Future<void> _loadStoredContactData() async {
-    final email = await AuthLocalStorage().getEmail() ?? "";
-    final phone = await AuthLocalStorage().getPhoneNumber() ?? "";
-    if (mounted) {
-      setState(() {
-        _emailDisplayController.text = email;
-        _phoneDisplayController.text = phone;
-      });
-    }
+    _phoneDisplayController.text = widget.initialPhone ?? "";
+    _emailDisplayController.text = widget.initialEmail ?? "";
   }
 
   @override
@@ -145,7 +138,7 @@ class _TechUpdateProfilePageState extends State<TechUpdateProfilePage> {
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text('حدث خطأ أثناء اختيار الصورة',
               textDirection: TextDirection.rtl),
           backgroundColor: Colors.red,
@@ -583,26 +576,30 @@ class _TechUpdateProfilePageState extends State<TechUpdateProfilePage> {
                                               : () {
                                                   if (_mainFormKey.currentState!
                                                       .validate()) {
-                                                    String currentName =
+                                                    final currentName =
                                                         _nameController.text
                                                             .trim();
-                                                    String nameToSend =
-                                                        (currentName ==
-                                                                widget
-                                                                    .initialName)
-                                                            ? ""
-                                                            : currentName;
-
-                                                    if (nameToSend.isEmpty &&
-                                                        _pickedImage == null &&
-                                                        _newPortfolioImages
-                                                            .isEmpty &&
-                                                        _deletedPortfolioImages
-                                                            .isEmpty &&
+                                                    final currentAboutMe =
                                                         _aboutMeController.text
-                                                                .trim() ==
+                                                            .trim();
+
+                                                    bool isNameChanged =
+                                                        currentName !=
+                                                            widget.initialName;
+                                                    bool isAboutMeChanged =
+                                                        currentAboutMe !=
                                                             widget
-                                                                .initialAboutMe) {
+                                                                .initialAboutMe;
+                                                    bool hasMediaChanged =
+                                                        _pickedImage != null ||
+                                                            _newPortfolioImages
+                                                                .isNotEmpty ||
+                                                            _deletedPortfolioImages
+                                                                .isNotEmpty;
+
+                                                    if (!isNameChanged &&
+                                                        !isAboutMeChanged &&
+                                                        !hasMediaChanged) {
                                                       ScaffoldMessenger.of(
                                                               context)
                                                           .showSnackBar(
@@ -623,20 +620,13 @@ class _TechUpdateProfilePageState extends State<TechUpdateProfilePage> {
                                                             TechProfileCubit>()
                                                         .updateBasicInfo(
                                                           token: widget.token,
-                                                          name: nameToSend,
-                                                          aboutMe: (_aboutMeController
-                                                                      .text
-                                                                      .trim()
-                                                                      .isEmpty ||
-                                                                  _aboutMeController
-                                                                          .text
-                                                                          .trim() ==
-                                                                      widget
-                                                                          .initialAboutMe)
-                                                              ? ""
-                                                              : _aboutMeController
-                                                                  .text
-                                                                  .trim(),
+                                                          name: isNameChanged
+                                                              ? currentName
+                                                              : null,
+                                                          aboutMe:
+                                                              isAboutMeChanged
+                                                                  ? currentAboutMe
+                                                                  : null,
                                                           profileImage:
                                                               _pickedImage,
                                                           newPortfolioImages:

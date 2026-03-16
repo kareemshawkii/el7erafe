@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:dartz/dartz.dart';
 import 'package:el7erafe/features/technician_flow/tech_profile/data/models/tech_schedule_model.dart';
-import 'package:flutter/rendering.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -55,7 +54,6 @@ class TechScheduleRepository {
       String token, List<TechScheduleModel> schedule) async {
     try {
       final body = json.encode(schedule.map((e) => e.toJson()).toList());
-      debugPrint("Request Body: $body"); // Debug print for request body
       final response = await http.post(
         Uri.parse('$_baseUrl/api/tech/availability/set'),
         headers: {
