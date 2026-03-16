@@ -1,4 +1,4 @@
-import 'package:el7erafe/features/technician_flow/tech_schedule/data/models/tech_schedule_model.dart';
+import 'package:el7erafe/features/technician_flow/tech_profile/data/models/tech_schedule_model.dart';
 
 abstract class TechScheduleState {}
 

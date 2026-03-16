@@ -1,6 +1,6 @@
 import 'package:el7erafe/features/technician_flow/tech_home/data/repositories/available_requests_repo.dart';
 import 'package:el7erafe/features/technician_flow/tech_home/presentation/pages/tech_home_page.dart';
-import 'package:el7erafe/features/technician_flow/tech_schedule/data/repositories/tech_schedule_repository.dart';
+import 'package:el7erafe/features/technician_flow/tech_profile/data/repositories/tech_schedule_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

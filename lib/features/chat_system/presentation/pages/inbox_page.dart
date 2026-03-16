@@ -108,7 +108,7 @@ class _InboxPageViewState extends State<InboxPageView> {
                                 color: Colors.black87,
                               ),
                               decoration: InputDecoration(
-                                hintText: "دور على حرفي بالاسم",
+                                hintText: "دور على شخص بالاسم",
                                 hintStyle: GoogleFonts.cairo(
                                   fontSize: 14.sp,
                                   color: Colors.grey.shade500,

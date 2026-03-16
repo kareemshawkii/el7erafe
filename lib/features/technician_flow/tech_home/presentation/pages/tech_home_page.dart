@@ -10,7 +10,6 @@ import 'package:el7erafe/features/technician_flow/tech_home/presentation/cubit/a
 import 'package:el7erafe/features/technician_flow/tech_home/presentation/cubit/available_requests_state.dart';
 import 'package:el7erafe/features/technician_flow/tech_home/presentation/cubit/tech_home_cubit.dart';
 import 'package:el7erafe/features/technician_flow/tech_profile/presentation/pages/tech_profile_page.dart';
-import 'package:el7erafe/features/technician_flow/tech_schedule/presentation/pages/tech_schedule_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -110,8 +109,8 @@ class _TechHomePageViewState extends State<TechHomePageView> {
         }
       },
       child: SingleChildScrollView(
-        child: Container(
-          decoration: const BoxDecoration(color: Colors.white),
+      child: Container(
+        decoration: const BoxDecoration(color: Colors.white),
           child: Column(
             children: [
               SizedBox(height: 50.h),
@@ -246,7 +245,7 @@ class _TechHomePageViewState extends State<TechHomePageView> {
                 padding: EdgeInsets.symmetric(horizontal: 16.w),
                 child: const TechHomeRequestsWidget(),
               ),
-              SizedBox(height: 24.h),
+                          SizedBox(height: 24.h),
             ],
           ),
         ),
@@ -255,7 +254,7 @@ class _TechHomePageViewState extends State<TechHomePageView> {
 
     final List<Widget> pages = [
       homeContent,
-      TechSchedulePage(token: token),
+      const Center(child: Text('سجل الحجوزات')),
       TechProfilePage(name: userName, token: token),
     ];
 
@@ -319,7 +318,7 @@ class _TechHomePageViewState extends State<TechHomePageView> {
                         label: 'الرئيسيه',
                       ),
                       BottomNavigationBarItem(
-                        icon: const Icon(Icons.calendar_month),
+                        icon: const Icon(Icons.history),
                         activeIcon: Container(
                           padding: EdgeInsets.symmetric(
                               vertical: 6.h, horizontal: 20.w),
@@ -327,9 +326,9 @@ class _TechHomePageViewState extends State<TechHomePageView> {
                             color: const Color(0xFF3775FA).withOpacity(0.1),
                             borderRadius: BorderRadius.circular(12.r),
                           ),
-                          child: const Icon(Icons.calendar_month),
+                          child: const Icon(Icons.history),
                         ),
-                        label: 'المواعيد',
+                        label: 'سجل الحجوزات',
                       ),
                       BottomNavigationBarItem(
                         icon: const Icon(Icons.person_2_outlined),

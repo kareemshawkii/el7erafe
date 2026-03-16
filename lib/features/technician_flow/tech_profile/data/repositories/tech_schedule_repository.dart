@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:dartz/dartz.dart';
-import 'package:el7erafe/features/technician_flow/tech_schedule/data/models/tech_schedule_model.dart';
+import 'package:el7erafe/features/technician_flow/tech_profile/data/models/tech_schedule_model.dart';
 import 'package:flutter/rendering.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';

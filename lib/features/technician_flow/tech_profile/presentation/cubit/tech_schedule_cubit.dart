@@ -1,6 +1,6 @@
-import 'package:el7erafe/features/technician_flow/tech_schedule/data/models/tech_schedule_model.dart';
-import 'package:el7erafe/features/technician_flow/tech_schedule/data/repositories/tech_schedule_repository.dart';
-import 'package:el7erafe/features/technician_flow/tech_schedule/presentation/cubit/tech_schedule_state.dart';
+import 'package:el7erafe/features/technician_flow/tech_profile/data/models/tech_schedule_model.dart';
+import 'package:el7erafe/features/technician_flow/tech_profile/data/repositories/tech_schedule_repository.dart';
+import 'package:el7erafe/features/technician_flow/tech_profile/presentation/cubit/tech_schedule_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class TechScheduleCubit extends Cubit<TechScheduleState> {

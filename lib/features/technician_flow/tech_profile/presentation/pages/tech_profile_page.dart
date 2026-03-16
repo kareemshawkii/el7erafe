@@ -5,15 +5,21 @@ import 'package:el7erafe/core/utils/animated_navigaton_with_build.dart';
 import 'package:el7erafe/features/authentication_module/login/data/repositories/auth_repository.dart';
 import 'package:el7erafe/features/authentication_module/login/presentation/cubit/login_cubit.dart';
 import 'package:el7erafe/features/authentication_module/login/presentation/pages/login_page.dart';
+import 'package:el7erafe/features/technician_flow/tech_profile/data/models/tech_schedule_model.dart';
 import 'package:el7erafe/features/technician_flow/tech_profile/data/repositories/tech_profile_repo.dart';
+import 'package:el7erafe/features/technician_flow/tech_profile/data/repositories/tech_schedule_repository.dart';
 import 'package:el7erafe/features/technician_flow/tech_profile/presentation/cubit/tech_profile_cubit.dart';
 import 'package:el7erafe/features/technician_flow/tech_profile/presentation/cubit/tech_profile_state.dart';
+import 'package:el7erafe/features/technician_flow/tech_profile/presentation/cubit/tech_schedule_cubit.dart';
+import 'package:el7erafe/features/technician_flow/tech_profile/presentation/cubit/tech_schedule_state.dart';
+import 'package:el7erafe/features/technician_flow/tech_profile/presentation/pages/edit_schedule_sheet.dart';
 import 'package:el7erafe/features/technician_flow/tech_profile/presentation/pages/update_tech_profile_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shimmer_ai/shimmer_ai.dart';
+import 'package:iconsax/iconsax.dart';
 
 class TechProfilePage extends StatelessWidget {
   final String? name;
@@ -23,9 +29,18 @@ class TechProfilePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => TechProfileCubit(TechProfileRepository())
-        ..loadProfile(token ?? "", name ?? "مستخدم"),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) => TechProfileCubit(TechProfileRepository())
+            ..loadProfile(token ?? "", name ?? "مستخدم"),
+        ),
+        BlocProvider(
+          create: (context) => TechScheduleCubit(
+            repository: TechScheduleRepository(),
+          )..fetchSchedule(token ?? ""),
+        ),
+      ],
       child: TechProfilePageView(name: name, token: token),
     );
   }
@@ -160,6 +175,47 @@ class _TechProfilePageViewState extends State<TechProfilePageView> {
           ],
         ),
       ),
+    );
+  }
+
+  TimeOfDay _parseApiTime(String timeString) {
+    final parts = timeString.split(':');
+    return TimeOfDay(hour: int.parse(parts[0]), minute: 0);
+  }
+
+  String _formatTimeOfDay(TimeOfDay time) {
+    final hour = time.hourOfPeriod == 0 ? 12 : time.hourOfPeriod;
+    final period = time.period == DayPeriod.am ? 'ص' : 'م';
+    return "$hour:00 $period";
+  }
+
+  String _getScheduleSummary(List<TechScheduleModel> schedule) {
+    if (schedule.isEmpty) return "لم يتم تحديد أوقات التوفر حتى الآن";
+    if (schedule.first.dayOfWeek == null) {
+      final from = _parseApiTime(schedule.first.fromTime);
+      final to = _parseApiTime(schedule.first.toTime);
+      return "متاح يوميا من ${_formatTimeOfDay(from)} لـ ${_formatTimeOfDay(to)}";
+    } else {
+      return "متاح في أيام محددة (مخصص)";
+    }
+  }
+
+  void _openEditBottomSheet(
+      BuildContext context, List<TechScheduleModel> currentSchedule) {
+    final cubit = context.read<TechScheduleCubit>();
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        return BlocProvider.value(
+          value: cubit,
+          child: EditScheduleBottomSheet(
+            token: widget.token ?? "",
+            initialSchedule: currentSchedule,
+          ),
+        );
+      },
     );
   }
 
@@ -422,6 +478,107 @@ class _TechProfilePageViewState extends State<TechProfilePageView> {
                                   ),
                                 ),
                               if (showWarning) SizedBox(height: 8.h),
+                              BlocBuilder<TechScheduleCubit, TechScheduleState>(
+                                builder: (context, state) {
+                                  List<TechScheduleModel> schedule = [];
+                                  bool isScheduleLoading = false;
+
+                                  if (state is TechScheduleLoading) {
+                                    isScheduleLoading = true;
+                                  } else if (state is TechScheduleLoaded) {
+                                    schedule = state.schedule;
+                                  } else if (context
+                                      .read<TechScheduleCubit>()
+                                      .currentSchedule
+                                      .isNotEmpty) {
+                                    schedule = context
+                                        .read<TechScheduleCubit>()
+                                        .currentSchedule;
+                                  }
+
+                                  return Container(
+                                    margin:
+                                        EdgeInsets.symmetric(horizontal: 20.w),
+                                    width: double.infinity,
+                                    padding: EdgeInsets.all(16.r),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(16.r),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withOpacity(0.03),
+                                          blurRadius: 10,
+                                          offset: const Offset(0, 4),
+                                        ),
+                                      ],
+                                      border: Border.all(
+                                          color: Colors.grey.shade200),
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                "أوقات توفّرك",
+                                                style: GoogleFonts.cairo(
+                                                  fontSize: 16.sp,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.black,
+                                                ),
+                                              ),
+                                              SizedBox(height: 4.h),
+                                              isScheduleLoading
+                                                  ? SizedBox(
+                                                      height: 20.h,
+                                                      width: 20.h,
+                                                      child:
+                                                          const CircularProgressIndicator(
+                                                              color: Color(
+                                                                  0xFF3775FA),
+                                                              strokeWidth: 2),
+                                                    )
+                                                  : Text(
+                                                      _getScheduleSummary(
+                                                          schedule),
+                                                      style: GoogleFonts.cairo(
+                                                        fontSize: 13.sp,
+                                                        color: Colors
+                                                            .grey.shade600,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                      ),
+                                                    ),
+                                            ],
+                                          ),
+                                        ),
+                                        InkWell(
+                                          onTap: isScheduleLoading
+                                              ? null
+                                              : () => _openEditBottomSheet(
+                                                  context, schedule),
+                                          child: Container(
+                                            padding: EdgeInsets.all(10.r),
+                                            decoration: BoxDecoration(
+                                              color: const Color(0xFF3775FA),
+                                              borderRadius:
+                                                  BorderRadius.circular(12.r),
+                                            ),
+                                            child: Icon(Iconsax.edit,
+                                                color: Colors.white,
+                                                size: 20.r),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              ),
+                              SizedBox(height: 16.h),
                               if (_aboutMe.isNotEmpty) ...[
                                 _buildAboutMeSection(_aboutMe),
                                 SizedBox(height: 16.h),
@@ -538,36 +695,40 @@ class _TechProfilePageViewState extends State<TechProfilePageView> {
   }
 
   Widget _buildAboutMeSection(String aboutText) {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 20.w),
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 20.w),
+      padding: EdgeInsets.all(16.r),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16.r),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.03),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+        border: Border.all(color: Colors.grey.shade200),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             "نبذة عنك",
             style: GoogleFonts.cairo(
-              fontSize: 14.sp,
+              fontSize: 16.sp,
               fontWeight: FontWeight.bold,
-              color: Colors.black87,
+              color: Colors.black,
             ),
           ),
           SizedBox(height: 8.h),
-          Container(
-            width: double.infinity,
-            padding: EdgeInsets.all(12.r),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12.r),
-              border:
-                  Border.all(color: Colors.grey.withOpacity(0.3), width: 1.w),
-            ),
-            child: Text(
-              aboutText,
-              style: GoogleFonts.cairo(
-                fontSize: 12.sp,
-                color: Colors.grey.shade600,
-                height: 1.5,
-              ),
+          Text(
+            aboutText,
+            style: GoogleFonts.cairo(
+              fontSize: 13.sp,
+              color: Colors.grey.shade600,
+              height: 1.5,
+              fontWeight: FontWeight.w500,
             ),
           ),
         ],
@@ -576,66 +737,102 @@ class _TechProfilePageViewState extends State<TechProfilePageView> {
   }
 
   Widget _buildPortfolioSection(BuildContext context, List<String> images) {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 20.w),
+    double availableWidth = MediaQuery.of(context).size.width - 40.w - 32.r;
+    double itemWidth = (availableWidth - (3 * 8.w)) / 4;
+
+    Widget content;
+
+    if (images.length <= 4) {
+      List<Widget> rowChildren = [];
+      for (int i = 0; i < images.length; i++) {
+        rowChildren.add(
+          Expanded(
+            child: _buildImageItem(context, images, i, null),
+          ),
+        );
+        if (i != images.length - 1) {
+          rowChildren.add(SizedBox(width: 8.w));
+        }
+      }
+      content = Row(children: rowChildren);
+    } else {
+      content = ListView.separated(
+        scrollDirection: Axis.horizontal,
+        itemCount: images.length,
+        separatorBuilder: (context, index) => SizedBox(width: 8.w),
+        itemBuilder: (context, index) {
+          return _buildImageItem(context, images, index, itemWidth);
+        },
+      );
+    }
+
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 20.w),
+      padding: EdgeInsets.all(16.r),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16.r),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.03),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+        border: Border.all(color: Colors.grey.shade200),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             "صور لشغلك السابق",
             style: GoogleFonts.cairo(
-              fontSize: 14.sp,
+              fontSize: 16.sp,
               fontWeight: FontWeight.bold,
-              color: Colors.black87,
+              color: Colors.black,
             ),
           ),
-          SizedBox(height: 8.h),
-          Container(
-            width: double.infinity,
-            padding: EdgeInsets.all(12.r),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12.r),
-              border:
-                  Border.all(color: Colors.grey.withOpacity(0.3), width: 1.w),
-            ),
-            child: SizedBox(
-              height: 60.h,
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                itemCount: images.length,
-                separatorBuilder: (context, index) => SizedBox(width: 8.w),
-                itemBuilder: (context, index) {
-                  return GestureDetector(
-                    onTap: () => _showImageGallery(context, images),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(8.r),
-                      child: Image.network(
-                        images[index],
-                        width: 80.w,
-                        height: 60.h,
-                        fit: BoxFit.cover,
-                        loadingBuilder: (context, child, loadingProgress) {
-                          if (loadingProgress == null) return child;
-                          return Container(
-                            width: 80.w,
-                            height: 60.h,
-                            color: Colors.white,
-                          ).withShimmerAi(
-                            loading: true,
-                            width: 80,
-                            height: 60,
-                            borderRadius: 8,
-                          );
-                        },
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
+          SizedBox(height: 12.h),
+          SizedBox(
+            height: 80.h,
+            child: content,
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildImageItem(
+      BuildContext context, List<String> images, int index, double? width) {
+    return GestureDetector(
+      onTap: () => _showImageGallery(context, images),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(8.r),
+        child: Image.network(
+          images[index],
+          width: width,
+          height: 80.h,
+          fit: BoxFit.cover,
+          loadingBuilder: (context, child, loadingProgress) {
+            if (loadingProgress == null) return child;
+            return Container(
+              width: width,
+              height: 80.h,
+              color: Colors.white,
+            ).withShimmerAi(
+              loading: true,
+              width: width,
+              height: 80,
+              borderRadius: 8,
+            );
+          },
+          errorBuilder: (_, __, ___) => Container(
+            width: width,
+            height: 80.h,
+            color: Colors.grey.shade200,
+            child: const Icon(Icons.image, color: Colors.grey),
+          ),
+        ),
       ),
     );
   }

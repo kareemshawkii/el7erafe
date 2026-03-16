@@ -4,14 +4,24 @@ import 'package:dartz/dartz.dart';
 import 'package:el7erafe/features/technician_flow/tech_profile/data/models/technician_profile_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:el7erafe/core/services/local_storage/auth_local_storage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class TechProfileRepository {
   final String _baseUrl =
       'https://el7rafe-gma4hrg0e9epfsc0.uaenorth-01.azurewebsites.net';
+  final String _cacheKey = 'tech_profile_cache';
 
   Future<Either<String, TechnicianProfileModel>> getProfileData(
       String token) async {
     try {
+      final prefs = await SharedPreferences.getInstance();
+      final cachedData = prefs.getString(_cacheKey);
+      if (cachedData != null) {
+        final data = json.decode(cachedData);
+        final profileModel = TechnicianProfileModel.fromJson(data);
+        return Right(profileModel);
+      }
+
       final response = await http.get(
         Uri.parse('$_baseUrl/api/tech/profile'),
         headers: {
@@ -26,6 +36,9 @@ class TechProfileRepository {
         await AuthLocalStorage().savePhoneNumber(data['phone'] ?? "");
         await AuthLocalStorage()
             .saveUserProfileImage(data['profileImage'] ?? "");
+
+        await prefs.setString(_cacheKey, response.body);
+
         final profileModel = TechnicianProfileModel.fromJson(data);
         return Right(profileModel);
       } else if (response.statusCode == 401) {
@@ -106,60 +119,94 @@ class TechProfileRepository {
   }) async {
     try {
       final Uri url = Uri.parse('$_baseUrl/api/tech/profile_update');
-      var request = http.MultipartRequest('PATCH', url);
-      request.headers['Authorization'] = 'Bearer $token';
+
+      bool hasMediaOrName = (name != null && name.isNotEmpty) ||
+          profileImage != null ||
+          (newPortfolioImages != null && newPortfolioImages.isNotEmpty) ||
+          (deletedPortfolioImages != null && deletedPortfolioImages.isNotEmpty);
+
+      if (hasMediaOrName) {
+        var request1 = http.MultipartRequest('PATCH', url);
+        request1.headers['Authorization'] = 'Bearer $token';
+
+        if (name != null && name.isNotEmpty) {
+          request1.fields['Name'] = name;
+        }
+
+        if (profileImage != null) {
+          request1.files.add(
+            await http.MultipartFile.fromPath(
+                'ProfileImage', profileImage.path),
+          );
+        }
+
+        if (newPortfolioImages != null && newPortfolioImages.isNotEmpty) {
+          for (var imageFile in newPortfolioImages) {
+            request1.files.add(
+              await http.MultipartFile.fromPath(
+                  'NewPortifolioImages', imageFile.path),
+            );
+          }
+        }
+
+        if (deletedPortfolioImages != null &&
+            deletedPortfolioImages.isNotEmpty) {
+          for (var deletedImage in deletedPortfolioImages) {
+            request1.files.add(
+              http.MultipartFile.fromString(
+                  'DeletedPortifolioImages', deletedImage),
+            );
+          }
+        }
+
+        var streamedResponse1 = await request1.send();
+        var response1 = await http.Response.fromStream(streamedResponse1);
+
+        if (response1.statusCode == 401) {
+          AuthLocalStorage authLocalStorage = AuthLocalStorage();
+          await authLocalStorage.clearSession();
+          return const Left("401");
+        } else if (response1.statusCode != 200 && response1.statusCode != 204) {
+          return Left(
+            (jsonDecode(response1.body)
+                    as Map<String, dynamic>)['errorMessage'] ??
+                "فشل تحديث البيانات الرجاء المحاولة مرة اخرى.",
+          );
+        }
+      }
+
+      if (aboutMe != null) {
+        var request2 = http.MultipartRequest('PATCH', url);
+        request2.headers['Authorization'] = 'Bearer $token';
+        request2.fields['AboutMe'] = aboutMe;
+
+        var streamedResponse2 = await request2.send();
+        var response2 = await http.Response.fromStream(streamedResponse2);
+
+        if (response2.statusCode == 401) {
+          AuthLocalStorage authLocalStorage = AuthLocalStorage();
+          await authLocalStorage.clearSession();
+          return const Left("401");
+        } else if (response2.statusCode != 200 && response2.statusCode != 204) {
+          return Left(
+            (jsonDecode(response2.body)
+                    as Map<String, dynamic>)['errorMessage'] ??
+                "فشل تحديث النبذة الشخصية.",
+          );
+        }
+      }
 
       if (name != null && name.isNotEmpty) {
-        request.fields['Name'] = name;
+        await AuthLocalStorage().saveUserName(name);
       }
-
-      request.fields['AboutMe'] = aboutMe!;
-
       if (profileImage != null) {
-        request.files.add(
-          await http.MultipartFile.fromPath('ProfileImage', profileImage.path),
-        );
+        await AuthLocalStorage().deleteUserProfileImage();
       }
 
-      if (newPortfolioImages != null && newPortfolioImages.isNotEmpty) {
-        for (var imageFile in newPortfolioImages) {
-          request.files.add(
-            await http.MultipartFile.fromPath(
-                'NewPortifolioImages', imageFile.path),
-          );
-        }
-      }
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove(_cacheKey);
 
-      if (deletedPortfolioImages != null && deletedPortfolioImages.isNotEmpty) {
-        for (var deletedImage in deletedPortfolioImages) {
-          request.files.add(
-            http.MultipartFile.fromString(
-                'DeletedPortifolioImages', deletedImage),
-          );
-        }
-      }
-
-      var streamedResponse = await request.send();
-      var response = await http.Response.fromStream(streamedResponse);
-
-      if (response.statusCode == 200 || response.statusCode == 204) {
-        if (name != null && name.isNotEmpty) {
-          await AuthLocalStorage().saveUserName(name);
-        }
-        if (profileImage != null) {
-          await AuthLocalStorage().deleteUserProfileImage();
-        }
-        return const Right("تم تحديث البيانات بنجاح");
-      } else if (response.statusCode == 401) {
-        AuthLocalStorage authLocalStorage = AuthLocalStorage();
-        await authLocalStorage.clearSession();
-        return const Left("401");
-      } else {
-        return Left(
-          (jsonDecode(response.body) as Map<String, dynamic>)['errorMessage'] ??
-              "فشل تحديث البيانات الرجاء المحاولة مرة اخرى.",
-        );
-      }
+      return const Right("تم تحديث البيانات بنجاح");
     } catch (e) {
       return const Left(
           "يوجد خطأ في الاتصال بالإنترنت الرجاء التحقق من اتصالك والمحاولة مرة اخرى.");
