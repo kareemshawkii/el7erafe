@@ -10,6 +10,7 @@ import 'package:el7erafe/features/technician_flow/tech_home/presentation/cubit/a
 import 'package:el7erafe/features/technician_flow/tech_home/presentation/cubit/available_requests_state.dart';
 import 'package:el7erafe/features/technician_flow/tech_home/presentation/cubit/tech_home_cubit.dart';
 import 'package:el7erafe/features/technician_flow/tech_profile/presentation/pages/tech_profile_page.dart';
+import 'package:el7erafe/features/technician_flow/tech_reservation_history/presentation/pages/tech_reservation_history_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -106,11 +107,15 @@ class _TechHomePageViewState extends State<TechHomePageView> {
             ),
             (route) => false,
           );
+        } else if (state is DeclineRequestError) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(state.error), backgroundColor: Colors.red),
+          );
         }
       },
       child: SingleChildScrollView(
-      child: Container(
-        decoration: const BoxDecoration(color: Colors.white),
+        child: Container(
+          decoration: const BoxDecoration(color: Colors.white),
           child: Column(
             children: [
               SizedBox(height: 50.h),
@@ -245,7 +250,7 @@ class _TechHomePageViewState extends State<TechHomePageView> {
                 padding: EdgeInsets.symmetric(horizontal: 16.w),
                 child: const TechHomeRequestsWidget(),
               ),
-                          SizedBox(height: 24.h),
+              SizedBox(height: 24.h),
             ],
           ),
         ),
@@ -254,7 +259,7 @@ class _TechHomePageViewState extends State<TechHomePageView> {
 
     final List<Widget> pages = [
       homeContent,
-      const Center(child: Text('سجل الحجوزات')),
+      TechReservationHistoryPage(),
       TechProfilePage(name: userName, token: token),
     ];
 

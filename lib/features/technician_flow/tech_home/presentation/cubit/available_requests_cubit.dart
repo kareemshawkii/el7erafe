@@ -101,6 +101,29 @@ class AvailableRequestsCubit extends Cubit<AvailableRequestsState> {
     );
   }
 
+  void declineRequest(int requestId) async {
+    emit(DeclineRequestLoading());
+
+    final result = await repository.declineRequest(requestId);
+
+    if (isClosed) return;
+
+    result.fold(
+      (error) {
+        if (error == "401") {
+          emit(AvailableRequestsUnauthorized());
+        } else {
+          emit(DeclineRequestError(error));
+          fetchAvailableRequests();
+        }
+      },
+      (successMessage) {
+        emit(DeclineRequestSuccess(successMessage));
+        fetchAvailableRequests();
+      },
+    );
+  }
+
   @override
   Future<void> close() {
     repository.disconnect();

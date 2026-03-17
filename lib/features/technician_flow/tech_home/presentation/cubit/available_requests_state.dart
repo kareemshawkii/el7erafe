@@ -29,3 +29,15 @@ final class MakeOfferError extends AvailableRequestsState {
   final String error;
   MakeOfferError(this.error);
 }
+
+final class DeclineRequestLoading extends AvailableRequestsState {}
+
+final class DeclineRequestSuccess extends AvailableRequestsState {
+  final String message;
+  DeclineRequestSuccess(this.message);
+}
+
+final class DeclineRequestError extends AvailableRequestsState {
+  final String error;
+  DeclineRequestError(this.error);
+}

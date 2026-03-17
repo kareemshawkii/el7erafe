@@ -591,7 +591,13 @@ class AvailableRequestDetailsPage extends StatelessWidget {
                       height: 45.h,
                       child: OutlinedButton(
                         onPressed: () {
+                          context
+                              .read<AvailableRequestsCubit>()
+                              .declineRequest(request.requestId);
                           Navigator.pop(context);
+                          context
+                              .read<AvailableRequestsCubit>()
+                              .fetchAvailableRequests();
                         },
                         style: OutlinedButton.styleFrom(
                           side: const BorderSide(color: Color(0xFF3775FA)),

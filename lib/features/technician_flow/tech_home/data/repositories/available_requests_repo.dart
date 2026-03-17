@@ -158,4 +158,37 @@ class AvailableRequestsRepo {
           "يوجد خطأ في الاتصال بالإنترنت. الرجاء التحقق من اتصالك.");
     }
   }
+
+  Future<Either<String, String>> declineRequest(int requestId) async {
+    try {
+      final token = await _authLocal.getToken();
+      if (token == null || token.isEmpty) return const Left("401");
+
+      final url = Uri.parse("$_baseUrl/api/tech/decline-request");
+      final response = await http.patch(
+        url,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({'requestId': requestId}),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        return const Right("تم رفض الطلب بنجاح");
+      } else if (response.statusCode == 401 || response.statusCode == 403) {
+        return const Left("401");
+      } else {
+        return Left(jsonDecode(response.body)['errorMessage'] ??
+            "حدث خطأ أثناء رفض الطلب");
+      }
+    } catch (e) {
+      final errorString = e.toString().toLowerCase();
+      if (errorString.contains('401') || errorString.contains('unauthorized')) {
+        return const Left("401");
+      }
+      return const Left(
+          "فشل في الاتصال بالخادم برجاء التحقق من اتصالك بالانترنت");
+    }
+  }
 }
