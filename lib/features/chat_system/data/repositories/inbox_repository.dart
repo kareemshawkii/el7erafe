@@ -19,8 +19,7 @@ class InboxRepository {
     String? token = await authLocalStorage.getToken();
     String? userType = await authLocalStorage.getUserType();
 
-    String endpoint =
-        (userType == 'T') ? '/api/tech/inbox' : '/api/cf/inbox';
+    String endpoint = (userType == 'T') ? '/api/tech/inbox' : '/api/cf/inbox';
 
     try {
       final response = await http.get(
@@ -59,6 +58,9 @@ class InboxRepository {
               ))
           .withAutomaticReconnect()
           .build();
+
+      _hubConnection?.serverTimeoutInMilliseconds = 60000;
+      _hubConnection?.keepAliveIntervalInMilliseconds = 30000;
 
       _hubConnection?.on("InboxUpdated", (arguments) {
         if (arguments != null && arguments.isNotEmpty) {

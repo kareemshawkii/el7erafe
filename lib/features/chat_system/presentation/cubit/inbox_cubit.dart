@@ -11,7 +11,7 @@ class InboxCubit extends Cubit<InboxState> {
 
   Future<void> fetchInbox() async {
     emit(InboxLoading());
-    
+
     try {
       await repository.initSignalR(
         onInboxUpdated: (updatedInbox) {
@@ -23,7 +23,7 @@ class InboxCubit extends Cubit<InboxState> {
       );
 
       final result = await repository.getInbox();
-      
+
       result.fold(
         (conversations) {
           _allConversations = conversations;
@@ -34,7 +34,8 @@ class InboxCubit extends Cubit<InboxState> {
         (error) {
           if (error == "401 unauthorized") {
             if (!isClosed) {
-              emit(InboxUnauthorized("انتهت صلاحية الجلسة، يرجى تسجيل الدخول مجدداً"));
+              emit(InboxUnauthorized(
+                  "انتهت صلاحية الجلسة، يرجى تسجيل الدخول مجدداً"));
             }
           } else {
             if (!isClosed) {
@@ -61,6 +62,14 @@ class InboxCubit extends Cubit<InboxState> {
         emit(InboxLoaded(filteredList));
       }
     }
+  }
+
+  void disconnectSignalR() {
+    repository.disconnect();
+  }
+
+  void reconnectAndRefresh() {
+    fetchInbox();
   }
 
   @override

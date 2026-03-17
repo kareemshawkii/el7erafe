@@ -26,6 +26,9 @@ class ChatRepository {
           .withAutomaticReconnect()
           .build();
 
+      _hubConnection?.serverTimeoutInMilliseconds = 60000;
+      _hubConnection?.keepAliveIntervalInMilliseconds = 30000;
+
       _hubConnection?.on("ReceiveMessage", (arguments) {
         if (arguments != null && arguments.isNotEmpty) {
           try {

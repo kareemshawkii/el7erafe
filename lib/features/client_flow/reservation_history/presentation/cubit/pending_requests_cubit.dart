@@ -13,15 +13,11 @@ class PendingRequestsCubit extends Cubit<PendingRequestsState> {
     emit(PendingRequestsLoading());
     try {
       final initialData = await repository.getInitialPendingRequests();
-      if (!isClosed) {
-        emit(PendingRequestsLoaded(initialData));
-      }
+      if (!isClosed) emit(PendingRequestsLoaded(initialData));
 
       await repository.connectAndListen(
         onListDataReceived: (data) {
-          if (!isClosed) {
-            emit(PendingRequestsLoaded(data));
-          }
+          if (!isClosed) emit(PendingRequestsLoaded(data));
         },
         onSingleDataReceived: (singleData) {
           if (!isClosed) {
@@ -41,20 +37,17 @@ class PendingRequestsCubit extends Cubit<PendingRequestsState> {
             }
           }
         },
-        onNewOfferReceived: (offerData) async {
+        onSignalRRefreshNeeded: () async {
+          // Triggered by Offer Received or Request Rejected
           if (!isClosed) {
             try {
               final updatedData = await repository.getInitialPendingRequests();
-              if (!isClosed) {
-                emit(PendingRequestsLoaded(updatedData));
-              }
+              if (!isClosed) emit(PendingRequestsLoaded(updatedData));
             } catch (_) {}
           }
         },
         onForceDisconnect: () {
-          if (!isClosed) {
-            emit(PendingRequestsUnauthorized());
-          }
+          if (!isClosed) emit(PendingRequestsUnauthorized());
         },
       );
     } catch (e) {
@@ -73,29 +66,19 @@ class PendingRequestsCubit extends Cubit<PendingRequestsState> {
   void fetchQuickOffers(int requestId) async {
     emit(OffersLoading());
     final result = await repository.getQuickOffers(requestId);
-
     if (isClosed) return;
-
     result.fold(
-      (error) {
-        if (error == "401") {
-          emit(PendingRequestsUnauthorized());
-        } else {
-          emit(PendingRequestsError(error));
-        }
-      },
-      (offersList) {
-        emit(OffersLoaded(offersList));
-      },
+      (error) => emit(error == "401"
+          ? PendingRequestsUnauthorized()
+          : PendingRequestsError(error)),
+      (offersList) => emit(OffersLoaded(offersList)),
     );
   }
 
   void cancelRequest(int requestId) async {
     emit(OfferActionLoading());
     final result = await repository.cancelRequest(requestId);
-
     if (isClosed) return;
-
     result.fold(
       (error) {
         if (error == "401") {
@@ -115,9 +98,7 @@ class PendingRequestsCubit extends Cubit<PendingRequestsState> {
   void acceptOffer(int offerId) async {
     emit(OfferActionLoading());
     final result = await repository.acceptOffer(offerId);
-
     if (isClosed) return;
-
     result.fold(
       (error) {
         if (error == "401") {
@@ -137,9 +118,7 @@ class PendingRequestsCubit extends Cubit<PendingRequestsState> {
   void declineOffer(int offerId, int requestId) async {
     emit(OfferActionLoading());
     final result = await repository.declineOffer(offerId);
-    
     if (isClosed) return;
-
     result.fold(
       (error) {
         if (error == "401") {
@@ -154,6 +133,14 @@ class PendingRequestsCubit extends Cubit<PendingRequestsState> {
         fetchQuickOffers(requestId);
       },
     );
+  }
+
+  void disconnectSignalR() {
+    repository.disconnect();
+  }
+
+  void reconnectAndRefresh() {
+    fetchPendingRequests();
   }
 
   @override

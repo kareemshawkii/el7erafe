@@ -15,18 +15,49 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:lottie/lottie.dart';
 
-class QuickOffersPage extends StatelessWidget {
+class QuickOffersPage extends StatefulWidget {
   final int requestId;
 
   const QuickOffersPage({super.key, required this.requestId});
 
   @override
+  State<QuickOffersPage> createState() => _QuickOffersPageState();
+}
+
+class _QuickOffersPageState extends State<QuickOffersPage>
+    with WidgetsBindingObserver {
+  late PendingRequestsCubit _cubit;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _cubit = PendingRequestsCubit(repository: PendingRequestsRepo())
+      ..fetchQuickOffers(widget.requestId);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _cubit.close();
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _cubit.reconnectAndRefresh();
+    } else if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.inactive) {
+      _cubit.disconnectSignalR();
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) =>
-          PendingRequestsCubit(repository: PendingRequestsRepo())
-            ..fetchQuickOffers(requestId),
-      child: OffersView(requestId: requestId),
+    return BlocProvider.value(
+      value: _cubit,
+      child: OffersView(requestId: widget.requestId),
     );
   }
 }
@@ -59,8 +90,8 @@ class OffersView extends StatelessWidget {
         appBar: AppBar(
           backgroundColor: Colors.white,
           // ignore: deprecated_member_use
-          shadowColor: Color(0xFF3775FA).withOpacity(0.2),
-          surfaceTintColor: Color(0xFF3775FA),
+          shadowColor: const Color(0xFF3775FA).withOpacity(0.2),
+          surfaceTintColor: const Color(0xFF3775FA),
           elevation: 0,
           centerTitle: true,
           leading: IconButton(

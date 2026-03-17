@@ -16,15 +16,46 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:lottie/lottie.dart';
 
-class PendingRequestsTab extends StatelessWidget {
+class PendingRequestsTab extends StatefulWidget {
   const PendingRequestsTab({super.key});
 
   @override
+  State<PendingRequestsTab> createState() => _PendingRequestsTabState();
+}
+
+class _PendingRequestsTabState extends State<PendingRequestsTab>
+    with WidgetsBindingObserver {
+  late PendingRequestsCubit _cubit;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _cubit = PendingRequestsCubit(repository: PendingRequestsRepo())
+      ..fetchPendingRequests();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _cubit.close();
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _cubit.reconnectAndRefresh();
+    } else if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.inactive) {
+      _cubit.disconnectSignalR();
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) =>
-          PendingRequestsCubit(repository: PendingRequestsRepo())
-            ..fetchPendingRequests(),
+    return BlocProvider.value(
+      value: _cubit,
       child: const PendingRequestsView(),
     );
   }

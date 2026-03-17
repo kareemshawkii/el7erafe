@@ -22,17 +22,43 @@ class PendingOffersTab extends StatefulWidget {
 }
 
 class _PendingOffersTabState extends State<PendingOffersTab>
-    with AutomaticKeepAliveClientMixin {
+    with AutomaticKeepAliveClientMixin, WidgetsBindingObserver {
+  late PendingOffersCubit _cubit;
+
   @override
   bool get wantKeepAlive => true;
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _cubit = PendingOffersCubit(repository: PendingOffersRepo())
+      ..fetchPendingOffers()
+      ..initializeSignalR();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _cubit.close();
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _cubit.reconnectAndRefresh();
+    } else if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.inactive) {
+      _cubit.disconnectSignalR();
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     super.build(context);
-    return BlocProvider(
-      create: (context) => PendingOffersCubit(repository: PendingOffersRepo())
-        ..fetchPendingOffers()
-        ..initializeSignalR(),
+    return BlocProvider.value(
+      value: _cubit,
       child: const PendingOffersView(),
     );
   }
@@ -121,7 +147,7 @@ class PendingOffersView extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(12.r),
       decoration: BoxDecoration(
-        color:  Colors.white,
+        color: Colors.white,
         borderRadius: BorderRadius.circular(16.r),
         border: Border.all(
             // ignore: deprecated_member_use
@@ -189,6 +215,9 @@ class PendingOffersView extends StatelessWidget {
                       fit: BoxFit.cover,
                       placeholder: (_, __) =>
                           Container(color: Colors.grey.shade200),
+                      errorWidget: (_, __, ___) => Container(
+                          color: Colors.grey.shade200,
+                          child: const Icon(Icons.person, color: Colors.grey)),
                     ),
                   ),
                   SizedBox(width: 8.w),
@@ -221,7 +250,7 @@ class PendingOffersView extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: 16.h),
+          SizedBox(height: 12.h),
           Row(
             textDirection: TextDirection.rtl,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,

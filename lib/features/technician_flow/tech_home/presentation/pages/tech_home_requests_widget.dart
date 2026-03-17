@@ -10,8 +10,36 @@ import 'package:el7erafe/core/utils/animated_navigaton_with_build.dart';
 import 'package:lottie/lottie.dart';
 import 'available_request_card.dart';
 
-class TechHomeRequestsWidget extends StatelessWidget {
+class TechHomeRequestsWidget extends StatefulWidget {
   const TechHomeRequestsWidget({super.key});
+
+  @override
+  State<TechHomeRequestsWidget> createState() => _TechHomeRequestsWidgetState();
+}
+
+class _TechHomeRequestsWidgetState extends State<TechHomeRequestsWidget>
+    with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      context.read<AvailableRequestsCubit>().reconnectAndRefresh();
+    } else if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.inactive) {
+      context.read<AvailableRequestsCubit>().disconnectSignalR();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

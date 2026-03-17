@@ -13,9 +13,7 @@ class AvailableRequestsCubit extends Cubit<AvailableRequestsState> {
     emit(AvailableRequestsLoading());
     try {
       final initialData = await repository.getInitialAvailableRequests();
-      if (!isClosed) {
-        emit(AvailableRequestsLoaded(initialData));
-      }
+      if (!isClosed) emit(AvailableRequestsLoaded(initialData));
 
       await repository.connectAndListen(
         onNewRequestReceived: (singleData) {
@@ -36,10 +34,18 @@ class AvailableRequestsCubit extends Cubit<AvailableRequestsState> {
             }
           }
         },
-        onForceDisconnect: () {
+        onSignalRRefreshNeeded: () async {
+          // Triggered when a client cancels a request
           if (!isClosed) {
-            emit(AvailableRequestsUnauthorized());
+            try {
+              final updatedData =
+                  await repository.getInitialAvailableRequests();
+              if (!isClosed) emit(AvailableRequestsLoaded(updatedData));
+            } catch (_) {}
           }
+        },
+        onForceDisconnect: () {
+          if (!isClosed) emit(AvailableRequestsUnauthorized());
         },
       );
     } catch (e) {
@@ -103,11 +109,8 @@ class AvailableRequestsCubit extends Cubit<AvailableRequestsState> {
 
   void declineRequest(int requestId) async {
     emit(DeclineRequestLoading());
-
     final result = await repository.declineRequest(requestId);
-
     if (isClosed) return;
-
     result.fold(
       (error) {
         if (error == "401") {
@@ -122,6 +125,14 @@ class AvailableRequestsCubit extends Cubit<AvailableRequestsState> {
         fetchAvailableRequests();
       },
     );
+  }
+
+  void disconnectSignalR() {
+    repository.disconnect();
+  }
+
+  void reconnectAndRefresh() {
+    fetchAvailableRequests();
   }
 
   @override

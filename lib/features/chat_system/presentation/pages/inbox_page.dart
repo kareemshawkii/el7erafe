@@ -1,5 +1,3 @@
-// ignore_for_file: deprecated_member_use
-
 import 'package:el7erafe/core/utils/animated_navigaton_with_build.dart';
 import 'package:el7erafe/features/authentication_module/login/data/repositories/auth_repository.dart';
 import 'package:el7erafe/features/authentication_module/login/presentation/cubit/login_cubit.dart';
@@ -34,13 +32,31 @@ class InboxPageView extends StatefulWidget {
   State<InboxPageView> createState() => _InboxPageViewState();
 }
 
-class _InboxPageViewState extends State<InboxPageView> {
+class _InboxPageViewState extends State<InboxPageView>
+    with WidgetsBindingObserver {
   final TextEditingController _searchController = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _searchController.dispose();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      context.read<InboxCubit>().reconnectAndRefresh();
+    } else if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.inactive) {
+      context.read<InboxCubit>().disconnectSignalR();
+    }
   }
 
   @override
@@ -302,7 +318,9 @@ class _AnimatedChatCardItemState extends State<AnimatedChatCardItem> {
               color: Colors.transparent,
               child: InkWell(
                 borderRadius: BorderRadius.circular(16.r),
+                // ignore: deprecated_member_use
                 splashColor: const Color(0xFF3775FA).withOpacity(0.1),
+                // ignore: deprecated_member_use
                 highlightColor: const Color(0xFF3775FA).withOpacity(0.05),
                 onTap: () {
                   FocusScope.of(context).unfocus();

@@ -26,18 +26,11 @@ class PendingOffersRepo {
 
       if (response.statusCode == 200) {
         final decodedData = jsonDecode(response.body);
-        if (decodedData is List) {
-          return Right(decodedData
-              .map((e) => PendingOfferModel.fromJson(e as Map<String, dynamic>))
-              .toList());
-        } else if (decodedData is Map<String, dynamic> &&
-            decodedData.containsKey('data')) {
-          final listData = decodedData['data'] as List;
-          return Right(listData
-              .map((e) => PendingOfferModel.fromJson(e as Map<String, dynamic>))
-              .toList());
-        }
-        return const Right([]);
+        final listData =
+            decodedData is List ? decodedData : decodedData['data'] as List;
+        return Right(listData
+            .map((e) => PendingOfferModel.fromJson(e as Map<String, dynamic>))
+            .toList());
       } else if (response.statusCode == 401 || response.statusCode == 403) {
         return const Left("401");
       } else {
@@ -53,7 +46,7 @@ class PendingOffersRepo {
   }
 
   Future<void> connectAndListen({
-    required Function(Map<String, dynamic>) onOfferRejected,
+    required Function() onSignalRRefreshNeeded,
     required Function() onForceDisconnect,
   }) async {
     try {
@@ -68,34 +61,20 @@ class PendingOffersRepo {
           .withAutomaticReconnect()
           .build();
 
-      _hubConnection!.on("OfferRejected", (List<dynamic>? parameters) {
-        if (parameters != null && parameters.isNotEmpty) {
-          try {
-            final rawData = parameters.first;
-            dynamic parsedData = rawData;
+      _hubConnection!.serverTimeoutInMilliseconds = 60000;
+      _hubConnection!.keepAliveIntervalInMilliseconds = 30000;
 
-            if (rawData is String) {
-              parsedData = jsonDecode(rawData);
-            }
+      _hubConnection!.on("OfferRejected", (_) => onSignalRRefreshNeeded());
+      _hubConnection!.on("OfferAccepted", (_) => onSignalRRefreshNeeded());
 
-            if (parsedData is Map) {
-              onOfferRejected(Map<String, dynamic>.from(parsedData));
-            }
-          } catch (_) {}
-        }
-      });
-
-      _hubConnection!.on("ForceDisconnect", (List<dynamic>? parameters) {
-        onForceDisconnect();
-      });
+      _hubConnection!.on("ForceDisconnect", (_) => onForceDisconnect());
 
       await _hubConnection!.start();
     } catch (_) {}
   }
 
   Future<void> disconnect() async {
-    if (_hubConnection != null &&
-        _hubConnection!.state == HubConnectionState.Connected) {
+    if (_hubConnection?.state == HubConnectionState.Connected) {
       await _hubConnection!.stop();
     }
   }

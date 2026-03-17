@@ -134,6 +134,14 @@ class ChatCubit extends Cubit<ChatState> {
     }
   }
 
+  void disconnectSignalR() {
+    repository.disconnect();
+  }
+
+  void reconnectAndRefresh() {
+    connectAndLoadHistory();
+  }
+
   @override
   Future<void> close() {
     repository.disconnect();

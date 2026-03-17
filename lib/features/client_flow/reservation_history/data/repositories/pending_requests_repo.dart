@@ -17,9 +17,7 @@ class PendingRequestsRepo {
   Future<List<PendingRequestModel>> getInitialPendingRequests() async {
     try {
       final token = await _authLocal.getToken();
-      if (token == null || token.isEmpty) {
-        throw Exception("401 Unauthorized");
-      }
+      if (token == null || token.isEmpty) throw Exception("401 Unauthorized");
 
       final url = Uri.parse("$_baseUrl/api/cf/getpendingservicerequests");
       final response = await http.get(url, headers: {
@@ -60,68 +58,48 @@ class PendingRequestsRepo {
   Future<void> connectAndListen({
     required Function(List<PendingRequestModel>) onListDataReceived,
     required Function(PendingRequestModel) onSingleDataReceived,
-    required Function(Map<String, dynamic>) onNewOfferReceived,
+    required Function() onSignalRRefreshNeeded,
     required Function() onForceDisconnect,
   }) async {
     try {
       final token = await _authLocal.getToken();
-      if (token == null || token.isEmpty) {
-        throw Exception("401 Unauthorized");
-      }
+      if (token == null || token.isEmpty) throw Exception("401 Unauthorized");
 
       _hubConnection = HubConnectionBuilder()
           .withUrl(_hubUrl,
-              options: HttpConnectionOptions(
-                accessTokenFactory: () async => token,
-              ))
+              options:
+                  HttpConnectionOptions(accessTokenFactory: () async => token))
           .withAutomaticReconnect()
           .build();
+
+      _hubConnection!.serverTimeoutInMilliseconds = 60000;
+      _hubConnection!.keepAliveIntervalInMilliseconds = 30000;
 
       _hubConnection!.on("ReceivePendingRequests", (List<dynamic>? parameters) {
         if (parameters != null && parameters.isNotEmpty) {
           try {
             final rawData = parameters.first;
-            dynamic parsedData = rawData;
-
-            if (rawData is String) {
-              parsedData = jsonDecode(rawData);
-            }
+            dynamic parsedData =
+                rawData is String ? jsonDecode(rawData) : rawData;
 
             if (parsedData is List) {
-              final parsedList = parsedData
+              onListDataReceived(parsedData
                   .map((e) =>
                       PendingRequestModel.fromJson(e as Map<String, dynamic>))
-                  .toList();
-              onListDataReceived(parsedList);
+                  .toList());
             } else if (parsedData is Map) {
-              final parsedSingle = PendingRequestModel.fromJson(
-                  Map<String, dynamic>.from(parsedData));
-              onSingleDataReceived(parsedSingle);
+              onSingleDataReceived(PendingRequestModel.fromJson(
+                  Map<String, dynamic>.from(parsedData)));
             }
           } catch (_) {}
         }
       });
 
-      _hubConnection!.on("ReceiveNewOffer", (List<dynamic>? parameters) {
-        if (parameters != null && parameters.isNotEmpty) {
-          try {
-            final rawData = parameters.first;
-            dynamic parsedData = rawData;
+      _hubConnection!.on("ReceiveNewOffer", (_) => onSignalRRefreshNeeded());
 
-            if (rawData is String) {
-              parsedData = jsonDecode(rawData);
-            }
+      _hubConnection!.on("RequestRejected", (_) => onSignalRRefreshNeeded());
 
-            if (parsedData is Map) {
-              onNewOfferReceived(Map<String, dynamic>.from(parsedData));
-            }
-          } catch (_) {}
-        }
-      });
-
-      _hubConnection!.on("ForceDisconnect", (List<dynamic>? parameters) {
-        onForceDisconnect();
-      });
+      _hubConnection!.on("ForceDisconnect", (_) => onForceDisconnect());
 
       await _hubConnection!.start();
     } catch (e) {
@@ -134,8 +112,7 @@ class PendingRequestsRepo {
   }
 
   Future<void> disconnect() async {
-    if (_hubConnection != null &&
-        _hubConnection!.state == HubConnectionState.Connected) {
+    if (_hubConnection?.state == HubConnectionState.Connected) {
       await _hubConnection!.stop();
     }
   }
@@ -154,28 +131,17 @@ class PendingRequestsRepo {
 
       if (response.statusCode == 200) {
         final decodedData = jsonDecode(response.body);
-        if (decodedData is List) {
-          return Right(decodedData
-              .map((e) => OfferModel.fromJson(e as Map<String, dynamic>))
-              .toList());
-        } else if (decodedData is Map<String, dynamic> &&
-            decodedData.containsKey('data')) {
-          final listData = decodedData['data'] as List;
-          return Right(listData
-              .map((e) => OfferModel.fromJson(e as Map<String, dynamic>))
-              .toList());
-        }
-        return const Right([]);
+        final listData =
+            decodedData is List ? decodedData : decodedData['data'] as List;
+        return Right(listData
+            .map((e) => OfferModel.fromJson(e as Map<String, dynamic>))
+            .toList());
       } else if (response.statusCode == 401 || response.statusCode == 403) {
         return const Left("401");
       } else {
         return const Left("فشل في جلب العروض");
       }
     } catch (e) {
-      final errorString = e.toString().toLowerCase();
-      if (errorString.contains('401') || errorString.contains('unauthorized')) {
-        return const Left("401");
-      }
       return const Left(
           "فشل في الاتصال بالخادم برجاء التحقق من اتصالك بالانترنت");
     }
@@ -185,25 +151,19 @@ class PendingRequestsRepo {
     try {
       final token = await _authLocal.getToken();
       if (token == null || token.isEmpty) return const Left("401");
-
       final url = Uri.parse("$_baseUrl/api/cf/cancel-request");
-      final response = await http.patch(
-        url,
-        headers: {
-          'Authorization': 'Bearer $token',
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode({'requestId': requestId}),
-      );
-
+      final response = await http.patch(url,
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Content-Type': 'application/json'
+          },
+          body: jsonEncode({'requestId': requestId}));
       if (response.statusCode == 200 || response.statusCode == 204) {
         return const Right("تم الغاء الطلب بنجاح");
-      } else if (response.statusCode == 401) {
-        return const Left("401");
-      } else {
-        return Left(jsonDecode(response.body)['errorMessage'] ?? "حدث خطأ");
       }
-    } catch (e) {
+      if (response.statusCode == 401) return const Left("401");
+      return Left(jsonDecode(response.body)['errorMessage'] ?? "حدث خطأ");
+    } catch (_) {
       return const Left("فشل الاتصال بالخادم");
     }
   }
@@ -212,25 +172,19 @@ class PendingRequestsRepo {
     try {
       final token = await _authLocal.getToken();
       if (token == null || token.isEmpty) return const Left("401");
-
       final url = Uri.parse("$_baseUrl/api/cf/offers/accept");
-      final response = await http.post(
-        url,
-        headers: {
-          'Authorization': 'Bearer $token',
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode({'offerId': offerId}),
-      );
-
+      final response = await http.post(url,
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Content-Type': 'application/json'
+          },
+          body: jsonEncode({'offerId': offerId}));
       if (response.statusCode == 200 || response.statusCode == 204) {
         return const Right("تم قبول العرض بنجاح");
-      } else if (response.statusCode == 401) {
-        return const Left("401");
-      } else {
-        return Left(jsonDecode(response.body)['errorMessage'] ?? "حدث خطأ");
       }
-    } catch (e) {
+      if (response.statusCode == 401) return const Left("401");
+      return Left(jsonDecode(response.body)['errorMessage'] ?? "حدث خطأ");
+    } catch (_) {
       return const Left("فشل الاتصال بالخادم");
     }
   }
@@ -239,25 +193,19 @@ class PendingRequestsRepo {
     try {
       final token = await _authLocal.getToken();
       if (token == null || token.isEmpty) return const Left("401");
-
       final url = Uri.parse("$_baseUrl/api/cf/offers/decline");
-      final response = await http.post(
-        url,
-        headers: {
-          'Authorization': 'Bearer $token',
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode({'offerId': offerId}),
-      );
-
+      final response = await http.post(url,
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Content-Type': 'application/json'
+          },
+          body: jsonEncode({'offerId': offerId}));
       if (response.statusCode == 200 || response.statusCode == 204) {
         return const Right("تم رفض العرض");
-      } else if (response.statusCode == 401) {
-        return const Left("401");
-      } else {
-        return Left(jsonDecode(response.body)['errorMessage'] ?? "حدث خطأ");
       }
-    } catch (e) {
+      if (response.statusCode == 401) return const Left("401");
+      return Left(jsonDecode(response.body)['errorMessage'] ?? "حدث خطأ");
+    } catch (_) {
       return const Left("فشل الاتصال بالخادم");
     }
   }

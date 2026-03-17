@@ -59,14 +59,32 @@ class ChatRoomView extends StatefulWidget {
   State<ChatRoomView> createState() => _ChatRoomViewState();
 }
 
-class _ChatRoomViewState extends State<ChatRoomView> {
+class _ChatRoomViewState extends State<ChatRoomView>
+    with WidgetsBindingObserver {
   final TextEditingController _messageController = TextEditingController();
   bool _isSendingLocation = false;
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _messageController.dispose();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      context.read<ChatCubit>().reconnectAndRefresh();
+    } else if (state == AppLifecycleState.paused ||
+        state == AppLifecycleState.inactive) {
+      context.read<ChatCubit>().disconnectSignalR();
+    }
   }
 
   void _sendMessage() {
