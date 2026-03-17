@@ -8,6 +8,7 @@ import 'package:el7erafe/features/client_flow/reservation_history/data/models/pe
 import 'package:el7erafe/features/client_flow/reservation_history/data/repositories/pending_requests_repo.dart';
 import 'package:el7erafe/features/client_flow/reservation_history/presentation/cubit/pending_requests_cubit.dart';
 import 'package:el7erafe/features/client_flow/reservation_history/presentation/cubit/pending_requests_state.dart';
+import 'package:el7erafe/features/client_flow/reservation_history/presentation/presentation/quick_offers_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -122,6 +123,8 @@ class PendingRequestsView extends StatelessWidget {
 
   Widget _buildQuickReserveCard(
       BuildContext context, PendingRequestModel request) {
+    bool hasOffer = (request.numberOfOffers ?? 0) > 0;
+
     return _BaseRequestCard(
       header: Row(
         textDirection: TextDirection.rtl,
@@ -173,15 +176,23 @@ class PendingRequestsView extends StatelessWidget {
           leftIcon: Icons.access_time,
         ),
       ],
-      primaryButtonText: 'كل العروض',
-      primaryButtonIcon: Icons.list,
-      onPrimaryPressed: () {
-        // Navigate to All Offers Page passing request.requestId
-      },
+      primaryButtonText: hasOffer ? 'كل العروض' : null,
+      primaryButtonIcon: hasOffer ? Icons.list : null,
+      onPrimaryPressed: hasOffer
+          ? () {
+              Navigator.push(
+                context,
+                SlideRightRouteWithBuild(
+                  builder: (context) =>
+                      QuickOffersPage(requestId: request.requestId),
+                ),
+              );
+            }
+          : null,
       secondaryButtonText: 'إلغاء الطلب',
       secondaryButtonIcon: Iconsax.close_circle,
       onSecondaryPressed: () {
-        // Trigger cancel API
+        _showCancelDialog(context, request.requestId);
       },
     );
   }
@@ -242,22 +253,40 @@ class PendingRequestsView extends StatelessWidget {
           ),
         ],
       ],
-      primaryButtonText: hasOffer ? 'قبول العرض' : 'تفاصيل الطلب',
-      primaryButtonIcon: hasOffer ? Iconsax.tick_circle : Iconsax.document_text,
-      onPrimaryPressed: () {
-        if (hasOffer) {
-          // Trigger Accept Offer API
-        } else {
-          // Go to Details
-        }
-      },
+      primaryButtonText: hasOffer ? 'قبول العرض' : null,
+      primaryButtonIcon: hasOffer ? Iconsax.tick_circle : null,
+      onPrimaryPressed: hasOffer
+          ? () {
+              context
+                  .read<PendingRequestsCubit>()
+                  .acceptOffer(request.offerId!);
+              context.read<PendingRequestsCubit>().fetchPendingRequests();
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('تم قبول العرض بنجاح',
+                      textDirection: TextDirection.rtl),
+                  backgroundColor: Colors.green,
+                ),
+              );
+            }
+          : null,
       secondaryButtonText: hasOffer ? 'رفض العرض' : 'إلغاء الطلب',
       secondaryButtonIcon: Iconsax.close_circle,
       onSecondaryPressed: () {
         if (hasOffer) {
-          // Trigger Reject Offer API
+          context
+              .read<PendingRequestsCubit>()
+              .declineOffer(request.offerId!, request.requestId);
+          context.read<PendingRequestsCubit>().fetchPendingRequests();
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content:
+                  Text('تم رفض العرض بنجاح', textDirection: TextDirection.rtl),
+              backgroundColor: Colors.grey,
+            ),
+          );
         } else {
-          // Trigger Cancel API
+          _showCancelDialog(context, request.requestId);
         }
       },
     );
@@ -288,9 +317,9 @@ class PendingRequestsView extends StatelessWidget {
 class _BaseRequestCard extends StatelessWidget {
   final Widget header;
   final List<Widget> details;
-  final String primaryButtonText;
-  final IconData primaryButtonIcon;
-  final VoidCallback onPrimaryPressed;
+  final String? primaryButtonText;
+  final IconData? primaryButtonIcon;
+  final VoidCallback? onPrimaryPressed;
   final String secondaryButtonText;
   final IconData secondaryButtonIcon;
   final VoidCallback onSecondaryPressed;
@@ -298,9 +327,9 @@ class _BaseRequestCard extends StatelessWidget {
   const _BaseRequestCard({
     required this.header,
     required this.details,
-    required this.primaryButtonText,
-    required this.primaryButtonIcon,
-    required this.onPrimaryPressed,
+    this.primaryButtonText,
+    this.primaryButtonIcon,
+    this.onPrimaryPressed,
     required this.secondaryButtonText,
     required this.secondaryButtonIcon,
     required this.onSecondaryPressed,
@@ -327,37 +356,41 @@ class _BaseRequestCard extends StatelessWidget {
           Row(
             textDirection: TextDirection.rtl,
             children: [
-              Expanded(
-                child: SizedBox(
-                  height: 40.h,
-                  child: ElevatedButton(
-                    onPressed: onPrimaryPressed,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF3775FA),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12.r)),
-                      elevation: 0,
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      textDirection: TextDirection.rtl,
-                      children: [
-                        Icon(primaryButtonIcon,
-                            color: Colors.white, size: 15.sp),
-                        SizedBox(width: 4.w),
-                        Text(
-                          primaryButtonText,
-                          style: GoogleFonts.cairo(
-                              fontSize: 15.sp,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white),
-                        ),
-                      ],
+              if (primaryButtonText != null &&
+                  primaryButtonIcon != null &&
+                  onPrimaryPressed != null) ...[
+                Expanded(
+                  child: SizedBox(
+                    height: 40.h,
+                    child: ElevatedButton(
+                      onPressed: onPrimaryPressed,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF3775FA),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12.r)),
+                        elevation: 0,
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        textDirection: TextDirection.rtl,
+                        children: [
+                          Icon(primaryButtonIcon,
+                              color: Colors.white, size: 15.sp),
+                          SizedBox(width: 4.w),
+                          Text(
+                            primaryButtonText!,
+                            style: GoogleFonts.cairo(
+                                fontSize: 15.sp,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-              SizedBox(width: 12.w),
+                SizedBox(width: 12.w),
+              ],
               Expanded(
                 child: SizedBox(
                   height: 40.h,
@@ -458,4 +491,79 @@ class _DetailRow extends StatelessWidget {
       ],
     );
   }
+}
+
+void _showCancelDialog(BuildContext context, int requestId) {
+  final cubit = context.read<PendingRequestsCubit>();
+
+  showGeneralDialog(
+    context: context,
+    barrierDismissible: true,
+    barrierLabel: 'CancelDialog',
+    barrierColor: Colors.black54,
+    transitionDuration: const Duration(milliseconds: 400),
+    pageBuilder: (dialogContext, animation, secondaryAnimation) {
+      return Directionality(
+        textDirection: TextDirection.rtl,
+        child: AlertDialog(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16.r),
+            side: BorderSide(color: const Color(0xFF3775FA), width: 1.5.w),
+          ),
+          shadowColor: Colors.black45,
+          surfaceTintColor: const Color(0xFFE2DFDF),
+          title: Text(
+            "إلغاء الطلب",
+            style: GoogleFonts.cairo(fontWeight: FontWeight.bold),
+          ),
+          content: Text(
+            "هل أنت متأكد من إلغاء هذا الطلب؟",
+            style: GoogleFonts.cairo(),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: Text(
+                "تراجع",
+                style: GoogleFonts.cairo(color: Colors.black),
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(dialogContext);
+                cubit.cancelRequest(requestId);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('تم إلغاء الطلب بنجاح',
+                        textDirection: TextDirection.rtl),
+                    backgroundColor: Colors.grey,
+                  ),
+                );
+              },
+              child: Text(
+                "تأكيد الإلغاء",
+                style: GoogleFonts.cairo(
+                    color: Colors.red, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
+        ),
+      );
+    },
+    transitionBuilder: (context, animation, secondaryAnimation, child) {
+      return ScaleTransition(
+        scale: Tween<double>(begin: 0.8, end: 1.0).animate(
+          CurvedAnimation(
+            parent: animation,
+            curve: Curves.easeOutBack,
+          ),
+        ),
+        child: FadeTransition(
+          opacity: animation,
+          child: child,
+        ),
+      );
+    },
+  );
 }

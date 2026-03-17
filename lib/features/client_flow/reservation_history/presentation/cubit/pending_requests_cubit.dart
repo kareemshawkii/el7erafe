@@ -41,6 +41,16 @@ class PendingRequestsCubit extends Cubit<PendingRequestsState> {
             }
           }
         },
+        onNewOfferReceived: (offerData) async {
+          if (!isClosed) {
+            try {
+              final updatedData = await repository.getInitialPendingRequests();
+              if (!isClosed) {
+                emit(PendingRequestsLoaded(updatedData));
+              }
+            } catch (_) {}
+          }
+        },
         onForceDisconnect: () {
           if (!isClosed) {
             emit(PendingRequestsUnauthorized());
@@ -58,6 +68,92 @@ class PendingRequestsCubit extends Cubit<PendingRequestsState> {
         }
       }
     }
+  }
+
+  void fetchQuickOffers(int requestId) async {
+    emit(OffersLoading());
+    final result = await repository.getQuickOffers(requestId);
+
+    if (isClosed) return;
+
+    result.fold(
+      (error) {
+        if (error == "401") {
+          emit(PendingRequestsUnauthorized());
+        } else {
+          emit(PendingRequestsError(error));
+        }
+      },
+      (offersList) {
+        emit(OffersLoaded(offersList));
+      },
+    );
+  }
+
+  void cancelRequest(int requestId) async {
+    emit(OfferActionLoading());
+    final result = await repository.cancelRequest(requestId);
+
+    if (isClosed) return;
+
+    result.fold(
+      (error) {
+        if (error == "401") {
+          emit(PendingRequestsUnauthorized());
+        } else {
+          emit(OfferActionError(error));
+          fetchPendingRequests();
+        }
+      },
+      (successMessage) {
+        emit(OfferActionSuccess(successMessage));
+        fetchPendingRequests();
+      },
+    );
+  }
+
+  void acceptOffer(int offerId) async {
+    emit(OfferActionLoading());
+    final result = await repository.acceptOffer(offerId);
+
+    if (isClosed) return;
+
+    result.fold(
+      (error) {
+        if (error == "401") {
+          emit(PendingRequestsUnauthorized());
+        } else {
+          emit(OfferActionError(error));
+          fetchPendingRequests();
+        }
+      },
+      (successMessage) {
+        emit(OfferActionSuccess(successMessage));
+        fetchPendingRequests();
+      },
+    );
+  }
+
+  void declineOffer(int offerId, int requestId) async {
+    emit(OfferActionLoading());
+    final result = await repository.declineOffer(offerId);
+    
+    if (isClosed) return;
+
+    result.fold(
+      (error) {
+        if (error == "401") {
+          emit(PendingRequestsUnauthorized());
+        } else {
+          emit(OfferActionError(error));
+          fetchQuickOffers(requestId);
+        }
+      },
+      (successMessage) {
+        emit(OfferActionSuccess(successMessage));
+        fetchQuickOffers(requestId);
+      },
+    );
   }
 
   @override

@@ -1,4 +1,5 @@
 import '../../data/models/pending_request_model.dart';
+import '../../data/models/offers_model.dart';
 
 abstract class PendingRequestsState {}
 
@@ -17,3 +18,22 @@ class PendingRequestsError extends PendingRequestsState {
 }
 
 class PendingRequestsUnauthorized extends PendingRequestsState {}
+
+class OffersLoading extends PendingRequestsState {}
+
+class OffersLoaded extends PendingRequestsState {
+  final List<OfferModel> offers;
+  OffersLoaded(this.offers);
+}
+
+class OfferActionLoading extends PendingRequestsState {}
+
+class OfferActionSuccess extends PendingRequestsState {
+  final String message;
+  OfferActionSuccess(this.message);
+}
+
+class OfferActionError extends PendingRequestsState {
+  final String error;
+  OfferActionError(this.error);
+}

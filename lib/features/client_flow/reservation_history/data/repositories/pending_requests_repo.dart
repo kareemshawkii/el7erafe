@@ -1,5 +1,7 @@
 import 'dart:convert';
+import 'package:dartz/dartz.dart';
 import 'package:el7erafe/core/services/local_storage/auth_local_storage.dart';
+import 'package:el7erafe/features/client_flow/reservation_history/data/models/offers_model.dart';
 import 'package:el7erafe/features/client_flow/reservation_history/data/models/pending_request_model.dart';
 import 'package:signalr_netcore/signalr_client.dart';
 import 'package:http/http.dart' as http;
@@ -44,20 +46,21 @@ class PendingRequestsRepo {
       } else if (response.statusCode == 401 || response.statusCode == 403) {
         throw Exception("401 Unauthorized");
       } else {
-        throw Exception("فشل في جلب الطلبات قيد الانتظار");
+        throw Exception("Failed to fetch pending requests");
       }
     } catch (e) {
       final errorString = e.toString().toLowerCase();
       if (errorString.contains('401') || errorString.contains('unauthorized')) {
         throw Exception("401 Unauthorized");
       }
-      throw Exception("فشل الاتصال بالخادم: ${e.toString()}");
+      throw Exception("Server connection failed");
     }
   }
 
   Future<void> connectAndListen({
     required Function(List<PendingRequestModel>) onListDataReceived,
     required Function(PendingRequestModel) onSingleDataReceived,
+    required Function(Map<String, dynamic>) onNewOfferReceived,
     required Function() onForceDisconnect,
   }) async {
     try {
@@ -76,17 +79,43 @@ class PendingRequestsRepo {
 
       _hubConnection!.on("ReceivePendingRequests", (List<dynamic>? parameters) {
         if (parameters != null && parameters.isNotEmpty) {
-          final rawData = parameters.first;
-          if (rawData is List) {
-            final parsedList = rawData
-                .map((e) =>
-                    PendingRequestModel.fromJson(e as Map<String, dynamic>))
-                .toList();
-            onListDataReceived(parsedList);
-          } else if (rawData is Map<String, dynamic>) {
-            final parsedSingle = PendingRequestModel.fromJson(rawData);
-            onSingleDataReceived(parsedSingle);
-          }
+          try {
+            final rawData = parameters.first;
+            dynamic parsedData = rawData;
+
+            if (rawData is String) {
+              parsedData = jsonDecode(rawData);
+            }
+
+            if (parsedData is List) {
+              final parsedList = parsedData
+                  .map((e) =>
+                      PendingRequestModel.fromJson(e as Map<String, dynamic>))
+                  .toList();
+              onListDataReceived(parsedList);
+            } else if (parsedData is Map) {
+              final parsedSingle = PendingRequestModel.fromJson(
+                  Map<String, dynamic>.from(parsedData));
+              onSingleDataReceived(parsedSingle);
+            }
+          } catch (_) {}
+        }
+      });
+
+      _hubConnection!.on("ReceiveNewOffer", (List<dynamic>? parameters) {
+        if (parameters != null && parameters.isNotEmpty) {
+          try {
+            final rawData = parameters.first;
+            dynamic parsedData = rawData;
+
+            if (rawData is String) {
+              parsedData = jsonDecode(rawData);
+            }
+
+            if (parsedData is Map) {
+              onNewOfferReceived(Map<String, dynamic>.from(parsedData));
+            }
+          } catch (_) {}
         }
       });
 
@@ -100,7 +129,7 @@ class PendingRequestsRepo {
       if (errorString.contains('401') || errorString.contains('unauthorized')) {
         throw Exception("401 Unauthorized");
       }
-      throw Exception("فشل الاتصال بالخادم: ${e.toString()}");
+      throw Exception("Server connection failed");
     }
   }
 
@@ -108,6 +137,128 @@ class PendingRequestsRepo {
     if (_hubConnection != null &&
         _hubConnection!.state == HubConnectionState.Connected) {
       await _hubConnection!.stop();
+    }
+  }
+
+  Future<Either<String, List<OfferModel>>> getQuickOffers(int requestId) async {
+    try {
+      final token = await _authLocal.getToken();
+      if (token == null || token.isEmpty) return const Left("401");
+
+      final url =
+          Uri.parse("$_baseUrl/api/cf/offers/quick?requestId=$requestId");
+      final response = await http.get(url, headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      });
+
+      if (response.statusCode == 200) {
+        final decodedData = jsonDecode(response.body);
+        if (decodedData is List) {
+          return Right(decodedData
+              .map((e) => OfferModel.fromJson(e as Map<String, dynamic>))
+              .toList());
+        } else if (decodedData is Map<String, dynamic> &&
+            decodedData.containsKey('data')) {
+          final listData = decodedData['data'] as List;
+          return Right(listData
+              .map((e) => OfferModel.fromJson(e as Map<String, dynamic>))
+              .toList());
+        }
+        return const Right([]);
+      } else if (response.statusCode == 401 || response.statusCode == 403) {
+        return const Left("401");
+      } else {
+        return const Left("فشل في جلب العروض");
+      }
+    } catch (e) {
+      final errorString = e.toString().toLowerCase();
+      if (errorString.contains('401') || errorString.contains('unauthorized')) {
+        return const Left("401");
+      }
+      return const Left(
+          "فشل في الاتصال بالخادم برجاء التحقق من اتصالك بالانترنت");
+    }
+  }
+
+  Future<Either<String, String>> cancelRequest(int requestId) async {
+    try {
+      final token = await _authLocal.getToken();
+      if (token == null || token.isEmpty) return const Left("401");
+
+      final url = Uri.parse("$_baseUrl/api/cf/cancel-request");
+      final response = await http.patch(
+        url,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({'requestId': requestId}),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        return const Right("تم الغاء الطلب بنجاح");
+      } else if (response.statusCode == 401) {
+        return const Left("401");
+      } else {
+        return Left(jsonDecode(response.body)['errorMessage'] ?? "حدث خطأ");
+      }
+    } catch (e) {
+      return const Left("فشل الاتصال بالخادم");
+    }
+  }
+
+  Future<Either<String, String>> acceptOffer(int offerId) async {
+    try {
+      final token = await _authLocal.getToken();
+      if (token == null || token.isEmpty) return const Left("401");
+
+      final url = Uri.parse("$_baseUrl/api/cf/offers/accept");
+      final response = await http.post(
+        url,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({'offerId': offerId}),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        return const Right("تم قبول العرض بنجاح");
+      } else if (response.statusCode == 401) {
+        return const Left("401");
+      } else {
+        return Left(jsonDecode(response.body)['errorMessage'] ?? "حدث خطأ");
+      }
+    } catch (e) {
+      return const Left("فشل الاتصال بالخادم");
+    }
+  }
+
+  Future<Either<String, String>> declineOffer(int offerId) async {
+    try {
+      final token = await _authLocal.getToken();
+      if (token == null || token.isEmpty) return const Left("401");
+
+      final url = Uri.parse("$_baseUrl/api/cf/offers/decline");
+      final response = await http.post(
+        url,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({'offerId': offerId}),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        return const Right("تم رفض العرض");
+      } else if (response.statusCode == 401) {
+        return const Left("401");
+      } else {
+        return Left(jsonDecode(response.body)['errorMessage'] ?? "حدث خطأ");
+      }
+    } catch (e) {
+      return const Left("فشل الاتصال بالخادم");
     }
   }
 }

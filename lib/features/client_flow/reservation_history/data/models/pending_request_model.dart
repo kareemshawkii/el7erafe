@@ -38,10 +38,10 @@ class PendingRequestModel {
       techName: json['techName'],
       techImage: json['techImage'],
       day: _formatArabicDate(json['day']),
-      fees: json['fees'] != null ? int.parse(json['fees'].toString()) : null,
+      fees: (json['fees'] as num?)?.toInt() ?? 0,
       offerId: json['offerId'],
       numberOfDays: json['numberOfDays'],
-    );
+    ); 
   }
 
   static String _formatArabicDate(dynamic rawDate) {

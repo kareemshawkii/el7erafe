@@ -103,14 +103,10 @@ class TechHomeRequestsWidget extends StatelessWidget {
               ),
               if (requests.isEmpty)
                 Padding(
-                  padding: EdgeInsets.only(top: 24.h),
+                  padding: EdgeInsets.only(top: 24.h, bottom: 24.h),
                   child: Center(
-                    child: Text(
-                      'لا توجد طلبات متاحة حالياً',
-                      style: GoogleFonts.cairo(
-                        color: Colors.grey,
-                        fontSize: 16.sp,
-                      ),
+                    child: Image.asset(
+                      'images/norequests.png',
                     ),
                   ),
                 )
