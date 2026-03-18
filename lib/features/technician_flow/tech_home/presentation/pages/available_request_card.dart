@@ -221,7 +221,7 @@ class AvailableRequestCard extends StatelessWidget {
                         showGeneralDialog(
                           context: context,
                           barrierDismissible: true,
-                          barrierLabel: 'MakeOfferDialog',
+                          barrierLabel: 'تقديم عرض',
                           barrierColor: Colors.black54,
                           transitionDuration: const Duration(milliseconds: 400),
                           pageBuilder:

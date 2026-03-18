@@ -133,10 +133,34 @@ class _TechHomeRequestsWidgetState extends State<TechHomeRequestsWidget>
                 Padding(
                   padding: EdgeInsets.only(top: 24.h, bottom: 24.h),
                   child: Center(
-                    child: Image.asset(
-                      'images/norequests.png',
+            child: Container(
+              width: double.infinity,
+              padding: EdgeInsets.symmetric(vertical: 32.h),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF9FAFF),
+                borderRadius: BorderRadius.circular(16.r),
+                border:
+                    // ignore: deprecated_member_use
+                    Border.all(color: const Color(0xFF3775FA).withOpacity(0.3)),
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.inbox_outlined,
+                      size: 48.r, color: const Color(0xFF3775FA)),
+                  SizedBox(height: 12.h),
+                  Text(
+                    "لا يوجد طلبات جديدة حاليا",
+                    style: GoogleFonts.cairo(
+                      fontSize: 16.sp,
+                      color: Colors.black,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
+                ],
+              ),
+            ),
+          )
                 )
               else
                 TweenAnimationBuilder<double>(

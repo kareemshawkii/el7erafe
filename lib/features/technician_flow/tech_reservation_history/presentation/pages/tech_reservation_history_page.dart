@@ -1,3 +1,4 @@
+import 'package:el7erafe/features/technician_flow/tech_reservation_history/presentation/pages/calender_tab.dart';
 import 'package:el7erafe/features/technician_flow/tech_reservation_history/presentation/pages/pending_offers_tab.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -61,7 +62,7 @@ class TechReservationHistoryPage extends StatelessWidget {
               const Expanded(
                 child: TabBarView(
                   children: [
-                    Center(child: Text('الطلبات المقبولة')),
+                    TechCurrentReservationsTab(),
                     PendingOffersTab(),
                     Center(child: Text('الطلبات المكتملة')),
                   ],

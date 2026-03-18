@@ -1,10 +1,12 @@
 // ignore_for_file: deprecated_member_use
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:el7erafe/core/services/local_storage/auth_local_storage.dart';
 import 'package:el7erafe/core/utils/animated_navigaton_with_build.dart';
 import 'package:el7erafe/features/authentication_module/login/data/repositories/auth_repository.dart';
 import 'package:el7erafe/features/authentication_module/login/presentation/cubit/login_cubit.dart';
 import 'package:el7erafe/features/authentication_module/login/presentation/pages/login_page.dart';
 import 'package:el7erafe/features/chat_system/presentation/pages/inbox_page.dart';
+import 'package:el7erafe/features/technician_flow/tech_home/data/models/in_progress_reservation_model.dart';
 import 'package:el7erafe/features/technician_flow/tech_home/data/repositories/available_requests_repo.dart';
 import 'package:el7erafe/features/technician_flow/tech_home/presentation/cubit/available_requests_cubit.dart';
 import 'package:el7erafe/features/technician_flow/tech_home/presentation/cubit/available_requests_state.dart';
@@ -79,6 +81,16 @@ class _TechHomePageViewState extends State<TechHomePageView> {
     }
   }
 
+  String _getValidImageUrl(String? url) {
+    if (url == null ||
+        url.trim().isEmpty ||
+        url.trim().toLowerCase() == 'null') {
+      return "";
+    }
+    if (url.startsWith('http://') || url.startsWith('https://')) return url;
+    return 'https://el7rafe-gma4hrg0e9epfsc0.uaenorth-01.azurewebsites.net/$url';
+  }
+
   @override
   Widget build(BuildContext context) {
     Widget homeContent =
@@ -87,7 +99,7 @@ class _TechHomePageViewState extends State<TechHomePageView> {
         if (state is AvailableRequestsUnauthorized) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('انتهت صلاحية الجلسة، يرجى تسجيل الدخول مرة أخرى',
+              content: Text('تم تسجيل الخروج من الجهاز الآخر، يرجى تسجيل الدخول مرة أخرى',
                   textDirection: TextDirection.rtl),
               backgroundColor: Colors.red,
             ),
@@ -250,6 +262,25 @@ class _TechHomePageViewState extends State<TechHomePageView> {
                 padding: EdgeInsets.symmetric(horizontal: 16.w),
                 child: const TechHomeRequestsWidget(),
               ),
+              BlocBuilder<AvailableRequestsCubit, AvailableRequestsState>(
+                builder: (context, state) {
+                  if (state is AvailableRequestsLoaded) {
+                    return Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 16.w),
+                      child: Column(
+                        children: [
+                          SizedBox(height: 16.h),
+                          if (state.inProgress != null)
+                            _buildInProgressSection(state.inProgress!)
+                          else
+                            _buildEmptyInProgress(),
+                        ],
+                      ),
+                    );
+                  }
+                  return const SizedBox.shrink();
+                },
+              ),
               SizedBox(height: 24.h),
             ],
           ),
@@ -259,7 +290,7 @@ class _TechHomePageViewState extends State<TechHomePageView> {
 
     final List<Widget> pages = [
       homeContent,
-      TechReservationHistoryPage(),
+      const TechReservationHistoryPage(),
       TechProfilePage(name: userName, token: token),
     ];
 
@@ -354,6 +385,339 @@ class _TechHomePageViewState extends State<TechHomePageView> {
               ),
             ),
           )),
+    );
+  }
+
+  Widget _buildEmptyInProgress() {
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0.0, end: 1.0),
+      duration: const Duration(milliseconds: 700),
+      curve: Curves.easeOutCubic,
+      builder: (context, value, child) {
+        return Transform.translate(
+          offset: Offset(0, 40 * (1 - value)),
+          child: Opacity(opacity: value, child: child),
+        );
+      },
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        textDirection: TextDirection.rtl,
+        children: [
+          Row(
+            textDirection: TextDirection.rtl,
+            children: [
+              GestureDetector(
+                onTap: () {
+                  context.read<AvailableRequestsCubit>().reconnectAndRefresh();
+                },
+                child: Icon(Icons.sync,
+                    color: const Color(0xFF3775FA), size: 22.r),
+              ),
+              SizedBox(width: 8.w),
+              Text(
+                "طلب قيد التنفيذ",
+                style: GoogleFonts.cairo(
+                  fontSize: 18.sp,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 24.h),
+          Center(
+            child: Container(
+              width: double.infinity,
+              padding: EdgeInsets.symmetric(vertical: 32.h),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF9FAFF),
+                borderRadius: BorderRadius.circular(16.r),
+                border:
+                    Border.all(color: const Color(0xFF3775FA).withOpacity(0.3)),
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.access_time_filled,
+                      size: 48.r, color: const Color(0xFF3775FA)),
+                  SizedBox(height: 12.h),
+                  Text(
+                    "لا يوجد طلبات قيد التنفيذ حاليا",
+                    style: GoogleFonts.cairo(
+                      fontSize: 16.sp,
+                      color: Colors.black,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInProgressSection(InProgressReservationModel reservation) {
+    return TweenAnimationBuilder<double>(
+      key: ValueKey(reservation.reservationId),
+      tween: Tween(begin: 0.0, end: 1.0),
+      duration: const Duration(milliseconds: 700),
+      curve: Curves.easeOutCubic,
+      builder: (context, value, child) {
+        return Transform.translate(
+          offset: Offset(0, 40 * (1 - value)),
+          child: Opacity(
+            opacity: value,
+            child: child,
+          ),
+        );
+      },
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        textDirection: TextDirection.rtl,
+        children: [
+          Row(
+            textDirection: TextDirection.rtl,
+            children: [
+              GestureDetector(
+                onTap: () {
+                  context.read<AvailableRequestsCubit>().reconnectAndRefresh();
+                },
+                child: Icon(Icons.sync,
+                    color: const Color(0xFF3775FA), size: 22.r),
+              ),
+              SizedBox(width: 8.w),
+              Text(
+                "طلب قيد التنفيذ",
+                style: GoogleFonts.cairo(
+                  fontSize: 18.sp,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 24.h),
+          IntrinsicHeight(
+            child: Row(
+              textDirection: TextDirection.rtl,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Column(
+                  children: [
+                    Icon(Icons.check_circle, color: Colors.green, size: 24.r),
+                    Expanded(
+                      child: Container(
+                        width: 1.5.w,
+                        color: Colors.grey.shade300,
+                        margin: EdgeInsets.symmetric(vertical: 4.h),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 40.h,
+                      child: Center(
+                        child: Container(
+                          width: 18.r,
+                          height: 18.r,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                                color: Colors.grey.shade500, width: 2.w),
+                          ),
+                          child: Center(
+                            child: Container(
+                              width: 8.r,
+                              height: 8.r,
+                              decoration: BoxDecoration(
+                                color: Colors.grey.shade800,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(width: 12.w),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    textDirection: TextDirection.rtl,
+                    children: [
+                      Text(
+                        "بدأ الطلب",
+                        style: GoogleFonts.cairo(
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
+                        ),
+                      ),
+                      if (reservation.description != null)
+                        Text(
+                          reservation.description!,
+                          style: GoogleFonts.cairo(
+                            fontSize: 13.sp,
+                            color: Colors.grey.shade600,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      SizedBox(height: 12.h),
+                      Container(
+                        padding: EdgeInsets.all(12.r),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF9FAFF),
+                          borderRadius: BorderRadius.circular(16.r),
+                          border: Border.all(
+                              color: const Color(0xFF3775FA).withOpacity(0.3)),
+                        ),
+                        child: Row(
+                          textDirection: TextDirection.rtl,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                textDirection: TextDirection.rtl,
+                                children: [
+                                  Row(
+                                    textDirection: TextDirection.rtl,
+                                    children: [
+                                      ClipOval(
+                                        child: CachedNetworkImage(
+                                          imageUrl: _getValidImageUrl(
+                                              reservation.clientImage),
+                                          width: 32.w,
+                                          height: 32.h,
+                                          fit: BoxFit.cover,
+                                          placeholder: (_, __) => Container(
+                                              color: Colors.grey.shade200),
+                                          errorWidget: (_, __, ___) =>
+                                              Container(
+                                                  color: Colors.grey.shade200,
+                                                  child: const Icon(
+                                                      Icons.person,
+                                                      color: Colors.grey)),
+                                        ),
+                                      ),
+                                      SizedBox(width: 8.w),
+                                      Text(
+                                        reservation.clientName ?? 'عميل',
+                                        style: GoogleFonts.cairo(
+                                          fontSize: 15.sp,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 16.h),
+                                  Row(
+                                    textDirection: TextDirection.rtl,
+                                    children: [
+                                      Icon(Icons.payments_outlined,
+                                          size: 16.r, color: Colors.black87),
+                                      SizedBox(width: 6.w),
+                                      Text("${reservation.fees} جنيه مصري",
+                                          style: GoogleFonts.cairo(
+                                              fontSize: 13.sp,
+                                              fontWeight: FontWeight.w600,
+                                              color: Colors.grey.shade700)),
+                                    ],
+                                  ),
+                                  SizedBox(height: 16.h),
+                                  Row(
+                                    textDirection: TextDirection.rtl,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Row(
+                                        textDirection: TextDirection.rtl,
+                                        children: [
+                                          Icon(Icons.calendar_today_outlined,
+                                              size: 16.r,
+                                              color: Colors.black87),
+                                          SizedBox(width: 4.w),
+                                          Text(
+                                            reservation.day ?? '',
+                                            style: GoogleFonts.cairo(
+                                              fontSize: 13.sp,
+                                              fontWeight: FontWeight.w500,
+                                              color: Colors.grey.shade700,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      Row(
+                                        textDirection: TextDirection.rtl,
+                                        children: [
+                                          Icon(Icons.access_time,
+                                              size: 16.r,
+                                              color: Colors.black87),
+                                          SizedBox(width: 4.w),
+                                          Text(
+                                            reservation.techTimeInterval ?? '',
+                                            style: GoogleFonts.cairo(
+                                              fontSize: 13.sp,
+                                              fontWeight: FontWeight.w500,
+                                              color: Colors.grey.shade700,
+                                            ),
+                                            textDirection: TextDirection.rtl,
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: 12.h),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: SizedBox(
+                          height: 40.h,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              // Complete Job Logic here
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF3775FA),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10.r)),
+                              padding: EdgeInsets.symmetric(horizontal: 24.w),
+                              elevation: 0,
+                            ),
+                            child: Row(
+                              textDirection: TextDirection.rtl,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.check_circle_outline, size: 15.r, color: Colors.white),
+                                SizedBox(width: 8.w),
+                                Text(
+                                  "إتمام الطلب",
+                                  style: GoogleFonts.cairo(
+                                    fontSize: 15.sp,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ],
+                            )
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

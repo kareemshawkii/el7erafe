@@ -132,7 +132,7 @@ class PendingOffersView extends StatelessWidget {
               itemCount: state.offers.length,
               separatorBuilder: (_, __) => SizedBox(height: 16.h),
               itemBuilder: (context, index) {
-                final offer = state.offers[index];
+                final offer = state.offers[state.offers.length - 1 - index];
                 return _buildPendingOfferCard(offer);
               },
             ),

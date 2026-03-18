@@ -13,14 +13,19 @@ class AvailableRequestsCubit extends Cubit<AvailableRequestsState> {
     emit(AvailableRequestsLoading());
     try {
       final initialData = await repository.getInitialAvailableRequests();
-      if (!isClosed) emit(AvailableRequestsLoaded(initialData));
+      final inProgressData = await repository.getInProgressReservation();
+
+      if (!isClosed) {
+        emit(AvailableRequestsLoaded(initialData, inProgress: inProgressData));
+      }
 
       await repository.connectAndListen(
         onNewRequestReceived: (singleData) {
           if (!isClosed) {
             if (state is AvailableRequestsLoaded) {
-              final currentList = List<AvailableRequestModel>.from(
-                  (state as AvailableRequestsLoaded).requests);
+              final currentState = state as AvailableRequestsLoaded;
+              final currentList =
+                  List<AvailableRequestModel>.from(currentState.requests);
               final index = currentList.indexWhere(
                   (element) => element.requestId == singleData.requestId);
               if (index != -1) {
@@ -28,19 +33,24 @@ class AvailableRequestsCubit extends Cubit<AvailableRequestsState> {
               } else {
                 currentList.add(singleData);
               }
-              emit(AvailableRequestsLoaded(currentList));
+              emit(AvailableRequestsLoaded(currentList,
+                  inProgress: currentState.inProgress));
             } else {
               emit(AvailableRequestsLoaded([singleData]));
             }
           }
         },
         onSignalRRefreshNeeded: () async {
-          // Triggered when a client cancels a request
           if (!isClosed) {
             try {
               final updatedData =
                   await repository.getInitialAvailableRequests();
-              if (!isClosed) emit(AvailableRequestsLoaded(updatedData));
+              final inProgressData =
+                  await repository.getInProgressReservation();
+              if (!isClosed) {
+                emit(AvailableRequestsLoaded(updatedData,
+                    inProgress: inProgressData));
+              }
             } catch (_) {}
           }
         },
@@ -87,7 +97,8 @@ class AvailableRequestsCubit extends Cubit<AvailableRequestsState> {
           } else {
             emit(MakeOfferError(error));
             if (currentState is AvailableRequestsLoaded) {
-              emit(AvailableRequestsLoaded(currentState.requests));
+              emit(AvailableRequestsLoaded(currentState.requests,
+                  inProgress: currentState.inProgress));
             }
           }
         }
@@ -100,7 +111,8 @@ class AvailableRequestsCubit extends Cubit<AvailableRequestsState> {
                 List<AvailableRequestModel>.from(currentState.requests);
             currentList
                 .removeWhere((element) => element.requestId == requestId);
-            emit(AvailableRequestsLoaded(currentList));
+            emit(AvailableRequestsLoaded(currentList,
+                inProgress: currentState.inProgress));
           }
         }
       },

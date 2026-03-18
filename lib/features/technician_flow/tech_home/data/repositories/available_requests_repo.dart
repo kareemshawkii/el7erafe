@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:dartz/dartz.dart';
 import 'package:el7erafe/core/services/local_storage/auth_local_storage.dart';
 import 'package:el7erafe/features/technician_flow/tech_home/data/models/available_request_model.dart';
+import 'package:el7erafe/features/technician_flow/tech_home/data/models/in_progress_reservation_model.dart';
 import 'package:signalr_netcore/signalr_client.dart';
 import 'package:http/http.dart' as http;
 
@@ -42,6 +43,32 @@ class AvailableRequestsRepo {
         throw Exception("401 Unauthorized");
       }
       throw Exception("فشل الاتصال بالخادم");
+    }
+  }
+
+  Future<InProgressReservationModel?> getInProgressReservation() async {
+    try {
+      final token = await _authLocal.getToken();
+      if (token == null || token.isEmpty) return null;
+
+      final url = Uri.parse("$_baseUrl/api/tech/in-progress");
+      final response = await http.get(url, headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      });
+
+      if (response.statusCode == 200) {
+        final decodedData = jsonDecode(response.body);
+        final listData =
+            decodedData is List ? decodedData : decodedData['data'];
+        if (listData is List && listData.isNotEmpty) {
+          return InProgressReservationModel.fromJson(
+              listData.first as Map<String, dynamic>);
+        }
+      }
+      return null;
+    } catch (_) {
+      return null;
     }
   }
 
