@@ -18,6 +18,11 @@ class ChatRepository {
     try {
       String? token = await AuthLocalStorage().getToken();
 
+      if (_hubConnection != null &&
+          _hubConnection!.state != HubConnectionState.Disconnected) {
+        await _hubConnection!.stop();
+      }
+
       _hubConnection = HubConnectionBuilder()
           .withUrl(hubUrl,
               options: HttpConnectionOptions(
@@ -81,6 +86,19 @@ class ChatRepository {
       _hubConnection?.on("UserOffline", (arguments) {
         if (arguments != null && arguments.isNotEmpty) {
           if (onUserOffline != null) onUserOffline(arguments[0].toString());
+        }
+      });
+
+      _hubConnection!.onclose(({error}) async {
+        await Future.delayed(const Duration(seconds: 3));
+        if (_hubConnection?.state == HubConnectionState.Disconnected) {
+          initConnection(
+            onMessageReceived: onMessageReceived,
+            onMessageStatusUpdated: onMessageStatusUpdated,
+            onMessagesRead: onMessagesRead,
+            onUserOnline: onUserOnline,
+            onUserOffline: onUserOffline,
+          );
         }
       });
 

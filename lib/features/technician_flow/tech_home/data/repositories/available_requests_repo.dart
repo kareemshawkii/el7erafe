@@ -81,6 +81,11 @@ class AvailableRequestsRepo {
       final token = await _authLocal.getToken();
       if (token == null || token.isEmpty) throw Exception("401 Unauthorized");
 
+      if (_hubConnection != null &&
+          _hubConnection!.state != HubConnectionState.Disconnected) {
+        await _hubConnection!.stop();
+      }
+
       _hubConnection = HubConnectionBuilder()
           .withUrl(_hubUrl,
               options:
@@ -108,7 +113,16 @@ class AvailableRequestsRepo {
       _hubConnection!
           .on("RemoveCanceledRequest", (_) => onSignalRRefreshNeeded());
 
+      _hubConnection!.on("JobCompleted", (_) => onSignalRRefreshNeeded());
+
       _hubConnection!.on("ForceDisconnect", (_) => onForceDisconnect());
+
+      _hubConnection!.onclose(({error}) async {
+        await Future.delayed(const Duration(seconds: 3));
+        if (_hubConnection?.state == HubConnectionState.Disconnected) {
+          onSignalRRefreshNeeded();
+        }
+      });
 
       await _hubConnection!.start();
     } catch (e) {
@@ -184,6 +198,33 @@ class AvailableRequestsRepo {
       }
       return Left(jsonDecode(response.body)['errorMessage'] ??
           "حدث خطأ أثناء رفض الطلب");
+    } catch (e) {
+      if (e.toString().toLowerCase().contains('401')) return const Left("401");
+      return const Left(
+          "فشل في الاتصال بالخادم برجاء التحقق من اتصالك بالانترنت");
+    }
+  }
+
+  Future<Either<String, String>> completeJob(int reservationId) async {
+    try {
+      final token = await _authLocal.getToken();
+      if (token == null || token.isEmpty) return const Left("401");
+      final response = await http.post(
+        Uri.parse("$_baseUrl/api/tech/complete-job"),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json'
+        },
+        body: jsonEncode({'reservationId': reservationId}),
+      );
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        return const Right("تم انهاء العمل بنجاح وفي انتظار الدفع");
+      }
+      if (response.statusCode == 401 || response.statusCode == 403) {
+        return const Left("401");
+      }
+      return Left(jsonDecode(response.body)['errorMessage'] ??
+          "حدث خطأ أثناء إنهاء العمل");
     } catch (e) {
       if (e.toString().toLowerCase().contains('401')) return const Left("401");
       return const Left(

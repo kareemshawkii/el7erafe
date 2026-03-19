@@ -139,6 +139,26 @@ class AvailableRequestsCubit extends Cubit<AvailableRequestsState> {
     );
   }
 
+  void completeJob(int reservationId) async {
+    emit(CompleteJobLoading());
+    final result = await repository.completeJob(reservationId);
+    if (isClosed) return;
+    result.fold(
+      (error) {
+        if (error == "401") {
+          emit(AvailableRequestsUnauthorized());
+        } else {
+          emit(CompleteJobError(error));
+          fetchAvailableRequests();
+        }
+      },
+      (successMessage) {
+        emit(CompleteJobSuccess(successMessage));
+        fetchAvailableRequests();
+      },
+    );
+  }
+
   void disconnectSignalR() {
     repository.disconnect();
   }

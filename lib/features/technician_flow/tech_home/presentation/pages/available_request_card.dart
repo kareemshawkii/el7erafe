@@ -232,6 +232,7 @@ class AvailableRequestCard extends StatelessWidget {
                               child: MakeOfferDialog(
                                 requestId: request.requestId,
                                 clientTimeInterval: request.clientTimeInterval,
+                                requestDate: request.day,
                               ),
                             );
                           },
@@ -339,8 +340,12 @@ class AvailableRequestCard extends StatelessWidget {
                     height: 40.h,
                     child: OutlinedButton(
                       onPressed: () {
-                        context.read<AvailableRequestsCubit>().declineRequest(request.requestId);
-                        context.read<AvailableRequestsCubit>().fetchAvailableRequests();
+                        context
+                            .read<AvailableRequestsCubit>()
+                            .declineRequest(request.requestId);
+                        context
+                            .read<AvailableRequestsCubit>()
+                            .fetchAvailableRequests();
                       },
                       style: OutlinedButton.styleFrom(
                         side: const BorderSide(color: Color(0xFF3775FA)),

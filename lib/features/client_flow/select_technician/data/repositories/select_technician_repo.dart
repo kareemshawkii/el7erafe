@@ -4,6 +4,7 @@ import 'package:el7erafe/features/client_flow/select_technician/data/models/requ
 import 'package:el7erafe/features/client_flow/select_technician/data/models/technicians_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:el7erafe/core/services/local_storage/auth_local_storage.dart';
+import 'package:intl/intl.dart';
 
 class TechnicianRequestRepository {
   final String baseUrl =
@@ -91,7 +92,13 @@ class TechnicianRequestRepository {
   }
 
   Future<Either<String, List<TechniciansModel>>> fetchCraftsmanData(
-      String service, String city, bool sort) async {
+      String service,
+      String city,
+      DateTime? date,
+      bool allDayAvailability,
+      String? availableFrom,
+      String? availableTo,
+      bool sort) async {
     AuthLocalStorage authLocalStorage = AuthLocalStorage();
     String? token = await authLocalStorage.getToken();
 
@@ -107,6 +114,14 @@ class TechnicianRequestRepository {
         body: jsonEncode({
           'serviceName': service,
           'cityName': city,
+          'day': date != null ? DateFormat('yyyy-MM-dd').format(date) : null,
+          'allDayAvailable': allDayAvailability,
+          'fromTime': availableFrom != null && availableFrom.isNotEmpty
+              ? availableFrom
+              : null,
+          'toTime': availableTo != null && availableTo.isNotEmpty
+              ? availableTo
+              : null,
           'sorted': sort,
         }),
       );

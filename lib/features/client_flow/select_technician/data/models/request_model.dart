@@ -2,7 +2,7 @@ import 'dart:io';
 
 class TechnicianReservationRequest {
   int? serviceId;
-  String? serviceName; // Stored from Home Page
+  String? serviceName;
   String? description;
   List<File>? images;
   String? governorate;
@@ -11,8 +11,8 @@ class TechnicianReservationRequest {
   String? specialSign;
   DateTime? day;
   bool allDayAvailability;
-  String? availableFrom; // format "HH:mm"
-  String? availableTo;   // format "HH:mm"
+  String? availableFrom;
+  String? availableTo;
   String? technicianId;
 
   TechnicianReservationRequest({
@@ -25,13 +25,12 @@ class TechnicianReservationRequest {
     this.street,
     this.specialSign,
     this.day,
-    this.allDayAvailability = true, // Default to true
+    this.allDayAvailability = true,
     this.availableFrom,
     this.availableTo,
     this.technicianId,
   });
 
-  
   Map<String, dynamic> toMap() {
     return {
       'service_id': serviceId,

@@ -53,6 +53,10 @@ class _TechnicianRequestPageState extends State<TechnicianRequestPage> {
         ..fetchTechnicians(
           service: widget.requestModel.serviceName!,
           city: widget.requestModel.city ?? "",
+          date: widget.requestModel.day ?? DateTime.now(),
+          allDayAvialabilty: widget.requestModel.allDayAvailability,
+          availableFrom: widget.requestModel.availableFrom ?? "",
+          availableTo: widget.requestModel.availableTo ?? "",
           sort: _isSortedByRate,
         ),
       child: Directionality(
@@ -139,14 +143,16 @@ class _TechnicianRequestPageState extends State<TechnicianRequestPage> {
                                           color: Colors.grey, fontSize: 18.sp),
                                       border: InputBorder.none,
                                       enabledBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(12.r),
+                                        borderRadius:
+                                            BorderRadius.circular(12.r),
                                         borderSide: BorderSide(
                                           color: Colors.grey.shade300,
                                           width: 1.w,
                                         ),
                                       ),
                                       focusedBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(12.r),
+                                        borderRadius:
+                                            BorderRadius.circular(12.r),
                                         borderSide: BorderSide(
                                           color: const Color(0xFF3775FA),
                                           width: 1.w,
@@ -194,7 +200,18 @@ class _TechnicianRequestPageState extends State<TechnicianRequestPage> {
                                                 .requestModel.serviceName!,
                                             city:
                                                 widget.requestModel.city ?? "",
-                                            sort: isRate,
+                                            date: widget.requestModel.day ??
+                                                DateTime.now(),
+                                            allDayAvialabilty: widget
+                                                .requestModel
+                                                .allDayAvailability,
+                                            availableFrom: widget.requestModel
+                                                    .availableFrom ??
+                                                "",
+                                            availableTo: widget
+                                                    .requestModel.availableTo ??
+                                                "",
+                                            sort: _isSortedByRate,
                                           );
                                     }
                                   },
@@ -233,11 +250,10 @@ class _TechnicianRequestPageState extends State<TechnicianRequestPage> {
                           listener: (context, state) {
                             if (state is FetchTechniciansError ||
                                 state is SubmitReservationError) {
-                              final String errorMessage =
-                                  state is FetchTechniciansError
-                                      ? state.message
-                                      : (state as SubmitReservationError)
-                                          .message;
+                              final String errorMessage = state
+                                      is FetchTechniciansError
+                                  ? state.message
+                                  : (state as SubmitReservationError).message;
                               showDialog(
                                 context: context,
                                 builder: (context) => Directionality(
@@ -421,7 +437,8 @@ class _TechnicianRequestPageState extends State<TechnicianRequestPage> {
                                     children: List.generate(
                                       techniciansList.length,
                                       (index) {
-                                        final technician = techniciansList[index];
+                                        final technician =
+                                            techniciansList[index];
                                         final requestCubit = context
                                             .read<TechnicianRequestCubit>();
                                         return TweenAnimationBuilder<double>(
@@ -456,7 +473,8 @@ class _TechnicianRequestPageState extends State<TechnicianRequestPage> {
                                                     builder: (newContext) =>
                                                         BlocProvider.value(
                                                       value: requestCubit,
-                                                      child: TechnicianDetailsPage(
+                                                      child:
+                                                          TechnicianDetailsPage(
                                                         technician: technician,
                                                         onReserveTap: () {
                                                           final fullRequest =
@@ -479,9 +497,10 @@ class _TechnicianRequestPageState extends State<TechnicianRequestPage> {
                                                             day: widget
                                                                 .requestModel
                                                                 .day,
-                                                            allDayAvailability: widget
-                                                                .requestModel
-                                                                .allDayAvailability,
+                                                            allDayAvailability:
+                                                                widget
+                                                                    .requestModel
+                                                                    .allDayAvailability,
                                                             availableFrom: widget
                                                                 .requestModel
                                                                 .availableFrom,
@@ -491,9 +510,9 @@ class _TechnicianRequestPageState extends State<TechnicianRequestPage> {
                                                             images: widget
                                                                 .requestModel
                                                                 .images,
-                                                            technicianId: technician
-                                                                .id
-                                                                .toString(),
+                                                            technicianId:
+                                                                technician.id
+                                                                    .toString(),
                                                           );
 
                                                           requestCubit
@@ -512,8 +531,10 @@ class _TechnicianRequestPageState extends State<TechnicianRequestPage> {
                                                       .requestModel.serviceId,
                                                   description: widget
                                                       .requestModel.description,
-                                                  city: widget.requestModel.city,
-                                                  street: widget.requestModel.street,
+                                                  city:
+                                                      widget.requestModel.city,
+                                                  street: widget
+                                                      .requestModel.street,
                                                   specialSign: widget
                                                       .requestModel.specialSign,
                                                   day: widget.requestModel.day,
@@ -521,10 +542,12 @@ class _TechnicianRequestPageState extends State<TechnicianRequestPage> {
                                                       .requestModel
                                                       .allDayAvailability,
                                                   availableFrom: widget
-                                                      .requestModel.availableFrom,
+                                                      .requestModel
+                                                      .availableFrom,
                                                   availableTo: widget
                                                       .requestModel.availableTo,
-                                                  images: widget.requestModel.images,
+                                                  images: widget
+                                                      .requestModel.images,
                                                   technicianId:
                                                       technician.id.toString(),
                                                 );
@@ -569,6 +592,18 @@ class _TechnicianRequestPageState extends State<TechnicianRequestPage> {
                                                 city:
                                                     widget.requestModel.city ??
                                                         "",
+                                                date: widget.requestModel.day ??
+                                                    DateTime.now(),
+                                                allDayAvialabilty: widget
+                                                    .requestModel
+                                                    .allDayAvailability,
+                                                availableFrom: widget
+                                                        .requestModel
+                                                        .availableFrom ??
+                                                    "",
+                                                availableTo: widget.requestModel
+                                                        .availableTo ??
+                                                    "",
                                                 sort: _isSortedByRate,
                                               );
                                         },

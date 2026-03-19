@@ -507,8 +507,7 @@ class _TechProfilePageViewState extends State<TechProfilePageView> {
                                 builder: (context, state) {
                                   List<TechScheduleModel> schedule = [];
                                   bool isScheduleLoading = false;
-
-                                  if (state is TechScheduleLoading) {
+                                  if (state is TechScheduleLoading || state is TechScheduleUpdateLoading) {
                                     isScheduleLoading = true;
                                   } else if (state is TechScheduleLoaded) {
                                     schedule = state.schedule;

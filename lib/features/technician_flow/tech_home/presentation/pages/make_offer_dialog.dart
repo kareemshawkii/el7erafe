@@ -1,3 +1,4 @@
+// ignore_for_file: deprecated_member_use
 import 'package:el7erafe/core/services/local_storage/auth_local_storage.dart';
 import 'package:el7erafe/core/utils/animated_navigaton_with_build.dart';
 import 'package:el7erafe/features/authentication_module/login/data/repositories/auth_repository.dart';
@@ -13,15 +14,18 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:lottie/lottie.dart';
 
 class MakeOfferDialog extends StatefulWidget {
   final int requestId;
   final String? clientTimeInterval;
+  final String? requestDate;
 
   const MakeOfferDialog({
     super.key,
     required this.requestId,
     this.clientTimeInterval,
+    this.requestDate,
   });
 
   @override
@@ -108,49 +112,71 @@ class _MakeOfferDialogState extends State<MakeOfferDialog> {
   void _showErrorDialog(String message) {
     showDialog(
       context: context,
-      builder: (context) => Directionality(
-        textDirection: TextDirection.rtl,
-        child: AlertDialog(
-          backgroundColor: Colors.white,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
-          title: Row(
-            children: [
-              Icon(Icons.warning_amber_rounded, color: Colors.red, size: 28.r),
-              SizedBox(width: 8.w),
-              Text(
-                "تنبيه",
-                style: GoogleFonts.cairo(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18.sp,
-                ),
-              ),
-            ],
-          ),
-          content: Text(
-            message,
-            style: GoogleFonts.cairo(
-              fontSize: 15.sp,
-              color: Colors.black87,
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: Text(
-                "حسناً",
-                style: GoogleFonts.cairo(
-                  color: const Color(0xFF3775FA),
-                  fontWeight: FontWeight.bold,
-                ),
+      builder: (context) => AlertDialog(
+        backgroundColor: Colors.white,
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
+        title: Row(
+          children: [
+            Icon(Icons.warning_amber_rounded, color: Colors.red, size: 28.r),
+            SizedBox(width: 8.w),
+            Text(
+              "تنبيه",
+              style: GoogleFonts.cairo(
+                fontWeight: FontWeight.bold,
+                fontSize: 18.sp,
               ),
             ),
           ],
         ),
+        content: Text(
+          message,
+          style: GoogleFonts.cairo(
+            fontSize: 15.sp,
+            color: Colors.black87,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: Text(
+              "حسناً",
+              style: GoogleFonts.cairo(
+                color: const Color(0xFF3775FA),
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ],
       ),
     );
+  }
+
+  bool _isDateToday(String? dateStr) {
+    if (dateStr == null || dateStr.isEmpty) return false;
+    try {
+      final now = DateTime.now();
+      String rawDateStr = dateStr;
+
+      List<String> parts = dateStr.split(' ');
+      if (parts.length > 1) {
+        rawDateStr = parts[1];
+      }
+
+      List<String> dateParts = rawDateStr.split('-');
+      if (dateParts.length == 3) {
+        int day = int.parse(dateParts[0]);
+        int month = int.parse(dateParts[1]);
+        int year = int.parse(dateParts[2]);
+
+        return now.year == year && now.month == month && now.day == day;
+      }
+      return false;
+    } catch (_) {
+      return false;
+    }
   }
 
   void _submitOffer() {
@@ -163,7 +189,22 @@ class _MakeOfferDialogState extends State<MakeOfferDialog> {
     }
 
     if (_fromTime!.hour >= _toTime!.hour) {
-      _showErrorDialog("وقت البداية يجب أن يكون قبل وقت النهاية.");
+      _showErrorDialog("وقت النهاية يجب أن يكون بعد وقت البداية.");
+      return;
+    }
+
+    final now = DateTime.now();
+    final isToday = _isDateToday(widget.requestDate);
+
+    if (isToday && _toTime!.hour < now.hour) {
+      _showErrorDialog(
+          "وقت النهاية يجب أن يكون بعد الوقت الحالي لأن الطلب لليوم.");
+      return;
+    }
+
+    if (isToday && _fromTime!.hour <= now.hour) {
+      _showErrorDialog(
+          "يجب اختيار وقت البدايه بعد ساعه علي الاقل من الوقت الحالي");
       return;
     }
 
@@ -194,7 +235,6 @@ class _MakeOfferDialogState extends State<MakeOfferDialog> {
           confirmText: "تأكيد",
           barrierColor: Colors.black45,
           barrierLabel: "اختار الوقت",
-          
           builder: (BuildContext context, Widget? child) {
             return Theme(
               data: Theme.of(context).copyWith(
@@ -212,7 +252,6 @@ class _MakeOfferDialogState extends State<MakeOfferDialog> {
                           : Colors.black),
                   hourMinuteColor: WidgetStateColor.resolveWith((states) =>
                       states.contains(WidgetState.selected)
-                          // ignore: deprecated_member_use
                           ? const Color(0xFF3775FA).withOpacity(0.1)
                           : Colors.grey.shade100),
                   dayPeriodTextColor: WidgetStateColor.resolveWith((states) =>
@@ -227,13 +266,10 @@ class _MakeOfferDialogState extends State<MakeOfferDialog> {
                       const BorderSide(color: Color(0xFF3775FA)),
                 ),
               ),
-              child: Directionality(
-                textDirection: TextDirection.rtl,
-                child: MediaQuery(
-                  data: MediaQuery.of(context)
-                      .copyWith(alwaysUse24HourFormat: false),
-                  child: child!,
-                ),
+              child: MediaQuery(
+                data: MediaQuery.of(context)
+                    .copyWith(alwaysUse24HourFormat: false),
+                child: child!,
               ),
             );
           },
@@ -308,17 +344,16 @@ class _MakeOfferDialogState extends State<MakeOfferDialog> {
         child: Container(
           padding: EdgeInsets.all(12.r),
           decoration: BoxDecoration(
-            color:  Colors.white,
+            color: Colors.white,
             boxShadow: [
               BoxShadow(
-                // ignore: deprecated_member_use
-                color: Color(0xFF3775FA).withOpacity(0.2),
+                color: const Color(0xFF3775FA).withOpacity(0.2),
                 blurRadius: 10.r,
                 offset: Offset(0, 4.h),
               ),
             ],
             borderRadius: BorderRadius.circular(24.r),
-            border: Border.all(color: Color(0xFF3775FA), width: 1.r),
+            border: Border.all(color: const Color(0xFF3775FA), width: 1.r),
           ),
           child: SingleChildScrollView(
             child: Form(
@@ -331,22 +366,22 @@ class _MakeOfferDialogState extends State<MakeOfferDialog> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            Icon(Icons.edit,
-                                color: const Color(0xFF3775FA), size: 17.r),
-                            SizedBox(width: 8.w),
-                            Text(
-                              "حدد السعر والمعاد لتقديم العرض",
-                              style: GoogleFonts.cairo(
-                                fontSize: 17.sp,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
-                              overflow: TextOverflow.ellipsis,
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Icon(Icons.edit,
+                              color: const Color(0xFF3775FA), size: 17.r),
+                          SizedBox(width: 8.w),
+                          Text(
+                            "حدد السعر والمعاد لتقديم العرض",
+                            style: GoogleFonts.cairo(
+                              fontSize: 17.sp,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
                             ),
-                          ],
-                        ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
                       Container(
                         width: 32.w,
                         height: 32.h,
@@ -424,31 +459,27 @@ class _MakeOfferDialogState extends State<MakeOfferDialog> {
                         Row(
                           children: [
                             Text(
-                          "حدد المعاد المتاح",
-                          style: GoogleFonts.cairo(
-                              fontSize: 14.sp,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black),
-                        ),
-                        if (_clientStartTime != null) ...[
-                          SizedBox(height: 4.h),
-                          Text(
-                            "  (مسموح بين ${widget.clientTimeInterval})",
-                            style: GoogleFonts.cairo(
-                                fontSize: 13.sp, color: Colors.black),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis
-                          ),
-                        ] else ...[
-                          SizedBox(height: 4.h),
-                          Text(
-                            "  (العميل متاح طوال اليوم)",
-                            style: GoogleFonts.cairo(
-                                fontSize: 13.sp, color: Colors.black),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis
-                          ),
-                        ],
+                              "حدد المعاد المتاح",
+                              style: GoogleFonts.cairo(
+                                  fontSize: 14.sp,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black),
+                            ),
+                            if (_clientStartTime != null) ...[
+                              SizedBox(height: 4.h),
+                              Text("  (مسموح بين ${widget.clientTimeInterval})",
+                                  style: GoogleFonts.cairo(
+                                      fontSize: 13.sp, color: Colors.black),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis),
+                            ] else ...[
+                              SizedBox(height: 4.h),
+                              Text("  (العميل متاح طوال اليوم)",
+                                  style: GoogleFonts.cairo(
+                                      fontSize: 13.sp, color: Colors.black),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis),
+                            ],
                           ],
                         ),
                         SizedBox(height: 16.h),
@@ -499,7 +530,7 @@ class _MakeOfferDialogState extends State<MakeOfferDialog> {
                                 setState(() {
                                   _needsMultipleDays = val;
                                   if (!val) {
-                                    _selectedDays = 2; 
+                                    _selectedDays = 2;
                                   }
                                 });
                               },
@@ -526,7 +557,7 @@ class _MakeOfferDialogState extends State<MakeOfferDialog> {
                                       height: 40.h,
                                       child: ListView.separated(
                                         scrollDirection: Axis.horizontal,
-                                        itemCount: 29, 
+                                        itemCount: 29,
                                         separatorBuilder: (_, __) =>
                                             SizedBox(width: 8.w),
                                         itemBuilder: (context, index) {
@@ -587,34 +618,47 @@ class _MakeOfferDialogState extends State<MakeOfferDialog> {
                         width: double.infinity,
                         height: 40.h,
                         child: ElevatedButton(
-                          onPressed:
-                              state is MakeOfferLoading ? null : _submitOffer,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF3775FA),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12.r),
+                            onPressed:
+                                state is MakeOfferLoading ? null : _submitOffer,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF3775FA),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12.r),
+                              ),
+                              elevation: 0,
                             ),
-                            elevation: 0,
-                          ),
-                          child: state is MakeOfferLoading
-                              ? const CircularProgressIndicator(
-                                  color: Colors.white)
-                              : Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(Iconsax.send, size: 16.r, color: Colors.white),
-                                    SizedBox(width: 8.w),
-                                    Text(
-                                      "تقديم العرض",
-                                      style: GoogleFonts.cairo(
-                                        fontSize: 16.sp,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                      ),
+                            child: state is MakeOfferLoading
+                                ? Center(
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Lottie.asset(
+                                          'assets/icon/loading.json',
+                                          width: 200.w,
+                                          height: 200.h,
+                                          repeat: true,
+                                          animate: true,
+                                        ),
+                                      ],
                                     ),
-                                  ],
-                              )
-                        ),
+                                  )
+                                : Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(Iconsax.send,
+                                          size: 16.r, color: Colors.white),
+                                      SizedBox(width: 8.w),
+                                      Text(
+                                        "تقديم العرض",
+                                        style: GoogleFonts.cairo(
+                                          fontSize: 16.sp,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ],
+                                  )),
                       );
                     },
                   ),

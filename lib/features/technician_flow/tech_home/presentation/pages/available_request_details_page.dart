@@ -484,6 +484,7 @@ class AvailableRequestDetailsPage extends StatelessWidget {
                                   requestId: request.requestId,
                                   clientTimeInterval:
                                       request.clientTimeInterval,
+                                  requestDate: request.day,
                                 ),
                               );
                             },

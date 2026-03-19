@@ -94,7 +94,7 @@ class PendingRequestsView extends StatelessWidget {
         }
       },
       builder: (context, state) {
-        if (state is PendingRequestsLoading) {
+        if (state is PendingRequestsLoading || state is OfferActionLoading) {
           return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,

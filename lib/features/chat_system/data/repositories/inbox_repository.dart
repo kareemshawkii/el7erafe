@@ -51,6 +51,11 @@ class InboxRepository {
     try {
       String? token = await AuthLocalStorage().getToken();
 
+      if (_hubConnection != null &&
+          _hubConnection!.state != HubConnectionState.Disconnected) {
+        await _hubConnection!.stop();
+      }
+
       _hubConnection = HubConnectionBuilder()
           .withUrl(hubUrl,
               options: HttpConnectionOptions(
@@ -78,6 +83,13 @@ class InboxRepository {
           } catch (e) {
             throw Exception("فشل في معالجة تحديثات المحادثات");
           }
+        }
+      });
+
+      _hubConnection!.onclose(({error}) async {
+        await Future.delayed(const Duration(seconds: 3));
+        if (_hubConnection?.state == HubConnectionState.Disconnected) {
+          initSignalR(onInboxUpdated: onInboxUpdated);
         }
       });
 

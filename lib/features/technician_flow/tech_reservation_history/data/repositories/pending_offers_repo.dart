@@ -53,6 +53,11 @@ class PendingOffersRepo {
       final token = await _authLocal.getToken();
       if (token == null || token.isEmpty) return;
 
+      if (_hubConnection != null &&
+          _hubConnection!.state != HubConnectionState.Disconnected) {
+        await _hubConnection!.stop();
+      }
+
       _hubConnection = HubConnectionBuilder()
           .withUrl(_hubUrl,
               options: HttpConnectionOptions(
@@ -68,6 +73,13 @@ class PendingOffersRepo {
       _hubConnection!.on("OfferAccepted", (_) => onSignalRRefreshNeeded());
 
       _hubConnection!.on("ForceDisconnect", (_) => onForceDisconnect());
+
+      _hubConnection!.onclose(({error}) async {
+        await Future.delayed(const Duration(seconds: 3));
+        if (_hubConnection?.state == HubConnectionState.Disconnected) {
+          onSignalRRefreshNeeded();
+        }
+      });
 
       await _hubConnection!.start();
     } catch (_) {}

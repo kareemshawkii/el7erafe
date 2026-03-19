@@ -44,3 +44,15 @@ final class DeclineRequestError extends AvailableRequestsState {
   final String error;
   DeclineRequestError(this.error);
 }
+
+final class CompleteJobLoading extends AvailableRequestsState {}
+
+final class CompleteJobSuccess extends AvailableRequestsState {
+  final String message;
+  CompleteJobSuccess(this.message);
+}
+
+final class CompleteJobError extends AvailableRequestsState {
+  final String error;
+  CompleteJobError(this.error);
+}

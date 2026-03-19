@@ -1,4 +1,5 @@
 // ignore_for_file: deprecated_member_use
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:el7erafe/core/services/local_storage/auth_local_storage.dart';
 import 'package:el7erafe/core/utils/animated_navigaton_with_build.dart';
@@ -99,7 +100,8 @@ class _TechHomePageViewState extends State<TechHomePageView> {
         if (state is AvailableRequestsUnauthorized) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('تم تسجيل الخروج من الجهاز الآخر، يرجى تسجيل الدخول مرة أخرى',
+              content: Text(
+                  'تم تسجيل الخروج من الجهاز الآخر، يرجى تسجيل الدخول مرة أخرى',
                   textDirection: TextDirection.rtl),
               backgroundColor: Colors.red,
             ),
@@ -120,6 +122,15 @@ class _TechHomePageViewState extends State<TechHomePageView> {
             (route) => false,
           );
         } else if (state is DeclineRequestError) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(state.error), backgroundColor: Colors.red),
+          );
+        } else if (state is CompleteJobSuccess) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+                content: Text(state.message), backgroundColor: Colors.green),
+          );
+        } else if (state is CompleteJobError) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(state.error), backgroundColor: Colors.red),
           );
@@ -682,7 +693,9 @@ class _TechHomePageViewState extends State<TechHomePageView> {
                           height: 40.h,
                           child: ElevatedButton(
                             onPressed: () {
-                              // Complete Job Logic here
+                              context
+                                  .read<AvailableRequestsCubit>()
+                                  .completeJob(reservation.reservationId);
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFF3775FA),
@@ -695,7 +708,8 @@ class _TechHomePageViewState extends State<TechHomePageView> {
                               textDirection: TextDirection.rtl,
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Icon(Icons.check_circle_outline, size: 15.r, color: Colors.white),
+                                Icon(Icons.check_circle_outline,
+                                    size: 15.r, color: Colors.white),
                                 SizedBox(width: 8.w),
                                 Text(
                                   "إتمام الطلب",
@@ -706,7 +720,7 @@ class _TechHomePageViewState extends State<TechHomePageView> {
                                   ),
                                 ),
                               ],
-                            )
+                            ),
                           ),
                         ),
                       ),

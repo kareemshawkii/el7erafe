@@ -11,6 +11,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:el7erafe/core/services/local_storage/auth_local_storage.dart';
 import 'package:el7erafe/features/client_flow/client_profile/presentation/cubit/client_profile_cubit.dart';
 import 'package:el7erafe/features/client_flow/client_profile/presentation/cubit/client_profile_state.dart';
+import 'package:lottie/lottie.dart';
 import 'package:path_provider/path_provider.dart';
 
 String hashedEmail = "";
@@ -744,12 +745,20 @@ class _SensitiveUpdateFlowSheetState extends State<_SensitiveUpdateFlowSheet> {
           },
           builder: (context, state) {
             if (state is ProfileLoading) {
-              return SizedBox(
-                  height: 200.h,
-                  child: const Center(
-                      child: CircularProgressIndicator(
-                    color: Color(0xFF3775FA),
-                  )));
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Lottie.asset(
+                      'assets/icon/loading.json',
+                      width: 200.w,
+                      height: 200.h,
+                      repeat: true,
+                      animate: true,
+                    ),
+                  ],
+                ),
+              );
             }
             if (state is ProfileError) {
               return _buildErrorUI(context, state.message);

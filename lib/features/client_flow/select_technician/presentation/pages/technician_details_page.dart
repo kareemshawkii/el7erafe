@@ -8,6 +8,7 @@ import 'package:el7erafe/features/client_flow/select_technician/presentation/pag
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:lottie/lottie.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:el7erafe/features/authentication_module/login/data/repositories/auth_repository.dart';
@@ -94,8 +95,8 @@ class TechnicianDetailsPage extends StatelessWidget {
                                     technician.rating.toStringAsFixed(1),
                                     iconColor: const Color(0xFFFFC107)),
                                 SizedBox(width: 20.w),
-                                _buildStatItem(
-                                    Icons.location_on_outlined, technician.city),
+                                _buildStatItem(Icons.location_on_outlined,
+                                    technician.city),
                               ],
                             ),
                             SizedBox(height: 24.h),
@@ -127,7 +128,8 @@ class TechnicianDetailsPage extends StatelessWidget {
                                 color: Colors.white,
                                 shape: BoxShape.circle,
                                 border: Border.all(
-                                    color: const Color(0xFF3775FA), width: 2.w)),
+                                    color: const Color(0xFF3775FA),
+                                    width: 2.w)),
                             child: ClipOval(
                               child: CachedNetworkImage(
                                 imageUrl: technician.profilePicture.isNotEmpty
@@ -136,7 +138,8 @@ class TechnicianDetailsPage extends StatelessWidget {
                                 width: 90.w,
                                 height: 90.h,
                                 fit: BoxFit.cover,
-                                placeholder: (context, url) => Shimmer.fromColors(
+                                placeholder: (context, url) =>
+                                    Shimmer.fromColors(
                                   baseColor: Colors.grey[300]!,
                                   highlightColor: Colors.grey[100]!,
                                   child: Container(color: Colors.white),
@@ -562,11 +565,19 @@ class TechnicianDetailsPage extends StatelessWidget {
                       elevation: 0,
                     ),
                     child: isLoading
-                        ? SizedBox(
-                            height: 20.h,
-                            width: 20.w,
-                            child: CircularProgressIndicator(
-                                color: Colors.white, strokeWidth: 2.5.w),
+                        ? Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Lottie.asset(
+                                  'assets/icon/loading.json',
+                                  width: 20.w,
+                                  height: 20.h,
+                                  repeat: true,
+                                  animate: true,
+                                ),
+                              ],
+                            ),
                           )
                         : Text(
                             "احجز دلوقتي",

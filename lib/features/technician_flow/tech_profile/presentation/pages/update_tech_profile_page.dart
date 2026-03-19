@@ -8,6 +8,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
+import 'package:lottie/lottie.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:el7erafe/core/services/local_storage/auth_local_storage.dart';
 import 'package:el7erafe/features/technician_flow/tech_profile/presentation/cubit/tech_profile_cubit.dart';
@@ -1094,12 +1095,20 @@ class _SensitiveUpdateFlowSheetState extends State<_SensitiveUpdateFlowSheet> {
           },
           builder: (context, state) {
             if (state is ProfileLoading) {
-              return SizedBox(
-                  height: 200.h,
-                  child: const Center(
-                      child: CircularProgressIndicator(
-                    color: Color(0xFF3775FA),
-                  )));
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Lottie.asset(
+                      'assets/icon/loading.json',
+                      width: 200.w,
+                      height: 200.h,
+                      repeat: true,
+                      animate: true,
+                    ),
+                  ],
+                ),
+              );
             }
             if (state is ProfileError) {
               return _buildErrorUI(context, state.message);
