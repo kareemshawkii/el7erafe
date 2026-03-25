@@ -7,7 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfileRepository {
   final String _baseUrl =
-      'https://el7rafe-gma4hrg0e9epfsc0.uaenorth-01.azurewebsites.net';
+      'https://el7rafeapp.azurewebsites.net';
   final String _cacheKey = 'client_profile_cache';
 
   Future<Either<String, Map<String, dynamic>>> getProfileData(

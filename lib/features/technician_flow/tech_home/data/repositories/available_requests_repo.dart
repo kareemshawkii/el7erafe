@@ -10,9 +10,9 @@ class AvailableRequestsRepo {
   HubConnection? _hubConnection;
   final AuthLocalStorage _authLocal = AuthLocalStorage();
   final String _baseUrl =
-      "https://el7rafe-gma4hrg0e9epfsc0.uaenorth-01.azurewebsites.net";
+      "https://el7rafeapp.azurewebsites.net";
   final String _hubUrl =
-      "https://el7rafe-gma4hrg0e9epfsc0.uaenorth-01.azurewebsites.net/technicianHub";
+      "https://el7rafeapp.azurewebsites.net/technicianHub";
 
   Future<List<AvailableRequestModel>> getInitialAvailableRequests() async {
     try {

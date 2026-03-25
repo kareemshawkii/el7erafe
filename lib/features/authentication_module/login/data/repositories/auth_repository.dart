@@ -9,7 +9,7 @@ import 'package:dartz/dartz.dart';
 
 class AuthRepository {
   final String _baseUrl =
-      "https://el7rafe-gma4hrg0e9epfsc0.uaenorth-01.azurewebsites.net";
+      "https://el7rafeapp.azurewebsites.net";
 
   Future<Either<Failure, UserModel>> login(
       String phoneNumber, String password) async {

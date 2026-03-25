@@ -8,7 +8,7 @@ import 'package:intl/intl.dart';
 
 class TechnicianRequestRepository {
   final String baseUrl =
-      "https://el7rafe-gma4hrg0e9epfsc0.uaenorth-01.azurewebsites.net";
+      "https://el7rafeapp.azurewebsites.net";
 
   Future<Either<String, String>> submitTechnicianReservation(
       TechnicianReservationRequest request) async {

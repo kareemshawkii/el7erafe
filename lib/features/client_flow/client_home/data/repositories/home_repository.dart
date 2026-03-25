@@ -6,7 +6,7 @@ import '../models/service_item.dart';
 
 class HomeRepository {
   final String baseUrl =
-      "https://el7rafe-gma4hrg0e9epfsc0.uaenorth-01.azurewebsites.net";
+      "https://el7rafeapp.azurewebsites.net";
 
   Future<Either<String, List<ServiceItem>>> getServices() async {
     AuthLocalStorage authLocalStorage = AuthLocalStorage();

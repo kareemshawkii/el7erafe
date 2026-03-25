@@ -6,7 +6,7 @@ import 'package:el7erafe/core/services/local_storage/auth_local_storage.dart';
 
 class ServiceRequestRepository {
   final String baseUrl =
-      "https://el7rafe-gma4hrg0e9epfsc0.uaenorth-01.azurewebsites.net";
+      "https://el7rafeapp.azurewebsites.net";
 
   Future<Either<String, String>> submitQuickReservation(
       ReservationRequest request) async {

@@ -4,7 +4,7 @@ import 'package:signalr_netcore/signalr_client.dart';
 
 class ChatRepository {
   final String hubUrl =
-      "https://el7rafe-gma4hrg0e9epfsc0.uaenorth-01.azurewebsites.net/chatHub";
+      "https://el7rafeapp.azurewebsites.net/chatHub";
   HubConnection? _hubConnection;
 
   Future<void> initConnection({

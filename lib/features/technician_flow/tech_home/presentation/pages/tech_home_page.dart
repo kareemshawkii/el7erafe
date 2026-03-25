@@ -89,7 +89,7 @@ class _TechHomePageViewState extends State<TechHomePageView> {
       return "";
     }
     if (url.startsWith('http://') || url.startsWith('https://')) return url;
-    return 'https://el7rafe-gma4hrg0e9epfsc0.uaenorth-01.azurewebsites.net/$url';
+    return 'https://el7rafeapp.azurewebsites.net/$url';
   }
 
   @override

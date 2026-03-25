@@ -7,7 +7,7 @@ import 'package:http/http.dart' as http;
 class TechCalendarRepo {
   final AuthLocalStorage _authLocal = AuthLocalStorage();
   final String _baseUrl =
-      "https://el7rafe-gma4hrg0e9epfsc0.uaenorth-01.azurewebsites.net";
+      "https://el7rafeapp.azurewebsites.net";
 
   Future<Either<String, List<TechReservationModel>>> getCalendarReservations(
       String date) async {

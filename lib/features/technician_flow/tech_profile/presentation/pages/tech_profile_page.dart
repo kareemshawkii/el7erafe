@@ -85,7 +85,7 @@ class _TechProfilePageViewState extends State<TechProfilePageView> {
       return url;
     }
     const baseUrl =
-        'https://el7rafe-gma4hrg0e9epfsc0.uaenorth-01.azurewebsites.net';
+        'https://el7rafeapp.azurewebsites.net';
     return url.startsWith('/') ? '$baseUrl$url' : '$baseUrl/$url';
   }
 

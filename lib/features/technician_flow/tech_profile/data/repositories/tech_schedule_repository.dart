@@ -6,7 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class TechScheduleRepository {
   final String _baseUrl =
-      "https://el7rafe-gma4hrg0e9epfsc0.uaenorth-01.azurewebsites.net";
+      "https://el7rafeapp.azurewebsites.net";
   final String _cacheKey = "tech_schedule_cache";
 
   Future<Either<String, List<TechScheduleModel>>> getSchedule(

@@ -9,7 +9,7 @@ import 'package:http/http.dart' as http;
 
 class OtpRepository {
   final String _baseUrl =
-      "https://el7rafe-gma4hrg0e9epfsc0.uaenorth-01.azurewebsites.net";
+      "https://el7rafeapp.azurewebsites.net";
 
   Future<Either<Failure, User>> verifyOtp(String email, String otpCode) async {
     final Uri verifyUrl = Uri.parse('$_baseUrl/api/auth/confirm-email');

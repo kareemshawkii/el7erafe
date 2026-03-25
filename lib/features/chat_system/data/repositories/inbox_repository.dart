@@ -9,9 +9,9 @@ import 'package:signalr_netcore/hub_connection_builder.dart';
 
 class InboxRepository {
   final String baseUrl =
-      "https://el7rafe-gma4hrg0e9epfsc0.uaenorth-01.azurewebsites.net";
+      "https://el7rafeapp.azurewebsites.net";
   final String hubUrl =
-      "https://el7rafe-gma4hrg0e9epfsc0.uaenorth-01.azurewebsites.net/chatHub";
+      "https://el7rafeapp.azurewebsites.net/chatHub";
   HubConnection? _hubConnection;
 
   Future<Either<List<InboxConversationModel>, String>> getInbox() async {
