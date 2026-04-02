@@ -8,10 +8,8 @@ import 'package:signalr_netcore/hub_connection.dart';
 import 'package:signalr_netcore/hub_connection_builder.dart';
 
 class InboxRepository {
-  final String baseUrl =
-      "https://el7rafeapp.azurewebsites.net";
-  final String hubUrl =
-      "https://el7rafeapp.azurewebsites.net/chatHub";
+  final String baseUrl = "https://el7rafeapp.azurewebsites.net";
+  final String hubUrl = "https://el7rafeapp.azurewebsites.net/chatHub";
   HubConnection? _hubConnection;
 
   Future<Either<List<InboxConversationModel>, String>> getInbox() async {
@@ -50,6 +48,7 @@ class InboxRepository {
   }) async {
     try {
       String? token = await AuthLocalStorage().getToken();
+      if (token == null || token.isEmpty) return;
 
       if (_hubConnection != null &&
           _hubConnection!.state != HubConnectionState.Disconnected) {
@@ -59,7 +58,7 @@ class InboxRepository {
       _hubConnection = HubConnectionBuilder()
           .withUrl(hubUrl,
               options: HttpConnectionOptions(
-                accessTokenFactory: () async => token ?? "",
+                accessTokenFactory: () async => token,
               ))
           .withAutomaticReconnect()
           .build();
@@ -80,22 +79,53 @@ class InboxRepository {
             if (onInboxUpdated != null) {
               onInboxUpdated(updatedInbox);
             }
-          } catch (e) {
-            throw Exception("فشل في معالجة تحديثات المحادثات");
-          }
+          } catch (_) {}
         }
       });
 
       _hubConnection!.onclose(({error}) async {
-        await Future.delayed(const Duration(seconds: 3));
-        if (_hubConnection?.state == HubConnectionState.Disconnected) {
-          initSignalR(onInboxUpdated: onInboxUpdated);
-        }
+        await _fallbackToApi(onInboxUpdated);
+        _reconnectLoop(onInboxUpdated);
       });
 
-      await _hubConnection?.start();
+      await _startConnection(onInboxUpdated);
+    } catch (_) {
+      await _fallbackToApi(onInboxUpdated);
+      _reconnectLoop(onInboxUpdated);
+    }
+  }
+
+  Future<void> _startConnection(
+      Function(List<InboxConversationModel>)? onInboxUpdated) async {
+    try {
+      if (_hubConnection?.state == HubConnectionState.Disconnected) {
+        await _hubConnection!.start();
+      }
     } catch (e) {
-      throw Exception("فشل الاتصال بالخادم يرجي التحقق من الإنترنت");
+      if (e.toString().toLowerCase().contains('401')) {
+        return;
+      }
+      await _fallbackToApi(onInboxUpdated);
+      _reconnectLoop(onInboxUpdated);
+    }
+  }
+
+  void _reconnectLoop(
+      Function(List<InboxConversationModel>)? onInboxUpdated) async {
+    await Future.delayed(const Duration(seconds: 5));
+    if (_hubConnection?.state == HubConnectionState.Disconnected) {
+      await _startConnection(onInboxUpdated);
+    }
+  }
+
+  Future<void> _fallbackToApi(
+      Function(List<InboxConversationModel>)? onInboxUpdated) async {
+    if (onInboxUpdated != null) {
+      final result = await getInbox();
+      result.fold(
+        (data) => onInboxUpdated(data),
+        (_) => null,
+      );
     }
   }
 

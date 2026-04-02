@@ -3,8 +3,7 @@ import 'package:el7erafe/features/chat_system/data/models/chat_message_model.dar
 import 'package:signalr_netcore/signalr_client.dart';
 
 class ChatRepository {
-  final String hubUrl =
-      "https://el7rafeapp.azurewebsites.net/chatHub";
+  final String hubUrl = "https://el7rafeapp.azurewebsites.net/chatHub";
   HubConnection? _hubConnection;
 
   Future<void> initConnection({
@@ -17,6 +16,7 @@ class ChatRepository {
   }) async {
     try {
       String? token = await AuthLocalStorage().getToken();
+      if (token == null || token.isEmpty) return;
 
       if (_hubConnection != null &&
           _hubConnection!.state != HubConnectionState.Disconnected) {
@@ -26,7 +26,7 @@ class ChatRepository {
       _hubConnection = HubConnectionBuilder()
           .withUrl(hubUrl,
               options: HttpConnectionOptions(
-                accessTokenFactory: () async => token ?? "",
+                accessTokenFactory: () async => token,
               ))
           .withAutomaticReconnect()
           .build();
@@ -40,9 +40,7 @@ class ChatRepository {
             final message =
                 ChatMessageModel.fromJson(arguments[0] as Map<String, dynamic>);
             if (onMessageReceived != null) onMessageReceived(message);
-          } catch (e) {
-            throw Exception("فشل في استقبال الرسالة");
-          }
+          } catch (_) {}
         }
       });
 
@@ -54,9 +52,7 @@ class ChatRepository {
             if (onMessageStatusUpdated != null) {
               onMessageStatusUpdated(messageId, newStatus);
             }
-          } catch (e) {
-            throw Exception("فشل في تحديث حالة الرسالة");
-          }
+          } catch (_) {}
         }
       });
 
@@ -71,9 +67,7 @@ class ChatRepository {
             if (onMessagesRead != null) {
               onMessagesRead(chatId, updatedMessageIds, newStatus);
             }
-          } catch (e) {
-            throw Exception("فشل في تحديث حالة الرسائل المقروءة");
-          }
+          } catch (_) {}
         }
       });
 
@@ -90,21 +84,76 @@ class ChatRepository {
       });
 
       _hubConnection!.onclose(({error}) async {
-        await Future.delayed(const Duration(seconds: 3));
-        if (_hubConnection?.state == HubConnectionState.Disconnected) {
-          initConnection(
-            onMessageReceived: onMessageReceived,
-            onMessageStatusUpdated: onMessageStatusUpdated,
-            onMessagesRead: onMessagesRead,
-            onUserOnline: onUserOnline,
-            onUserOffline: onUserOffline,
-          );
-        }
+        _reconnectLoop(
+          onMessageReceived: onMessageReceived,
+          onMessageStatusUpdated: onMessageStatusUpdated,
+          onMessagesRead: onMessagesRead,
+          onUserOnline: onUserOnline,
+          onUserOffline: onUserOffline,
+        );
       });
 
-      await _hubConnection?.start();
+      await _startConnection(
+        onMessageReceived: onMessageReceived,
+        onMessageStatusUpdated: onMessageStatusUpdated,
+        onMessagesRead: onMessagesRead,
+        onUserOnline: onUserOnline,
+        onUserOffline: onUserOffline,
+      );
+    } catch (_) {
+      _reconnectLoop(
+        onMessageReceived: onMessageReceived,
+        onMessageStatusUpdated: onMessageStatusUpdated,
+        onMessagesRead: onMessagesRead,
+        onUserOnline: onUserOnline,
+        onUserOffline: onUserOffline,
+      );
+    }
+  }
+
+  Future<void> _startConnection({
+    Function(ChatMessageModel)? onMessageReceived,
+    Function(int messageId, String newStatus)? onMessageStatusUpdated,
+    Function(int chatId, List<int> messageIds, String newStatus)?
+        onMessagesRead,
+    Function(String)? onUserOnline,
+    Function(String)? onUserOffline,
+  }) async {
+    try {
+      if (_hubConnection?.state == HubConnectionState.Disconnected) {
+        await _hubConnection!.start();
+      }
     } catch (e) {
-      throw Exception("فشل الاتصال بالخادم");
+      if (e.toString().toLowerCase().contains('401')) {
+        return;
+      }
+      _reconnectLoop(
+        onMessageReceived: onMessageReceived,
+        onMessageStatusUpdated: onMessageStatusUpdated,
+        onMessagesRead: onMessagesRead,
+        onUserOnline: onUserOnline,
+        onUserOffline: onUserOffline,
+      );
+    }
+  }
+
+  void _reconnectLoop({
+    Function(ChatMessageModel)? onMessageReceived,
+    Function(int messageId, String newStatus)? onMessageStatusUpdated,
+    Function(int chatId, List<int> messageIds, String newStatus)?
+        onMessagesRead,
+    Function(String)? onUserOnline,
+    Function(String)? onUserOffline,
+  }) async {
+    await Future.delayed(const Duration(seconds: 5));
+    if (_hubConnection?.state == HubConnectionState.Disconnected) {
+      await _startConnection(
+        onMessageReceived: onMessageReceived,
+        onMessageStatusUpdated: onMessageStatusUpdated,
+        onMessagesRead: onMessagesRead,
+        onUserOnline: onUserOnline,
+        onUserOffline: onUserOffline,
+      );
     }
   }
 

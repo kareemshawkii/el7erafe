@@ -1,11 +1,10 @@
 // ignore_for_file: deprecated_member_use, use_build_context_synchronously
-
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:el7erafe/core/utils/animated_navigation.dart';
 import 'package:el7erafe/features/client_flow/client_home/data/models/service_item.dart';
 import 'package:el7erafe/features/client_flow/quick_reserve/presentation/pages/quick_reserve_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -72,22 +71,28 @@ class ServiceItemCardState extends State<ServiceItemCard> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              CachedNetworkImage(
-                imageUrl: widget.service.imageUrl,
-                width: 80.w,
-                height: 80.h,
-                placeholder: (context, url) => Shimmer.fromColors(
-                  baseColor: Colors.grey[300]!,
-                  highlightColor: Colors.grey[100]!,
-                  child: Container(
-                    width: 50.w,
-                    height: 50.h,
-                    decoration: const BoxDecoration(
-                        color: Colors.white, shape: BoxShape.circle),
+              ClipRRect(
+                borderRadius:
+                    BorderRadius.only(topRight: Radius.circular(30.r)),
+                child: SvgPicture.network(
+                  widget.service.imageUrl,
+                  width: 85.r,
+                  height: 85.r,
+                  placeholderBuilder: (context) => Shimmer.fromColors(
+                    baseColor: Colors.transparent,
+                    highlightColor: Colors.grey[100]!,
+                    child: Container(
+                      width: 85.r,
+                      height: 85.r,
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
                   ),
+                  errorBuilder: (context, error, stackTrace) =>
+                      const Icon(Icons.broken_image, color: Colors.grey),
                 ),
-                errorWidget: (context, url, error) =>
-                    const Icon(Icons.broken_image, color: Colors.grey),
               ),
               SizedBox(height: 8.h),
               Padding(

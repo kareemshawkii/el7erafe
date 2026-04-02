@@ -9,10 +9,8 @@ import 'package:http/http.dart' as http;
 class PendingRequestsRepo {
   HubConnection? _hubConnection;
   final AuthLocalStorage _authLocal = AuthLocalStorage();
-  final String _baseUrl =
-      "https://el7rafeapp.azurewebsites.net";
-  final String _hubUrl =
-      "https://el7rafeapp.azurewebsites.net/clientHub";
+  final String _baseUrl = "https://el7rafeapp.azurewebsites.net";
+  final String _hubUrl = "https://el7rafeapp.azurewebsites.net/clientHub";
 
   Future<List<PendingRequestModel>> getInitialPendingRequests() async {
     try {
@@ -63,7 +61,10 @@ class PendingRequestsRepo {
   }) async {
     try {
       final token = await _authLocal.getToken();
-      if (token == null || token.isEmpty) throw Exception("401 Unauthorized");
+      if (token == null || token.isEmpty) {
+        onForceDisconnect();
+        return;
+      }
 
       if (_hubConnection != null &&
           _hubConnection!.state != HubConnectionState.Disconnected) {
@@ -107,19 +108,41 @@ class PendingRequestsRepo {
       _hubConnection!.on("ForceDisconnect", (_) => onForceDisconnect());
 
       _hubConnection!.onclose(({error}) async {
-        await Future.delayed(const Duration(seconds: 3));
-        if (_hubConnection?.state == HubConnectionState.Disconnected) {
-          onSignalRRefreshNeeded();
-        }
+        onSignalRRefreshNeeded();
+        _reconnectLoop(onSignalRRefreshNeeded, onForceDisconnect);
       });
 
-      await _hubConnection!.start();
+      await _startConnection(onSignalRRefreshNeeded, onForceDisconnect);
     } catch (e) {
-      final errorString = e.toString().toLowerCase();
-      if (errorString.contains('401') || errorString.contains('unauthorized')) {
-        throw Exception("401 Unauthorized");
+      if (e.toString().toLowerCase().contains('401')) {
+        onForceDisconnect();
+      } else {
+        onSignalRRefreshNeeded();
       }
-      throw Exception("Server connection failed");
+    }
+  }
+
+  Future<void> _startConnection(
+      Function() onFallback, Function() onForceDisconnect) async {
+    try {
+      if (_hubConnection?.state == HubConnectionState.Disconnected) {
+        await _hubConnection!.start();
+      }
+    } catch (e) {
+      if (e.toString().toLowerCase().contains('401')) {
+        onForceDisconnect();
+        return;
+      }
+      onFallback();
+      _reconnectLoop(onFallback, onForceDisconnect);
+    }
+  }
+
+  void _reconnectLoop(
+      Function() onFallback, Function() onForceDisconnect) async {
+    await Future.delayed(const Duration(seconds: 5));
+    if (_hubConnection?.state == HubConnectionState.Disconnected) {
+      await _startConnection(onFallback, onForceDisconnect);
     }
   }
 
