@@ -1,7 +1,7 @@
 name: el7erafe
 description: "Software Solution for fixing the gap between the users and technicians."
 publish_to: 'none'
-version: 1.0.0+9
+version: 1.0.0+12
 
 environment:
   sdk: '>=3.0.0 <4.0.0' 
@@ -38,6 +38,7 @@ dependencies:
   path_provider: ^2.1.2
   firebase_core: ^4.5.0
   shimmer_ai: ^1.3.0
+  firebase_messaging: ^16.1.3
 
 cupertino_icons: ^1.0.8
 

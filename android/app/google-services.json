@@ -7,9 +7,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1018829688873:android:b171a04da630be92ab8c38",
+        "mobilesdk_app_id": "1:1018829688873:android:cf93c657a7581226ab8c38",
         "android_client_info": {
-          "package_name": "com.example.el7erafe"
+          "package_name": "com.el7erafe.app"
         }
       },
       "oauth_client": [],
