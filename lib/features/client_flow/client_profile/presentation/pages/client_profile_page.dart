@@ -8,6 +8,7 @@ import 'package:el7erafe/features/client_flow/client_profile/data/repositories/c
 import 'package:el7erafe/features/client_flow/client_profile/presentation/cubit/client_profile_cubit.dart';
 import 'package:el7erafe/features/client_flow/client_profile/presentation/cubit/client_profile_state.dart';
 import 'package:el7erafe/features/client_flow/client_profile/presentation/pages/update_profile_page.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -54,6 +55,56 @@ class _ClientProfilePageViewState extends State<ClientProfilePageView> {
   void initState() {
     super.initState();
     _loadLocalData();
+    _checkInitialNotificationStatus();
+  }
+
+  Future<void> _checkInitialNotificationStatus() async {
+    final settings = await FirebaseMessaging.instance.getNotificationSettings();
+    setState(() {
+      _notificationsEnabled =
+          settings.authorizationStatus == AuthorizationStatus.authorized ||
+              settings.authorizationStatus == AuthorizationStatus.provisional;
+    });
+  }
+
+  Future<void> _handleNotificationToggle(bool isTurningOn) async {
+    if (isTurningOn) {
+      final settings = await FirebaseMessaging.instance.requestPermission();
+
+      if (settings.authorizationStatus == AuthorizationStatus.authorized ||
+          settings.authorizationStatus == AuthorizationStatus.provisional) {
+        String? token = await FirebaseMessaging.instance.getToken();
+        debugPrint("Notifications turned ON. New Token: $token");
+        // (Optional) Send this new token to your backend
+
+        setState(() => _notificationsEnabled = true);
+      } else {
+        setState(() => _notificationsEnabled = false);
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text(
+                'الإشعارات مغلقة من النظام. يرجى تفعيلها من إعدادات الهاتف.',
+                style: TextStyle(fontFamily: 'Cairo'),
+              ),
+              backgroundColor: Colors.redAccent,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
+      }
+    } else {
+      try {
+        await FirebaseMessaging.instance.deleteToken();
+        debugPrint("Notifications turned OFF. Token deleted.");
+        // (Optional) Tell your backend to remove the token for this user
+
+        setState(() => _notificationsEnabled = false);
+      } catch (e) {
+        debugPrint("Error deleting token: $e");
+      }
+    }
   }
 
   void _navigateToLogin(BuildContext context, String message) {
@@ -401,8 +452,13 @@ class _ClientProfilePageViewState extends State<ClientProfilePageView> {
                                         child: Switch(
                                           value: _notificationsEnabled,
                                           activeThumbColor: _primaryBlue,
-                                          onChanged: (val) => setState(() =>
-                                              _notificationsEnabled = val),
+                                          onChanged: (val) {
+                                            // Optimistically update UI for a snappy feel,
+                                            // the function will revert it if permission is denied.
+                                            setState(() =>
+                                                _notificationsEnabled = val);
+                                            _handleNotificationToggle(val);
+                                          },
                                         ),
                                       ),
                                     ),

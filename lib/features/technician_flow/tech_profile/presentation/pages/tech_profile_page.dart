@@ -14,8 +14,8 @@ import 'package:el7erafe/features/technician_flow/tech_profile/presentation/cubi
 import 'package:el7erafe/features/technician_flow/tech_profile/presentation/cubit/tech_schedule_state.dart';
 import 'package:el7erafe/features/technician_flow/tech_profile/presentation/pages/edit_schedule_sheet.dart';
 import 'package:el7erafe/features/technician_flow/tech_profile/presentation/pages/update_tech_profile_page.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -73,6 +73,53 @@ class _TechProfilePageViewState extends State<TechProfilePageView> {
   void initState() {
     super.initState();
     _loadLocalData();
+    _checkInitialNotificationStatus();
+  }
+
+  Future<void> _checkInitialNotificationStatus() async {
+    final settings = await FirebaseMessaging.instance.getNotificationSettings();
+    setState(() {
+      _notificationsEnabled =
+          settings.authorizationStatus == AuthorizationStatus.authorized ||
+              settings.authorizationStatus == AuthorizationStatus.provisional;
+    });
+  }
+
+  Future<void> _handleNotificationToggle(bool isTurningOn) async {
+    if (isTurningOn) {
+      final settings = await FirebaseMessaging.instance.requestPermission();
+      if (settings.authorizationStatus == AuthorizationStatus.authorized ||
+          settings.authorizationStatus == AuthorizationStatus.provisional) {
+        String? token = await FirebaseMessaging.instance.getToken();
+        debugPrint("Notifications turned ON. New Token: $token");
+        // (Optional) Send this new token to your backend
+        setState(() => _notificationsEnabled = true);
+      } else {
+        setState(() => _notificationsEnabled = false);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text(
+                'الإشعارات مغلقة من النظام. يرجى تفعيلها من إعدادات الهاتف.',
+                style: TextStyle(fontFamily: 'Cairo'),
+              ),
+              backgroundColor: Colors.redAccent,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
+      }
+    } else {
+      try {
+        await FirebaseMessaging.instance.deleteToken();
+        debugPrint("Notifications turned OFF. Token deleted.");
+        // (Optional) Tell your backend to remove the token for this user
+
+        setState(() => _notificationsEnabled = false);
+      } catch (e) {
+        debugPrint("Error deleting token: $e");
+      }
+    }
   }
 
   String _getValidImageUrl(String? url) {
@@ -84,8 +131,7 @@ class _TechProfilePageViewState extends State<TechProfilePageView> {
     if (url.startsWith('http://') || url.startsWith('https://')) {
       return url;
     }
-    const baseUrl =
-        'https://el7rafeapp.azurewebsites.net';
+    const baseUrl = 'https://el7rafeapp.azurewebsites.net';
     return url.startsWith('/') ? '$baseUrl$url' : '$baseUrl/$url';
   }
 
@@ -507,7 +553,8 @@ class _TechProfilePageViewState extends State<TechProfilePageView> {
                                 builder: (context, state) {
                                   List<TechScheduleModel> schedule = [];
                                   bool isScheduleLoading = false;
-                                  if (state is TechScheduleLoading || state is TechScheduleUpdateLoading) {
+                                  if (state is TechScheduleLoading ||
+                                      state is TechScheduleUpdateLoading) {
                                     isScheduleLoading = true;
                                   } else if (state is TechScheduleLoaded) {
                                     schedule = state.schedule;
@@ -639,11 +686,14 @@ class _TechProfilePageViewState extends State<TechProfilePageView> {
                                       trailing: SizedBox(
                                         width: 50.w,
                                         height: 20.h,
-                                        child: CupertinoSwitch(
+                                        child: Switch(
                                           value: _notificationsEnabled,
-                                          activeColor: _primaryBlue,
-                                          onChanged: (val) => setState(() =>
-                                              _notificationsEnabled = val),
+                                          activeThumbColor: _primaryBlue,
+                                          onChanged: (val) {
+                                            setState(() =>
+                                                _notificationsEnabled = val);
+                                            _handleNotificationToggle(val);
+                                          },
                                         ),
                                       ),
                                     ),

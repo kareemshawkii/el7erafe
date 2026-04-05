@@ -1,3 +1,4 @@
+import 'package:el7erafe/core/services/notifications/notification_router.dart';
 import 'package:el7erafe/features/technician_flow/tech_home/data/repositories/available_requests_repo.dart';
 import 'package:el7erafe/features/technician_flow/tech_home/presentation/pages/tech_home_page.dart';
 import 'package:el7erafe/features/technician_flow/tech_profile/data/repositories/tech_schedule_repository.dart';
@@ -27,6 +28,9 @@ import 'package:el7erafe/features/client_flow/client_home/presentation/pages/cli
 import 'package:el7erafe/features/client_flow/client_profile/data/repositories/client_profile_repo.dart';
 import 'package:el7erafe/features/client_flow/quick_reserve/data/repositories/quick_reserve_repo.dart';
 import 'package:el7erafe/features/client_flow/select_technician/data/repositories/select_technician_repo.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'firebase_options.dart';
 
 enum InitialRoute {
   onboarding,
@@ -36,8 +40,39 @@ enum InitialRoute {
   login
 }
 
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  debugPrint("Handling a background message: ${message.messageId}");
+}
+
 Future<void> main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  try {
+    NotificationSettings settings = await FirebaseMessaging.instance.requestPermission(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
+    
+    debugPrint('User notification permission status: ${settings.authorizationStatus}');
+
+    if (settings.authorizationStatus == AuthorizationStatus.authorized || 
+        settings.authorizationStatus == AuthorizationStatus.provisional) {
+      
+      String? token = await FirebaseMessaging.instance.getToken();
+      debugPrint("FCM Device Token: $token");
+      
+    } else {
+      debugPrint("User declined notification permissions.");
+    }
+  } catch (e) {
+    debugPrint("Error with FCM permissions or token: $e");
+  }
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
   SystemChrome.setPreferredOrientations([
@@ -95,6 +130,125 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     FlutterNativeSplash.remove();
+    _setupNotificationListeners();
+  }
+
+  void _setupNotificationListeners() {
+    FirebaseMessaging.instance
+        .getInitialMessage()
+        .then((RemoteMessage? message) {
+      if (message != null) {
+        Future.delayed(const Duration(milliseconds: 500), () {
+          NotificationRouter.processAndRoute(message);
+        });
+      }
+    });
+
+    // 2. App is in the background, and user taps notification
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      NotificationRouter.processAndRoute(message);
+    });
+
+    // 3. App is currently open (Foreground)
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      debugPrint("Received message in foreground!");
+      final context = globalNavigatorKey.currentContext;
+      if (context == null) return;
+
+      final title = message.notification?.title ?? 'إشعار جديد';
+      final body =
+          message.notification?.body ?? 'لديك تحديث جديد، اضغط للتفاصيل.';
+
+      // ignore: use_build_context_synchronously
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          elevation: 0,
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.transparent,
+          padding: EdgeInsets.zero,
+          duration: const Duration(seconds: 5),
+          content: GestureDetector(
+            onTap: () {
+              ScaffoldMessenger.of(context).hideCurrentSnackBar();
+              NotificationRouter.processAndRoute(message);
+            },
+            child: Container(
+              margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    // ignore: deprecated_member_use
+                    color: Colors.black.withOpacity(0.08),
+                    blurRadius: 15,
+                    offset: const Offset(0, 5),
+                  ),
+                ],
+                border: Border.all(
+                  color: const Color(0xFF3775FA)
+                      // ignore: deprecated_member_use
+                      .withOpacity(0.3), // Light primary color border
+                  width: 1,
+                ),
+              ),
+              child: Row(
+                children: [
+                  // Icon Container
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      // ignore: deprecated_member_use
+                      color: const Color(0xFF3775FA).withOpacity(0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(
+                      Icons.notifications_active_rounded,
+                      color: Color(0xFF3775FA),
+                      size: 24,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  // Text Content
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          title,
+                          style: const TextStyle(
+                            color: Colors.black87,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15,
+                            fontFamily: 'Cairo',
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          body,
+                          style: const TextStyle(
+                            color: Colors.black54,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 13,
+                            fontFamily: 'Cairo',
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    });
   }
 
   Widget _getInitialPage(BuildContext context) {
@@ -150,6 +304,7 @@ class _MyAppState extends State<MyApp> {
         splitScreenMode: true,
         builder: (context, child) {
           return MaterialApp(
+            navigatorKey: globalNavigatorKey,
             locale: const Locale('ar'),
             debugShowCheckedModeBanner: false,
             title: 'El7erafe',
