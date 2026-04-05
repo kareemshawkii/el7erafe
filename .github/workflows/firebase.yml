@@ -1,6 +1,6 @@
 name: Distribute Flutter App to Firebase
 
-# 1. The Trigger: Runs automatically on pushes to main, or manually via a button
+# 1. The Trigger: Runs automatically on pushes to main, or manually via a buttons
 on:
   push:
     branches:
