@@ -1,4 +1,4 @@
-package com.example.el7erafe
+package com.el7erafe.app
 
 import io.flutter.embedding.android.FlutterActivity
 
