@@ -7,7 +7,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.el7erafe"
+    namespace = "com.el7erafe.app"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
