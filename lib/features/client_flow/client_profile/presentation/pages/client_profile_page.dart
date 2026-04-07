@@ -1,5 +1,6 @@
 // ignore_for_file: deprecated_member_use
 import 'package:el7erafe/core/services/local_storage/auth_local_storage.dart';
+import 'package:el7erafe/core/services/notifications/notification_api_service.dart';
 import 'package:el7erafe/core/utils/animated_navigaton_with_build.dart';
 import 'package:el7erafe/features/authentication_module/login/data/repositories/auth_repository.dart';
 import 'package:el7erafe/features/authentication_module/login/presentation/cubit/login_cubit.dart';
@@ -74,13 +75,10 @@ class _ClientProfilePageViewState extends State<ClientProfilePageView> {
       if (settings.authorizationStatus == AuthorizationStatus.authorized ||
           settings.authorizationStatus == AuthorizationStatus.provisional) {
         String? token = await FirebaseMessaging.instance.getToken();
-        debugPrint("Notifications turned ON. New Token: $token");
-        // (Optional) Send this new token to your backend
-
+        await NotificationApiService.saveFcmToken(token ?? "");
         setState(() => _notificationsEnabled = true);
       } else {
         setState(() => _notificationsEnabled = false);
-
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -97,12 +95,22 @@ class _ClientProfilePageViewState extends State<ClientProfilePageView> {
     } else {
       try {
         await FirebaseMessaging.instance.deleteToken();
-        debugPrint("Notifications turned OFF. Token deleted.");
-        // (Optional) Tell your backend to remove the token for this user
-
+        await NotificationApiService.deleteFcmToken();
         setState(() => _notificationsEnabled = false);
       } catch (e) {
-        debugPrint("Error deleting token: $e");
+        setState(() => _notificationsEnabled = true);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text(
+                'حدث خطأ أثناء تعطيل الإشعارات. حاول مرة أخرى.',
+                style: TextStyle(fontFamily: 'Cairo'),
+              ),
+              backgroundColor: Colors.redAccent,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
       }
     }
   }

@@ -1,3 +1,4 @@
+import 'package:el7erafe/core/services/notifications/notification_api_service.dart';
 import 'package:el7erafe/core/services/notifications/notification_router.dart';
 import 'package:el7erafe/features/technician_flow/tech_home/data/repositories/available_requests_repo.dart';
 import 'package:el7erafe/features/technician_flow/tech_home/presentation/pages/tech_home_page.dart';
@@ -43,7 +44,6 @@ enum InitialRoute {
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  debugPrint("Handling a background message: ${message.messageId}");
 }
 
 Future<void> main() async {
@@ -53,25 +53,24 @@ Future<void> main() async {
   );
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   try {
-    NotificationSettings settings = await FirebaseMessaging.instance.requestPermission(
+    NotificationSettings settings =
+        await FirebaseMessaging.instance.requestPermission(
       alert: true,
       badge: true,
       sound: true,
     );
-    
-    debugPrint('User notification permission status: ${settings.authorizationStatus}');
 
-    if (settings.authorizationStatus == AuthorizationStatus.authorized || 
+    if (settings.authorizationStatus == AuthorizationStatus.authorized ||
         settings.authorizationStatus == AuthorizationStatus.provisional) {
-      
       String? token = await FirebaseMessaging.instance.getToken();
-      debugPrint("FCM Device Token: $token");
-      
+      if (token != null) {
+        await NotificationApiService.saveFcmToken(token);
+      }
     } else {
-      debugPrint("User declined notification permissions.");
+      // User declined or has not accepted permission
     }
   } catch (e) {
-    debugPrint("Error with FCM permissions or token: $e");
+    // Handle any errors that occur during permission request or token retrieval
   }
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
@@ -151,7 +150,6 @@ class _MyAppState extends State<MyApp> {
 
     // 3. App is currently open (Foreground)
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      debugPrint("Received message in foreground!");
       final context = globalNavigatorKey.currentContext;
       if (context == null) return;
 
