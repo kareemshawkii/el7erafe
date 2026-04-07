@@ -3,6 +3,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:el7erafe/core/services/local_storage/auth_local_storage.dart';
 import 'package:el7erafe/core/services/notifications/notification_api_service.dart';
 import 'package:el7erafe/core/utils/animated_navigaton_with_build.dart';
+import 'package:el7erafe/core/utils/modern_snakebar.dart';
 import 'package:el7erafe/features/authentication_module/login/data/repositories/auth_repository.dart';
 import 'package:el7erafe/features/authentication_module/login/presentation/cubit/login_cubit.dart';
 import 'package:el7erafe/features/authentication_module/login/presentation/pages/login_page.dart';
@@ -97,16 +98,10 @@ class _TechProfilePageViewState extends State<TechProfilePageView> {
       } else {
         setState(() => _notificationsEnabled = false);
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: const Text(
-                'الإشعارات مغلقة من النظام. يرجى تفعيلها من إعدادات الهاتف.',
-                style: TextStyle(fontFamily: 'Cairo'),
-              ),
-              backgroundColor: Colors.redAccent,
-              behavior: SnackBarBehavior.floating,
-            ),
-          );
+          ModernSnackbar.showError(
+              context: context,
+              message:
+                  "لم يتم تفعيل الإشعارات. يمكنك تفعيلها من إعدادات التطبيق.");
         }
       }
     } else {
@@ -117,16 +112,9 @@ class _TechProfilePageViewState extends State<TechProfilePageView> {
       } catch (e) {
         setState(() => _notificationsEnabled = true);
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: const Text(
-                'حدث خطأ أثناء تعطيل الإشعارات. حاول مرة أخرى.',
-                style: TextStyle(fontFamily: 'Cairo'),
-              ),
-              backgroundColor: Colors.redAccent,
-              behavior: SnackBarBehavior.floating,
-            ),
-          );
+          ModernSnackbar.showError(
+              context: context,
+              message: "حدث خطأ أثناء تعطيل الإشعارات. حاول مرة أخرى.");
         }
       }
     }
@@ -146,12 +134,7 @@ class _TechProfilePageViewState extends State<TechProfilePageView> {
   }
 
   void _navigateToLogin(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message, textDirection: TextDirection.rtl),
-        backgroundColor: Colors.green,
-      ),
-    );
+    ModernSnackbar.showError(context: context, message: message);
     Navigator.pushAndRemoveUntil(
       context,
       SlideRightRouteWithBuild(
@@ -300,12 +283,7 @@ class _TechProfilePageViewState extends State<TechProfilePageView> {
         } else if (state is ProfileActionSuccess) {
           _navigateToLogin(context, state.message);
         } else if (state is ProfileError) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.message, textDirection: TextDirection.rtl),
-              backgroundColor: Colors.red,
-            ),
-          );
+          ModernSnackbar.showError(context: context, message: state.message);
         }
       },
       builder: (context, state) {

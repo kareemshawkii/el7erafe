@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:el7erafe/core/services/local_storage/auth_local_storage.dart';
 import 'package:el7erafe/core/utils/animated_navigaton_with_build.dart';
+import 'package:el7erafe/core/utils/modern_snakebar.dart';
 import 'package:el7erafe/features/authentication_module/login/data/repositories/auth_repository.dart';
 import 'package:el7erafe/features/authentication_module/login/presentation/cubit/login_cubit.dart';
 import 'package:el7erafe/features/authentication_module/login/presentation/pages/login_page.dart';
@@ -69,12 +70,9 @@ class PendingRequestsView extends StatelessWidget {
     return BlocConsumer<PendingRequestsCubit, PendingRequestsState>(
       listener: (context, state) async {
         if (state is PendingRequestsUnauthorized) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('انتهت صلاحية الجلسة، يرجى تسجيل الدخول مرة أخرى',
-                  textDirection: TextDirection.rtl),
-              backgroundColor: Colors.red,
-            ),
+          ModernSnackbar.showError(
+            context: context,
+            message: 'انتهت صلاحية الجلسة. الرجاء تسجيل الدخول مرة أخرى.',
           );
           await AuthLocalStorage().deleteToken();
           if (!context.mounted) return;
@@ -292,12 +290,9 @@ class PendingRequestsView extends StatelessWidget {
                   .read<PendingRequestsCubit>()
                   .acceptOffer(request.offerId!);
               context.read<PendingRequestsCubit>().fetchPendingRequests();
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('تم قبول العرض بنجاح',
-                      textDirection: TextDirection.rtl),
-                  backgroundColor: Colors.green,
-                ),
+              ModernSnackbar.showSuccess(
+                context: context,
+                message: 'تم قبول العرض بنجاح',
               );
             }
           : null,
@@ -309,12 +304,12 @@ class PendingRequestsView extends StatelessWidget {
               .read<PendingRequestsCubit>()
               .declineOffer(request.offerId!, request.requestId);
           context.read<PendingRequestsCubit>().fetchPendingRequests();
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content:
-                  Text('تم رفض العرض بنجاح', textDirection: TextDirection.rtl),
-              backgroundColor: Colors.grey,
-            ),
+          ModernSnackbar.show(
+            context: context,
+            message: 'تم رفض العرض بنجاح',
+            title: "تم الرفض",
+            color: Colors.orange,
+            icon: Icons.cancel_outlined,
           );
         } else {
           _showCancelDialog(context, request.requestId);
@@ -564,12 +559,12 @@ void _showCancelDialog(BuildContext context, int requestId) {
               onPressed: () {
                 Navigator.pop(dialogContext);
                 cubit.cancelRequest(requestId);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('تم إلغاء الطلب بنجاح',
-                        textDirection: TextDirection.rtl),
-                    backgroundColor: Colors.grey,
-                  ),
+                ModernSnackbar.show(
+                  context: context,
+                  message: 'تم إلغاء الطلب بنجاح',
+                  title: "تم الإلغاء",
+                  color: Colors.grey,
+                  icon: Icons.cancel_outlined,
                 );
               },
               child: Text(

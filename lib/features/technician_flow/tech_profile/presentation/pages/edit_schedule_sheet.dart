@@ -1,5 +1,6 @@
 // ignore_for_file: deprecated_member_use
 
+import 'package:el7erafe/core/utils/modern_snakebar.dart';
 import 'package:el7erafe/features/client_flow/quick_reserve/presentation/pages/time_picker.dart';
 import 'package:el7erafe/features/technician_flow/tech_profile/data/models/day_config.dart';
 import 'package:el7erafe/features/technician_flow/tech_profile/data/models/tech_schedule_model.dart';
@@ -269,12 +270,7 @@ class _EditScheduleBottomSheetState extends State<EditScheduleBottomSheet> {
     return BlocListener<TechScheduleCubit, TechScheduleState>(
       listener: (context, state) {
         if (state is TechScheduleUpdateSuccess) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.message, textDirection: TextDirection.rtl),
-              backgroundColor: Colors.green,
-            ),
-          );
+          ModernSnackbar.showSuccess(context: context, message: state.message);
           Navigator.pop(context);
         } else if (state is TechScheduleError) {
           _showError(state.error);

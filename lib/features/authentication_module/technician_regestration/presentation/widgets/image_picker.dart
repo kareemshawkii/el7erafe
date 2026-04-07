@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:el7erafe/core/utils/modern_snakebar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
@@ -52,11 +53,10 @@ class _ImagePickerButtonState extends State<ImagePickerButton> {
       _pickImage(source);
     } else if (status.isDenied) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('الرجاء السماح بالوصول إلى الكاميرا أو المعرض.',
-                textDirection: TextDirection.rtl)),
-      );
+      ModernSnackbar.showError(
+          context: context,
+          message:
+              "تم رفض الوصول إلى ${source == ImageSource.camera ? 'الكاميرا' : 'المعرض'}. من فضلك امنح الإذن للمتابعة.");
     } else if (status.isPermanentlyDenied) {
       if (!mounted) return;
       _showSettingsDialog();
@@ -157,13 +157,9 @@ class _ImagePickerButtonState extends State<ImagePickerButton> {
 
       if (extension != 'jpg' && extension != 'jpeg' && extension != 'png') {
         if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("من فضلك اختر صورة بصيغة JPG أو PNG فقط.",
-                textDirection: TextDirection.rtl),
-            backgroundColor: Colors.red,
-          ),
-        );
+        ModernSnackbar.showError(
+            context: context,
+            message: "من فضلك اختر صورة بصيغة JPG أو PNG فقط.");
         return;
       }
 
@@ -173,13 +169,9 @@ class _ImagePickerButtonState extends State<ImagePickerButton> {
 
       if (finalCompressedFile.lengthSync() == 0) {
         if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("الصورة المختارة غير صالحة. من فضلك اختر صورة أخرى.",
-                textDirection: TextDirection.rtl),
-            backgroundColor: Colors.red,
-          ),
-        );
+        ModernSnackbar.showError(
+            context: context,
+            message: "الصورة المختارة غير صالحة. يرجى اختيار صورة أخرى.");
         return;
       }
 
@@ -192,9 +184,9 @@ class _ImagePickerButtonState extends State<ImagePickerButton> {
       }
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to pick image: $e')),
-      );
+      ModernSnackbar.showError(
+          context: context,
+          message: "فشل في اختيار الصورة. يرجى المحاولة مرة أخرى.");
     }
   }
 

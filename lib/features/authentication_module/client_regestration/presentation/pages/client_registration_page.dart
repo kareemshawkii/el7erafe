@@ -2,6 +2,7 @@
 
 import 'package:el7erafe/core/services/local_storage/auth_local_storage.dart';
 import 'package:el7erafe/core/utils/animated_navigaton_with_build.dart';
+import 'package:el7erafe/core/utils/modern_snakebar.dart';
 import 'package:el7erafe/features/authentication_module/client_regestration/data/repositories/client_registration_repo.dart';
 import 'package:el7erafe/features/authentication_module/client_regestration/presentation/cubit/client_registration_cubit.dart';
 import 'package:el7erafe/features/authentication_module/client_regestration/presentation/cubit/client_registration_state.dart';
@@ -49,23 +50,18 @@ class ClientRegistrationView extends StatelessWidget {
       body: BlocListener<ClientRegistrationCubit, ClientRegistrationState>(
         listener: (context, state) async {
           if (state is ClientRegFailure) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.error, textDirection: TextDirection.rtl),
-                backgroundColor: Colors.red,
-              ),
+            ModernSnackbar.showError(
+              context: context,
+              message: state.error,
             );
           }
           if (state is ClientRegSuccess) {
             AuthLocalStorage authLocalStorage = AuthLocalStorage();
             String? email = await authLocalStorage.getEmail();
             if (!context.mounted) return;
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('تم ارسال كود التحقق بنجاح',
-                    textDirection: TextDirection.rtl),
-                backgroundColor: Colors.green,
-              ),
+            ModernSnackbar.showSuccess(
+              context: context,
+              message: 'تم ارسال كود التحقق بنجاح',
             );
             Navigator.push(
               context,

@@ -1,6 +1,7 @@
 // ignore_for_file: deprecated_member_use
 
 import 'dart:io';
+import 'package:el7erafe/core/utils/modern_snakebar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -101,14 +102,9 @@ class _ClientUpdateProfilePageState extends State<ClientUpdateProfilePage> {
 
         if (compressedFile.lengthSync() == 0) {
           if (!mounted) return;
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text(
-                  "حدث خطأ أثناء معالجة الصورة. الرجاء المحاولة مرة أخرى.",
-                  textDirection: TextDirection.rtl),
-              backgroundColor: Colors.red,
-            ),
-          );
+          ModernSnackbar.showError(
+              context: context,
+              message: "فشل في معالجة الصورة، الرجاء المحاولة مرة أخرى");
           return;
         }
 
@@ -120,13 +116,9 @@ class _ClientUpdateProfilePageState extends State<ClientUpdateProfilePage> {
       }
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('حدث خطأ أثناء اختيار الصورة',
-              textDirection: TextDirection.rtl),
-          backgroundColor: Colors.red,
-        ),
-      );
+      ModernSnackbar.showError(
+          context: context,
+          message: "حدث خطأ أثناء اختيار الصورة، الرجاء المحاولة مرة أخرى");
     }
   }
 
@@ -231,13 +223,8 @@ class _ClientUpdateProfilePageState extends State<ClientUpdateProfilePage> {
         body: BlocListener<ProfileCubit, ProfileState>(
           listener: (context, state) {
             if (state is FieldUpdateSuccess) {
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                content: Text(state.message,
-                    style: GoogleFonts.cairo(),
-                    textDirection: TextDirection.rtl),
-                backgroundColor: Colors.green,
-              ));
-
+              ModernSnackbar.showSuccess(
+                  context: context, message: state.message);
               if (state.newName != null) _nameController.text = state.newName!;
               if (state.newPhone != null) {
                 _phoneDisplayController.text = state.newPhone!;
@@ -253,12 +240,8 @@ class _ClientUpdateProfilePageState extends State<ClientUpdateProfilePage> {
               }
               Navigator.pop(context);
             } else if (state is ProfileError) {
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                content: Text(state.message,
-                    style: GoogleFonts.cairo(),
-                    textDirection: TextDirection.rtl),
-                backgroundColor: Colors.red,
-              ));
+              ModernSnackbar.showError(
+                  context: context, message: state.message);
             }
           },
           child: Column(
@@ -467,19 +450,14 @@ class _ClientUpdateProfilePageState extends State<ClientUpdateProfilePage> {
                                                             : currentName;
                                                     if (nameToSend.isEmpty &&
                                                         _pickedImage == null) {
-                                                      ScaffoldMessenger.of(
-                                                              context)
-                                                          .showSnackBar(
-                                                        const SnackBar(
-                                                          content: Text(
-                                                              "لم تقم بإجراء أي تعديلات",
-                                                              textDirection:
-                                                                  TextDirection
-                                                                      .rtl),
-                                                          backgroundColor:
-                                                              Colors.grey,
-                                                        ),
-                                                      );
+                                                      ModernSnackbar.show(
+                                                          context: context,
+                                                          message:
+                                                              "لم يتم إجراء أي تعديلات",
+                                                          title: "تنبيه",
+                                                          color: Colors.grey,
+                                                          icon: Icons
+                                                              .info_outline);
                                                       return;
                                                     }
                                                     context

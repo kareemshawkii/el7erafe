@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:el7erafe/core/services/local_storage/auth_local_storage.dart';
 import 'package:el7erafe/core/utils/animated_navigaton_with_build.dart';
+import 'package:el7erafe/core/utils/modern_snakebar.dart';
 import 'package:el7erafe/features/authentication_module/login/data/repositories/auth_repository.dart';
 import 'package:el7erafe/features/authentication_module/login/presentation/cubit/login_cubit.dart';
 import 'package:el7erafe/features/authentication_module/login/presentation/pages/login_page.dart';
@@ -76,8 +77,7 @@ class OffersView extends StatelessWidget {
     if (url.startsWith('http://') || url.startsWith('https://')) {
       return url;
     }
-    const baseUrl =
-        'https://el7rafeapp.azurewebsites.net';
+    const baseUrl = 'https://el7rafeapp.azurewebsites.net';
     return url.startsWith('/') ? '$baseUrl$url' : '$baseUrl/$url';
   }
 
@@ -126,16 +126,10 @@ class OffersView extends StatelessWidget {
                 (route) => false,
               );
             } else if (state is OfferActionSuccess) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                    content: Text(state.message),
-                    backgroundColor: Colors.green),
-              );
+              ModernSnackbar.showSuccess(
+                  context: context, message: state.message);
             } else if (state is OfferActionError) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                    content: Text(state.error), backgroundColor: Colors.red),
-              );
+              ModernSnackbar.showError(context: context, message: state.error);
             }
           },
           builder: (context, state) {
@@ -274,11 +268,8 @@ class OffersView extends StatelessWidget {
         Navigator.pop(context);
         context.read<PendingRequestsCubit>().acceptOffer(offer.offerId);
         context.read<PendingRequestsCubit>().fetchPendingRequests();
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text('تم قبول العرض بنجاح'),
-              backgroundColor: Colors.green),
-        );
+        ModernSnackbar.showSuccess(
+            context: context, message: 'تم قبول العرض بنجاح');
       },
       secondaryButtonText: 'رفض العرض',
       secondaryButtonIcon: Iconsax.close_circle,

@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:el7erafe/core/services/local_storage/rejected_local_storage.dart';
 import 'package:el7erafe/core/services/models/rejected_user.dart';
+import 'package:el7erafe/core/utils/modern_snakebar.dart';
 import 'package:el7erafe/features/authentication_module/technician_regestration/data/model/rejected_technician_model.dart';
 import 'package:el7erafe/features/authentication_module/technician_regestration/presentation/cubit/technician_resubmit_cubit.dart';
 import 'package:el7erafe/features/authentication_module/technician_regestration/presentation/cubit/technician_resubmit_state.dart';
@@ -45,11 +46,9 @@ class _TechnicianResubmitFormState extends State<TechnicianResubmitForm> {
     if (!_formKey.currentState!.validate()) return;
 
     if (rejectedTechnician == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('حدث خطأ في تحميل بيانات الرفض'),
-            backgroundColor: Colors.red),
-      );
+      ModernSnackbar.showError(
+          context: context,
+          message: "حدث خطأ غير متوقع، الرجاء المحاولة لاحقًا");
       return;
     }
 
@@ -84,11 +83,7 @@ class _TechnicianResubmitFormState extends State<TechnicianResubmitForm> {
   }
 
   void _showError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-          content: Text(message, textDirection: TextDirection.rtl),
-          backgroundColor: Colors.red),
-    );
+    ModernSnackbar.showError(context: context, message: message);
   }
 
   @override

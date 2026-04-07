@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:el7erafe/core/utils/animated_navigaton_with_build.dart';
+import 'package:el7erafe/core/utils/modern_snakebar.dart';
 import 'package:el7erafe/features/authentication_module/client_regestration/presentation/cubit/password_strength_cubit.dart';
 import 'package:el7erafe/features/authentication_module/client_regestration/presentation/cubit/password_strength_state.dart';
 import 'package:el7erafe/features/authentication_module/login/data/repositories/auth_repository.dart';
@@ -65,33 +66,21 @@ class _TechnicianRegistrationFormState
           backIdImage == null ||
           criminalRecordImage == null ||
           profileImage == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text('الرجاء إرفاق جميع الصور المطلوبة',
-                  textDirection: TextDirection.rtl),
-              backgroundColor: Colors.red),
-        );
+        ModernSnackbar.showError(
+            context: context, message: "الرجاء رفع جميع الصور المطلوبة");
         return;
       }
     }
 
     if (_selectedGovernorate == null || _selectedCity == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('الرجاء اختيار المحافظة والمدينة',
-                textDirection: TextDirection.rtl),
-            backgroundColor: Colors.red),
-      );
+      ModernSnackbar.showError(
+          context: context, message: "الرجاء اختيار المحافظة والمدينة");
       return;
     }
 
     if (selectedService == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('الرجاء اختيار نوع الحرفة',
-                textDirection: TextDirection.rtl),
-            backgroundColor: Colors.red),
-      );
+      ModernSnackbar.showError(
+          context: context, message: "الرجاء اختيار نوع الحرفة");
       return;
     }
 

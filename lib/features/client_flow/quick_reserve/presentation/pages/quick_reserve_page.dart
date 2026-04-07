@@ -3,6 +3,7 @@
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:el7erafe/core/utils/animated_navigation.dart';
 import 'package:el7erafe/core/utils/animated_navigaton_with_build.dart';
+import 'package:el7erafe/core/utils/modern_snakebar.dart';
 import 'package:el7erafe/features/authentication_module/login/data/repositories/auth_repository.dart';
 import 'package:el7erafe/features/authentication_module/login/presentation/cubit/login_cubit.dart';
 import 'package:el7erafe/features/authentication_module/login/presentation/pages/login_page.dart';
@@ -214,13 +215,8 @@ class _ServiceRequestPageState extends State<ServiceRequestPage> {
                   ),
                 );
               } else if (state is ServiceRequestUnauthorized) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(state.unauthMessage,
-                        textDirection: TextDirection.rtl),
-                    backgroundColor: Colors.red,
-                  ),
-                );
+                ModernSnackbar.showError(
+                    context: context, message: state.unauthMessage);
                 Navigator.pushAndRemoveUntil(
                   context,
                   SlideRightRouteWithBuild(
@@ -553,30 +549,18 @@ class _ServiceRequestPageState extends State<ServiceRequestPage> {
                                                 model.day!.day == now.day);
                                           }
                                           if (isToday && t.hour < now.hour) {
-                                            ScaffoldMessenger.of(context)
-                                                .showSnackBar(
-                                              const SnackBar(
-                                                content: Text(
-                                                    "لا يمكن اختيار وقت بداية في الماضي",
-                                                    textDirection:
-                                                        TextDirection.rtl),
-                                                backgroundColor: Colors.red,
-                                              ),
-                                            );
+                                            ModernSnackbar.showError(
+                                                context: context,
+                                                message:
+                                                    "لا يمكن اختيار وقت بداية في الماضي");
                                             return;
                                           }
 
                                           if (isToday && t.hour == now.hour) {
-                                            ScaffoldMessenger.of(context)
-                                                .showSnackBar(
-                                              const SnackBar(
-                                                content: Text(
-                                                    "يجب اخيار ساعه تكون بعد الساعه الحالية",
-                                                    textDirection:
-                                                        TextDirection.rtl),
-                                                backgroundColor: Colors.red,
-                                              ),
-                                            );
+                                            ModernSnackbar.showError(
+                                                context: context,
+                                                message:
+                                                    "يجب اخيار ساعه تكون بعد الساعه الحالية");
                                             return;
                                           }
 
@@ -587,16 +571,10 @@ class _ServiceRequestPageState extends State<ServiceRequestPage> {
                                                 .split(":")[0]);
 
                                             if (t.hour >= endHour) {
-                                              ScaffoldMessenger.of(context)
-                                                  .showSnackBar(
-                                                const SnackBar(
-                                                  content: Text(
-                                                      "وقت البداية يجب أن يكون قبل وقت النهاية",
-                                                      textDirection:
-                                                          TextDirection.rtl),
-                                                  backgroundColor: Colors.red,
-                                                ),
-                                              );
+                                              ModernSnackbar.showError(
+                                                  context: context,
+                                                  message:
+                                                      "وقت البداية يجب أن يكون قبل وقت النهاية");
                                               return;
                                             }
                                           }
@@ -656,45 +634,27 @@ class _ServiceRequestPageState extends State<ServiceRequestPage> {
                                                 .split(":")[0]);
 
                                             if (t.hour <= startHour) {
-                                              ScaffoldMessenger.of(context)
-                                                  .showSnackBar(
-                                                const SnackBar(
-                                                  content: Text(
-                                                      "وقت النهاية يجب أن يكون بعد وقت البداية",
-                                                      textDirection:
-                                                          TextDirection.rtl),
-                                                  backgroundColor: Colors.red,
-                                                ),
-                                              );
+                                              ModernSnackbar.showError(
+                                                  context: context,
+                                                  message:
+                                                      "وقت النهاية يجب أن يكون بعد وقت البداية");
                                               return;
                                             }
                                           }
 
                                           if (isToday && t.hour < now.hour) {
-                                            ScaffoldMessenger.of(context)
-                                                .showSnackBar(
-                                              const SnackBar(
-                                                content: Text(
-                                                    "لا يمكن اختيار وقت نهاية في الماضي",
-                                                    textDirection:
-                                                        TextDirection.rtl),
-                                                backgroundColor: Colors.red,
-                                              ),
-                                            );
+                                            ModernSnackbar.showError(
+                                                context: context,
+                                                message:
+                                                    "لا يمكن اختيار وقت نهاية في الماضي");
                                             return;
                                           }
 
                                           if (isToday && t.hour == now.hour) {
-                                            ScaffoldMessenger.of(context)
-                                                .showSnackBar(
-                                              const SnackBar(
-                                                content: Text(
-                                                    "يجب اخيار ساعه تكون بعد الساعه الحالية",
-                                                    textDirection:
-                                                        TextDirection.rtl),
-                                                backgroundColor: Colors.red,
-                                              ),
-                                            );
+                                            ModernSnackbar.showError(
+                                                context: context,
+                                                message:
+                                                    "يجب اخيار ساعه تكون بعد الساعه الحالية");
                                             return;
                                           }
 
@@ -744,82 +704,50 @@ class _ServiceRequestPageState extends State<ServiceRequestPage> {
                                     FocusScope.of(context).unfocus();
                                     if (requestModel.description == null ||
                                         requestModel.description!.isEmpty) {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                          content: Text(
-                                              "برجاء كتابه وصف المشكله",
-                                              textDirection: TextDirection.rtl),
-                                          backgroundColor: Colors.red,
-                                        ),
-                                      );
+                                      ModernSnackbar.showError(
+                                          context: context,
+                                          message: "برجاء كتابه وصف المشكله");
                                       return;
                                     }
                                     if (requestModel.day == null) {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                          content: Text(
-                                              "برجاء اختيار اليوم المطلوب فيه الخدمة",
-                                              textDirection: TextDirection.rtl),
-                                          backgroundColor: Colors.red,
-                                        ),
-                                      );
+                                      ModernSnackbar.showError(
+                                          context: context,
+                                          message:
+                                              "برجاء اختيار اليوم المطلوب فيه الخدمة");
                                       return;
                                     }
                                     if (requestModel.street == null ||
                                         requestModel.city == null ||
                                         requestModel.governorate == null) {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                          content: Text(
-                                              "برجاء تحديد العنوان بالكامل",
-                                              textDirection: TextDirection.rtl),
-                                          backgroundColor: Colors.red,
-                                        ),
-                                      );
+                                      ModernSnackbar.showError(
+                                          context: context,
+                                          message:
+                                              "برجاء اختيار المحافظه والمدينة وكتابة اسم الشارع بالتفصيل");
                                       return;
                                     }
                                     if (requestModel.street!.length < 10 ||
                                         requestModel.street!.length > 200) {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                          content: Text(
-                                              "برجاء كتابة عنوان أكثر تفصيلاً اسم الشارع لا يقل عن 10 حروف ولا يتجاوز 200 حرف",
-                                              textDirection: TextDirection.rtl),
-                                          backgroundColor: Colors.red,
-                                        ),
-                                      );
+                                      ModernSnackbar.showError(
+                                          context: context,
+                                          message:
+                                              "برجاء كتابة عنوان أكثر تفصيلاً اسم الشارع لا يقل عن 10 حروف ولا يتجاوز 200 حرف");
                                       return;
                                     }
                                     if (requestModel.description!.length < 10 ||
                                         requestModel.description!.length >
                                             200) {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                          content: Text(
-                                              "برجاء كتابة وصف أكثر تفصيلاً لا يقل عن 10 حروف ولا يتجاوز 200 حرف",
-                                              textDirection: TextDirection.rtl),
-                                          backgroundColor: Colors.red,
-                                        ),
-                                      );
+                                      ModernSnackbar.showError(
+                                          context: context,
+                                          message:
+                                              "برجاء كتابة وصف أكثر تفصيلاً لا يقل عن 10 حروف ولا يتجاوز 200 حرف");
                                       return;
                                     }
                                     if (!requestModel.allDayAvailability &&
                                         (requestModel.availableFrom == null ||
                                             requestModel.availableTo == null)) {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                          content: Text(
-                                              "برجاء تحديد الوقت المناسب",
-                                              textDirection: TextDirection.rtl),
-                                          backgroundColor: Colors.red,
-                                        ),
-                                      );
+                                      ModernSnackbar.showError(
+                                          context: context,
+                                          message: "برجاء تحديد الوقت المناسب");
                                       return;
                                     }
                                     cubit.submitQuickRequest();
@@ -858,82 +786,50 @@ class _ServiceRequestPageState extends State<ServiceRequestPage> {
                                     FocusScope.of(context).unfocus();
                                     if (requestModel.description == null ||
                                         requestModel.description!.isEmpty) {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                          content: Text(
-                                              "برجاء كتابه وصف المشكله",
-                                              textDirection: TextDirection.rtl),
-                                          backgroundColor: Colors.red,
-                                        ),
-                                      );
+                                      ModernSnackbar.showError(
+                                          context: context,
+                                          message: "برجاء كتابه وصف المشكله");
                                       return;
                                     }
                                     if (requestModel.day == null) {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                          content: Text(
-                                              "برجاء اختيار اليوم المطلوب فيه الخدمة",
-                                              textDirection: TextDirection.rtl),
-                                          backgroundColor: Colors.red,
-                                        ),
-                                      );
+                                      ModernSnackbar.showError(
+                                          context: context,
+                                          message:
+                                              "برجاء اختيار اليوم المطلوب فيه الخدمة");
                                       return;
                                     }
                                     if (requestModel.street == null ||
                                         requestModel.city == null ||
                                         requestModel.governorate == null) {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                          content: Text(
-                                              "برجاء اختيار المحافظه والمدينة وكتابة اسم الشارع بالتفصيل",
-                                              textDirection: TextDirection.rtl),
-                                          backgroundColor: Colors.red,
-                                        ),
-                                      );
+                                      ModernSnackbar.showError(
+                                          context: context,
+                                          message:
+                                              "برجاء اختيار المحافظه والمدينة وكتابة اسم الشارع بالتفصيل");
                                       return;
                                     }
                                     if (!requestModel.allDayAvailability &&
                                         (requestModel.availableFrom == null ||
                                             requestModel.availableTo == null)) {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                          content: Text(
-                                              "برجاء تحديد الوقت المناسب",
-                                              textDirection: TextDirection.rtl),
-                                          backgroundColor: Colors.red,
-                                        ),
-                                      );
+                                      ModernSnackbar.showError(
+                                          context: context,
+                                          message: "برجاء تحديد الوقت المناسب");
                                       return;
                                     }
                                     if (requestModel.street!.length < 10 ||
                                         requestModel.street!.length > 200) {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                          content: Text(
-                                              "برجاء كتابة عنوان أكثر تفصيلاً اسم الشارع لا يقل عن 10 حروف ولا يتجاوز 200 حرف",
-                                              textDirection: TextDirection.rtl),
-                                          backgroundColor: Colors.red,
-                                        ),
-                                      );
+                                      ModernSnackbar.showError(
+                                          context: context,
+                                          message:
+                                              "برجاء كتابة عنوان أكثر تفصيلاً اسم الشارع لا يقل عن 10 حروف ولا يتجاوز 200 حرف");
                                       return;
                                     }
                                     if (requestModel.description!.length < 10 ||
                                         requestModel.description!.length >
                                             200) {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                          content: Text(
-                                              "برجاء كتابة وصف أكثر تفصيلاً لا يقل عن 10 حروف ولا يتجاوز 200 حرف",
-                                              textDirection: TextDirection.rtl),
-                                          backgroundColor: Colors.red,
-                                        ),
-                                      );
+                                      ModernSnackbar.showError(
+                                          context: context,
+                                          message:
+                                              "برجاء كتابة وصف أكثر تفصيلاً لا يقل عن 10 حروف ولا يتجاوز 200 حرف");
                                       return;
                                     }
 

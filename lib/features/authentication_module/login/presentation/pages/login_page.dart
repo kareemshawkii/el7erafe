@@ -1,4 +1,5 @@
 import 'package:el7erafe/core/utils/animated_navigaton_with_build.dart';
+import 'package:el7erafe/core/utils/modern_snakebar.dart';
 import 'package:el7erafe/features/client_flow/client_home/presentation/pages/client_home_page.dart';
 import 'package:el7erafe/core/services/local_storage/auth_local_storage.dart';
 import 'package:el7erafe/features/authentication_module/otp_page/data/Repository/otp_repository.dart';
@@ -16,6 +17,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:iconsax/iconsax.dart';
 import '../cubit/login_cubit.dart';
 import '../cubit/login_state.dart';
 import '../widgets/login_form.dart';
@@ -41,12 +43,7 @@ class LoginView extends StatelessWidget {
       body: BlocListener<LoginCubit, LoginState>(
         listener: (context, state) async {
           if (state is AuthFailure) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.error, textDirection: TextDirection.rtl),
-                backgroundColor: Colors.red,
-              ),
-            );
+            ModernSnackbar.showError(context: context, message: state.error);
           }
           if (state is AuthSuccess) {
             String? type = await AuthLocalStorage().getUserType();
@@ -67,35 +64,22 @@ class LoginView extends StatelessWidget {
               );
             } else {
               if (!context.mounted) return;
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('حصلت مشكله غير متوقعه جرب تسجل تاني',
-                      textDirection: TextDirection.rtl),
-                  backgroundColor: Colors.red,
-                ),
-              );
+              ModernSnackbar.showError(
+                  context: context,
+                  message: 'حصلت مشكله غير متوقعه جرب تسجل تاني');
             }
             if (!context.mounted) return;
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('تم تسجيل الدخول بنجاح',
-                    textDirection: TextDirection.rtl),
-                backgroundColor: Colors.green,
-              ),
-            );
+            ModernSnackbar.showSuccess(
+                context: context, message: 'تم تسجيل الدخول بنجاح');
           }
           if (state is OtpSent) {
             AuthLocalStorage authLocalStorage = AuthLocalStorage();
             String? storedEmail = await authLocalStorage.getEmail();
             if (storedEmail != null && storedEmail.isNotEmpty) {
               if (!context.mounted) return;
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('تم إرسال رمز التحقق إلى البريد الإلكتروني',
-                      textDirection: TextDirection.rtl),
-                  backgroundColor: Colors.green,
-                ),
-              );
+              ModernSnackbar.showSuccess(
+                  context: context,
+                  message: 'تم إرسال رمز التحقق إلى البريد الإلكتروني');
               Navigator.push(
                 context,
                 SlideRightRouteWithBuild(
@@ -109,13 +93,9 @@ class LoginView extends StatelessWidget {
               );
             } else {
               if (!context.mounted) return;
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('حدث خطأ ما، يرجى المحاولة مرة أخرى',
-                      textDirection: TextDirection.rtl),
-                  backgroundColor: Colors.red,
-                ),
-              );
+              ModernSnackbar.showError(
+                  context: context,
+                  message: 'حدث خطأ ما، يرجى المحاولة مرة أخرى');
             }
           }
           if (state is TechnicianOtpSent) {
@@ -123,13 +103,9 @@ class LoginView extends StatelessWidget {
             String? storedEmail = await authLocalStorage.getTechnicianEmail();
             if (storedEmail != null && storedEmail.isNotEmpty) {
               if (!context.mounted) return;
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('تم إرسال رمز التحقق إلى البريد الإلكتروني',
-                      textDirection: TextDirection.rtl),
-                  backgroundColor: Colors.green,
-                ),
-              );
+              ModernSnackbar.showSuccess(
+                  context: context,
+                  message: 'تم إرسال رمز التحقق إلى البريد الإلكتروني');
               Navigator.push(
                 context,
                 SlideRightRouteWithBuild(
@@ -143,25 +119,20 @@ class LoginView extends StatelessWidget {
               );
             } else {
               if (!context.mounted) return;
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('حدث خطأ ما، يرجى المحاولة مرة أخرى',
-                      textDirection: TextDirection.rtl),
-                  backgroundColor: Colors.red,
-                ),
-              );
+              ModernSnackbar.showError(
+                  context: context,
+                  message: 'حدث خطأ ما، يرجى المحاولة مرة أخرى');
             }
           }
           if (state is AuthPending) {
             if (!context.mounted) return;
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text(
+            ModernSnackbar.show(
+                context: context,
+                title: 'الطلب معلق',
+                message:
                     'لم يتم قبول الطلب بعد سيتم إعلامك عند القبول قريبا...',
-                    textDirection: TextDirection.rtl),
-                backgroundColor: Colors.blue,
-              ),
-            );
+                color: Colors.blue,
+                icon: Iconsax.clock);
             Navigator.pushAndRemoveUntil(
               context,
               SlideRightRouteWithBuild(
@@ -178,14 +149,10 @@ class LoginView extends StatelessWidget {
           }
           if (state is AuthRejected) {
             if (!context.mounted) return;
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text(
-                    'تم رفض طلبك، يرجى مراجعه الملفات المرفقه واعاده ارسال طلب اخر',
-                    textDirection: TextDirection.rtl),
-                backgroundColor: Colors.red,
-              ),
-            );
+            ModernSnackbar.showError(
+                context: context,
+                message:
+                    "تم رفض طلبك، يرجى إعادة تقديم الطلب مع معلومات صحيحة");
             Navigator.pushAndRemoveUntil(
               context,
               SlideRightRouteWithBuild(
@@ -202,13 +169,9 @@ class LoginView extends StatelessWidget {
           }
           if (state is AuthBlocked) {
             if (!context.mounted) return;
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('تم حظر حسابك دائما، يرجى التواصل مع الدعم الفني',
-                    textDirection: TextDirection.rtl),
-                backgroundColor: Colors.red,
-              ),
-            );
+            ModernSnackbar.showError(
+                context: context,
+                message: 'تم حظر حسابك دائما، يرجى التواصل مع الدعم الفني');
           }
         },
         child: GestureDetector(

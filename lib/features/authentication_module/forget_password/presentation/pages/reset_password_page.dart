@@ -1,4 +1,5 @@
 import 'package:el7erafe/core/utils/animated_navigaton_with_build.dart';
+import 'package:el7erafe/core/utils/modern_snakebar.dart';
 import 'package:el7erafe/features/authentication_module/client_regestration/presentation/cubit/password_strength_cubit.dart';
 import 'package:el7erafe/features/authentication_module/client_regestration/presentation/cubit/password_strength_state.dart';
 import 'package:el7erafe/features/authentication_module/forget_password/data/repositories/reset_password_repo.dart';
@@ -65,22 +66,12 @@ class _ResetPasswordPageState extends State<ResetPasswordView> {
       body: BlocListener<ResetPasswordCubit, ResetPasswordState>(
         listener: (context, state) async {
           if (state is ResetPasswordInvalid) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content:
-                    Text(state.errorMessage, textDirection: TextDirection.rtl),
-                backgroundColor: Colors.red,
-              ),
-            );
+            ModernSnackbar.showError(
+                context: context, message: state.errorMessage);
           }
           if (state is ResetPasswordValid) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('تم تغيير كلمة السر بنجاح',
-                    textDirection: TextDirection.rtl),
-                backgroundColor: Colors.green,
-              ),
-            );
+            ModernSnackbar.showSuccess(
+                context: context, message: 'تم تغيير كلمة السر بنجاح');
             Navigator.pushAndRemoveUntil(
               context,
               SlideRightRouteWithBuild(

@@ -2,6 +2,7 @@
 
 import 'package:el7erafe/core/services/local_storage/auth_local_storage.dart';
 import 'package:el7erafe/core/utils/animated_navigaton_with_build.dart';
+import 'package:el7erafe/core/utils/modern_snakebar.dart';
 import 'package:el7erafe/features/authentication_module/client_regestration/presentation/cubit/password_strength_cubit.dart';
 import 'package:el7erafe/features/authentication_module/login/data/repositories/auth_repository.dart';
 import 'package:el7erafe/features/authentication_module/login/presentation/cubit/login_cubit.dart';
@@ -52,23 +53,14 @@ class TechnicianRegistrationView extends StatelessWidget {
           TechnicianRegistrationState>(
         listener: (context, state) async {
           if (state is TechnicianRegFailure) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.error, textDirection: TextDirection.rtl),
-                backgroundColor: Colors.red,
-              ),
-            );
+            ModernSnackbar.showError(context: context, message: state.error);
           } else if (state is TechnicianRegSuccess) {
             AuthLocalStorage authLocalStorage = AuthLocalStorage();
             String? email = await authLocalStorage.getTechnicianEmail();
             if (!context.mounted) return;
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('تم ارسال رمز التحقق إلى البريد الإلكتروني',
-                    textDirection: TextDirection.rtl),
-                backgroundColor: Colors.green,
-              ),
-            );
+            ModernSnackbar.showSuccess(
+                context: context,
+                message: "تم ارسال رمز التحقق إلى البريد الإلكتروني");
             if (!context.mounted) return;
             Navigator.pushAndRemoveUntil(
                 context,
@@ -83,12 +75,7 @@ class TechnicianRegistrationView extends StatelessWidget {
                 ),
                 (route) => false);
           } else if (state is TecnicianRegBlocked) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.message, textDirection: TextDirection.rtl),
-                backgroundColor: Colors.red,
-              ),
-            );
+            ModernSnackbar.showError(context: context, message: state.message);
             Navigator.pushAndRemoveUntil(
               context,
               SlideRightRouteWithBuild(

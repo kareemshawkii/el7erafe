@@ -1,4 +1,5 @@
 import 'package:el7erafe/core/utils/animated_navigaton_with_build.dart';
+import 'package:el7erafe/core/utils/modern_snakebar.dart';
 import 'package:el7erafe/features/authentication_module/login/data/repositories/auth_repository.dart';
 import 'package:el7erafe/features/authentication_module/login/presentation/cubit/login_cubit.dart';
 import 'package:el7erafe/features/authentication_module/login/presentation/pages/login_page.dart';
@@ -159,13 +160,8 @@ class _InboxPageViewState extends State<InboxPageView>
                   child: BlocConsumer<InboxCubit, InboxState>(
                     listener: (context, state) {
                       if (state is InboxUnauthorized) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content:
-                                Text(state.message, style: GoogleFonts.cairo()),
-                            backgroundColor: Colors.red,
-                          ),
-                        );
+                        ModernSnackbar.showError(
+                            context: context, message: state.message);
                         Navigator.pushAndRemoveUntil(
                           context,
                           SlideRightRouteWithBuild(
@@ -178,13 +174,8 @@ class _InboxPageViewState extends State<InboxPageView>
                           (route) => false,
                         );
                       } else if (state is InboxError) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content:
-                                Text(state.message, style: GoogleFonts.cairo()),
-                            backgroundColor: Colors.red,
-                          ),
-                        );
+                        ModernSnackbar.showError(
+                            context: context, message: state.message);
                       }
                     },
                     builder: (context, state) {

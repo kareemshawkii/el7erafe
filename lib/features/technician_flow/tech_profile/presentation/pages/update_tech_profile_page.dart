@@ -1,6 +1,7 @@
 // ignore_for_file: deprecated_member_use
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:el7erafe/core/utils/modern_snakebar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -76,8 +77,7 @@ class _TechUpdateProfilePageState extends State<TechUpdateProfilePage> {
     if (url.startsWith('http://') || url.startsWith('https://')) {
       return url;
     }
-    const baseUrl =
-        'https://el7rafeapp.azurewebsites.net';
+    const baseUrl = 'https://el7rafeapp.azurewebsites.net';
     return url.startsWith('/') ? '$baseUrl$url' : '$baseUrl/$url';
   }
 
@@ -121,14 +121,9 @@ class _TechUpdateProfilePageState extends State<TechUpdateProfilePage> {
         File compressedFile = await _compressImage(originalFile);
         if (compressedFile.lengthSync() == 0) {
           if (!mounted) return;
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text(
-                  "حدث خطأ أثناء معالجة الصورة. الرجاء المحاولة مرة أخرى.",
-                  textDirection: TextDirection.rtl),
-              backgroundColor: Colors.red,
-            ),
-          );
+          ModernSnackbar.showError(
+              context: context,
+              message: "الصورة المختارة غير صالحة، الرجاء اختيار صورة أخرى");
           return;
         }
         setState(() {
@@ -139,26 +134,18 @@ class _TechUpdateProfilePageState extends State<TechUpdateProfilePage> {
                 20) {
               _newPortfolioImages.add(compressedFile);
             } else {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('الحد الأقصى هو 20 صورة',
-                      textDirection: TextDirection.rtl),
-                  backgroundColor: Colors.red,
-                ),
-              );
+              ModernSnackbar.showError(
+                  context: context,
+                  message: "الحد الأقصى لصور معرض الأعمال هو 20 صورة");
             }
           }
         });
       }
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('حدث خطأ أثناء اختيار الصورة',
-              textDirection: TextDirection.rtl),
-          backgroundColor: Colors.red,
-        ),
-      );
+      ModernSnackbar.showError(
+          context: context,
+          message: "فشل في اختيار الصورة، الرجاء المحاولة مرة أخرى");
     }
   }
 
@@ -372,12 +359,8 @@ class _TechUpdateProfilePageState extends State<TechUpdateProfilePage> {
         body: BlocListener<TechProfileCubit, TechProfileState>(
           listener: (context, state) {
             if (state is FieldUpdateSuccess) {
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                content: Text(state.message,
-                    style: GoogleFonts.cairo(),
-                    textDirection: TextDirection.rtl),
-                backgroundColor: Colors.green,
-              ));
+              ModernSnackbar.showSuccess(
+                  context: context, message: state.message);
 
               if (state.newName != null) _nameController.text = state.newName!;
               if (state.newPhone != null) {
@@ -394,12 +377,8 @@ class _TechUpdateProfilePageState extends State<TechUpdateProfilePage> {
               }
               Navigator.pop(context);
             } else if (state is ProfileError) {
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                content: Text(state.message,
-                    style: GoogleFonts.cairo(),
-                    textDirection: TextDirection.rtl),
-                backgroundColor: Colors.red,
-              ));
+              ModernSnackbar.showError(
+                  context: context, message: state.message);
             }
           },
           child: Column(
@@ -621,19 +600,14 @@ class _TechUpdateProfilePageState extends State<TechUpdateProfilePage> {
                                                     if (!isNameChanged &&
                                                         !isAboutMeChanged &&
                                                         !hasMediaChanged) {
-                                                      ScaffoldMessenger.of(
-                                                              context)
-                                                          .showSnackBar(
-                                                        const SnackBar(
-                                                          content: Text(
-                                                              "لم تقم بإجراء أي تعديلات",
-                                                              textDirection:
-                                                                  TextDirection
-                                                                      .rtl),
-                                                          backgroundColor:
-                                                              Colors.grey,
-                                                        ),
-                                                      );
+                                                      ModernSnackbar.show(
+                                                          context: context,
+                                                          message:
+                                                              "لم يتم إجراء أي تعديلات",
+                                                          title: "تنبيه",
+                                                          color: Colors.grey,
+                                                          icon: Icons
+                                                              .info_outline);
                                                       return;
                                                     }
                                                     context
@@ -778,12 +752,9 @@ class _TechUpdateProfilePageState extends State<TechUpdateProfilePage> {
                 return GestureDetector(
                   onTap: () {
                     if (totalImages >= 20) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                            content: Text('الحد الأقصى هو 20 صورة',
-                                textDirection: TextDirection.rtl),
-                            backgroundColor: Colors.red),
-                      );
+                      ModernSnackbar.showError(
+                          context: context,
+                          message: "الحد الأقصى لصور معرض الأعمال هو 20 صورة");
                       return;
                     }
                     _showImageSourceSheet(context, isProfileImage: false);

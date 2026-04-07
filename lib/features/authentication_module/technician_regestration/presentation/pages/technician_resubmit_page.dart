@@ -1,4 +1,5 @@
 import 'package:el7erafe/core/utils/animated_navigaton_with_build.dart';
+import 'package:el7erafe/core/utils/modern_snakebar.dart';
 import 'package:el7erafe/features/authentication_module/login/data/repositories/auth_repository.dart';
 import 'package:el7erafe/features/authentication_module/login/presentation/cubit/login_cubit.dart';
 import 'package:el7erafe/features/authentication_module/login/presentation/pages/login_page.dart';
@@ -39,20 +40,11 @@ class TechnicianResubmitView extends StatelessWidget {
       body: BlocListener<TechnicianResubmitCubit, TechnicianResubmitState>(
         listener: (context, state) {
           if (state is TechnicianResubmitFailure) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.error, textDirection: TextDirection.rtl),
-                backgroundColor: Colors.red,
-              ),
-            );
+            ModernSnackbar.showError(context: context, message: state.error);
           } else if (state is TechnicianResubmitSuccess) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('تم ارسال البيانات بنجاح وفي انتظار التحقق',
-                    textDirection: TextDirection.rtl),
-                backgroundColor: Colors.green,
-              ),
-            );
+            ModernSnackbar.showSuccess(
+                context: context,
+                message: "تم ارسال البيانات بنجاح وفي انتظار التحقق");
             Navigator.pushAndRemoveUntil(
               context,
               SlideRightRouteWithBuild(
@@ -67,12 +59,7 @@ class TechnicianResubmitView extends StatelessWidget {
               (route) => false,
             );
           } else if (state is TechnicianResubmitBlocked) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.message, textDirection: TextDirection.rtl),
-                backgroundColor: Colors.red,
-              ),
-            );
+            ModernSnackbar.showError(context: context, message: state.message);
             Navigator.pushAndRemoveUntil(
               context,
               SlideRightRouteWithBuild(

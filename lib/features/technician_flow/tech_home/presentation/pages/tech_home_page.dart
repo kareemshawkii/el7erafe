@@ -3,6 +3,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:el7erafe/core/services/local_storage/auth_local_storage.dart';
 import 'package:el7erafe/core/utils/animated_navigaton_with_build.dart';
+import 'package:el7erafe/core/utils/modern_snakebar.dart';
 import 'package:el7erafe/features/authentication_module/login/data/repositories/auth_repository.dart';
 import 'package:el7erafe/features/authentication_module/login/presentation/cubit/login_cubit.dart';
 import 'package:el7erafe/features/authentication_module/login/presentation/pages/login_page.dart';
@@ -98,14 +99,9 @@ class _TechHomePageViewState extends State<TechHomePageView> {
         BlocListener<AvailableRequestsCubit, AvailableRequestsState>(
       listener: (context, state) async {
         if (state is AvailableRequestsUnauthorized) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text(
-                  'تم تسجيل الخروج من الجهاز الآخر، يرجى تسجيل الدخول مرة أخرى',
-                  textDirection: TextDirection.rtl),
-              backgroundColor: Colors.red,
-            ),
-          );
+          ModernSnackbar.showError(
+              context: context,
+              message: "انتهت صلاحية الجلسة، يرجى تسجيل الدخول مرة أخرى");
           await AuthLocalStorage().deleteToken();
           if (!context.mounted) return;
           Navigator.pushAndRemoveUntil(
@@ -122,17 +118,19 @@ class _TechHomePageViewState extends State<TechHomePageView> {
             (route) => false,
           );
         } else if (state is DeclineRequestError) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.error), backgroundColor: Colors.red),
+          ModernSnackbar.showError(
+            context: context,
+            message: state.error,
           );
         } else if (state is CompleteJobSuccess) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-                content: Text(state.message), backgroundColor: Colors.green),
+          ModernSnackbar.showSuccess(
+            context: context,
+            message: state.message,
           );
         } else if (state is CompleteJobError) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.error), backgroundColor: Colors.red),
+          ModernSnackbar.showError(
+            context: context,
+            message: state.error,
           );
         }
       },

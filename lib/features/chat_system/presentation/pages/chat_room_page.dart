@@ -1,3 +1,4 @@
+import 'package:el7erafe/core/utils/modern_snakebar.dart';
 import 'package:el7erafe/features/chat_system/data/models/chat_message_model.dart';
 import 'package:el7erafe/features/chat_system/data/repositories/chat_repository.dart';
 import 'package:el7erafe/features/chat_system/presentation/cubit/chat_cubit.dart';
@@ -148,11 +149,7 @@ class _ChatRoomViewState extends State<ChatRoomView>
 
   void _showSnackBar(String text) {
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-          content: Text(text, style: GoogleFonts.cairo()),
-          backgroundColor: Colors.red),
-    );
+    ModernSnackbar.showError(context: context, message: text);
   }
 
   @override
@@ -419,10 +416,13 @@ class _ChatRoomViewState extends State<ChatRoomView>
         onLongPress: () {
           if (message.messageType.startsWith('Call')) return;
           Clipboard.setData(ClipboardData(text: message.content));
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              content: Text("تم نسخ الرسالة", style: GoogleFonts.cairo()),
-              backgroundColor: const Color(0xFF3775FA),
-              duration: const Duration(seconds: 2)));
+          ModernSnackbar.show(
+            context: context,
+            message: "تم نسخ الرسالة",
+            color: const Color(0xFF3775FA),
+            icon: Icons.copy,
+            title: "نسخ",
+          );
         },
         child: Align(
           alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,

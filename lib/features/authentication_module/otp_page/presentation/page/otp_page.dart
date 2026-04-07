@@ -1,4 +1,5 @@
 import 'package:el7erafe/core/utils/animated_navigaton_with_build.dart';
+import 'package:el7erafe/core/utils/modern_snakebar.dart';
 import 'package:el7erafe/features/client_flow/client_home/presentation/pages/client_home_page.dart';
 import 'package:el7erafe/features/authentication_module/otp_page/data/Repository/otp_repository.dart';
 import 'package:el7erafe/features/authentication_module/otp_page/presentation/cubit/otp_cubit.dart';
@@ -43,13 +44,9 @@ class _OtpViewState extends State<OtpView> {
             _enteredOtp,
           );
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('الرجاء إدخال الرمز المكون من 6 أرقام',
-              textDirection: TextDirection.rtl),
-          backgroundColor: Colors.red,
-        ),
-      );
+      ModernSnackbar.showError(
+          context: context,
+          message: "الرجاء إدخال رمز التحقق المكون من 6 أرقام");
     }
   }
 
@@ -61,21 +58,11 @@ class _OtpViewState extends State<OtpView> {
       body: BlocListener<OtpCubit, OtpState>(
         listener: (context, state) {
           if (state is OtpFailure) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.error, textDirection: TextDirection.rtl),
-                backgroundColor: Colors.red,
-              ),
-            );
+            ModernSnackbar.showError(context: context, message: state.error);
           }
           if (state is OtpSuccess) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('تم تفعيل الحساب بنجاح',
-                    textDirection: TextDirection.rtl),
-                backgroundColor: Colors.green,
-              ),
-            );
+            ModernSnackbar.showSuccess(
+                context: context, message: "تم تفعيل الحساب بنجاح");
             Navigator.pushAndRemoveUntil(
               context,
               SlideRightRouteWithBuild(builder: (_) => const ClientHomePage()),
@@ -83,13 +70,8 @@ class _OtpViewState extends State<OtpView> {
             );
           }
           if (state is OtpResent) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('تم إعادة إرسال كود التحقق بنجاح',
-                    textDirection: TextDirection.rtl),
-                backgroundColor: Colors.green,
-              ),
-            );
+            ModernSnackbar.showSuccess(
+                context: context, message: "تم إعادة إرسال كود التحقق بنجاح");
           }
         },
         child: GestureDetector(

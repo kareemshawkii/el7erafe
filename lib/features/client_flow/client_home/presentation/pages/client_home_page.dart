@@ -2,6 +2,7 @@
 
 import 'package:el7erafe/core/services/local_storage/auth_local_storage.dart';
 import 'package:el7erafe/core/utils/animated_navigaton_with_build.dart';
+import 'package:el7erafe/core/utils/modern_snakebar.dart';
 import 'package:el7erafe/features/authentication_module/login/data/repositories/auth_repository.dart';
 import 'package:el7erafe/features/authentication_module/login/presentation/cubit/login_cubit.dart';
 import 'package:el7erafe/features/authentication_module/login/presentation/pages/login_page.dart';
@@ -261,13 +262,8 @@ class _ClientHomePageViewState extends State<ClientHomePageView> {
                     unreadMessagesCount = state.count;
                   });
                 } else if (state is HomeUnauthorized) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content:
-                          Text(state.message, textDirection: TextDirection.rtl),
-                      backgroundColor: Colors.red,
-                    ),
-                  );
+                  ModernSnackbar.showError(
+                      context: context, message: state.message);
                   Navigator.pushAndRemoveUntil(
                     context,
                     SlideRightRouteWithBuild(

@@ -1,4 +1,5 @@
 import 'package:el7erafe/core/utils/animated_navigaton_with_build.dart';
+import 'package:el7erafe/core/utils/modern_snakebar.dart';
 import 'package:el7erafe/features/authentication_module/forget_password/data/repositories/otp_forget_repo.dart';
 import 'package:el7erafe/features/authentication_module/forget_password/data/repositories/reset_password_repo.dart';
 import 'package:el7erafe/features/authentication_module/forget_password/presentation/cubit/forget_otp_cubit.dart';
@@ -46,12 +47,9 @@ class _ForgetOtpViewState extends State<ForgetOtpView> {
             _enteredOtp,
           );
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('الرجاء إدخال الرمز المكون من 6 أرقام',
-              textDirection: TextDirection.rtl),
-          backgroundColor: Colors.red,
-        ),
+      ModernSnackbar.showError(
+        context: context,
+        message: 'الرجاء إدخال رمز التحقق المكون من 6 أرقام',
       );
     }
   }
@@ -64,20 +62,15 @@ class _ForgetOtpViewState extends State<ForgetOtpView> {
       body: BlocListener<ForgetOtpCubit, ForgetOtpState>(
         listener: (context, state) {
           if (state is ForgetOtpFailure) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.error, textDirection: TextDirection.rtl),
-                backgroundColor: Colors.red,
-              ),
+            ModernSnackbar.showError(
+              context: context,
+              message: state.error,
             );
           }
           if (state is ForgetOtpSuccess) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('تم التحقق من الرمز بنجاح',
-                    textDirection: TextDirection.rtl),
-                backgroundColor: Colors.green,
-              ),
+            ModernSnackbar.showSuccess(
+              context: context,
+              message: 'تم التحقق من الرمز بنجاح',
             );
             Navigator.pushAndRemoveUntil(
               context,
@@ -94,12 +87,9 @@ class _ForgetOtpViewState extends State<ForgetOtpView> {
             );
           }
           if (state is ForgetOtpResent) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('تم إعادة إرسال رمز التحقق بنجاح',
-                    textDirection: TextDirection.rtl),
-                backgroundColor: Colors.green,
-              ),
+            ModernSnackbar.showSuccess(
+              context: context,
+              message: 'تم إعادة إرسال رمز التحقق بنجاح',
             );
           }
         },

@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:el7erafe/core/services/local_storage/auth_local_storage.dart';
 import 'package:el7erafe/core/utils/animated_navigaton_with_build.dart';
+import 'package:el7erafe/core/utils/modern_snakebar.dart';
 import 'package:el7erafe/features/authentication_module/login/data/repositories/auth_repository.dart';
 import 'package:el7erafe/features/authentication_module/login/presentation/cubit/login_cubit.dart';
 import 'package:el7erafe/features/authentication_module/login/presentation/pages/login_page.dart';
@@ -67,8 +68,7 @@ class _TechCurrentReservationsTabState extends State<TechCurrentReservationsTab>
     if (url.startsWith('http://') || url.startsWith('https://')) {
       return url;
     }
-    const baseUrl =
-        'https://el7rafeapp.azurewebsites.net';
+    const baseUrl = 'https://el7rafeapp.azurewebsites.net';
     return url.startsWith('/') ? '$baseUrl$url' : '$baseUrl/$url';
   }
 
@@ -109,7 +109,7 @@ class _TechCurrentReservationsTabState extends State<TechCurrentReservationsTab>
     return BlocProvider.value(
       value: _cubit,
       child: Scaffold(
-        backgroundColor:  Colors.white,
+        backgroundColor: Colors.white,
         body: Column(
           children: [
             _buildCalendarHeader(),
@@ -133,11 +133,8 @@ class _TechCurrentReservationsTabState extends State<TechCurrentReservationsTab>
                       (route) => false,
                     );
                   } else if (state is ActionSuccess) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                          content: Text(state.message),
-                          backgroundColor: Colors.green),
-                    );
+                    ModernSnackbar.showSuccess(
+                        context: context, message: state.message);
                     Navigator.pushAndRemoveUntil(
                       context,
                       SlideRightRouteWithBuild(
@@ -146,11 +143,8 @@ class _TechCurrentReservationsTabState extends State<TechCurrentReservationsTab>
                       (route) => false,
                     );
                   } else if (state is ActionError) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                          content: Text(state.error),
-                          backgroundColor: Colors.red),
-                    );
+                    ModernSnackbar.showError(
+                        context: context, message: state.error);
                   }
                 },
                 builder: (context, state) {
@@ -236,7 +230,7 @@ class _TechCurrentReservationsTabState extends State<TechCurrentReservationsTab>
                 child: ListView.builder(
                   controller: _scrollController,
                   scrollDirection: Axis.horizontal,
-                  physics: const PageScrollPhysics(), 
+                  physics: const PageScrollPhysics(),
                   itemCount: _calendarDays.length,
                   padding: EdgeInsets.symmetric(horizontal: 16.w),
                   itemBuilder: (context, index) {
@@ -333,8 +327,7 @@ class _TechCurrentReservationsTabState extends State<TechCurrentReservationsTab>
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize:
-            MainAxisSize.min, 
+        mainAxisSize: MainAxisSize.min,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,

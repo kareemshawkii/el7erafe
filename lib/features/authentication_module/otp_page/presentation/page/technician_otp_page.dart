@@ -1,5 +1,6 @@
 import 'package:el7erafe/core/services/local_storage/auth_local_storage.dart';
 import 'package:el7erafe/core/utils/animated_navigaton_with_build.dart';
+import 'package:el7erafe/core/utils/modern_snakebar.dart';
 import 'package:el7erafe/features/authentication_module/login/data/repositories/auth_repository.dart';
 import 'package:el7erafe/features/authentication_module/login/presentation/cubit/login_cubit.dart';
 import 'package:el7erafe/features/authentication_module/login/presentation/pages/login_page.dart';
@@ -17,6 +18,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:iconsax/iconsax.dart';
 
 class TechnicianOtpPage extends StatelessWidget {
   final String email;
@@ -52,13 +54,9 @@ class _TechnicianOtpViewState extends State<TechnicianOtpView> {
             _enteredOtp,
           );
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('الرجاء إدخال الرمز المكون من 6 أرقام',
-              textDirection: TextDirection.rtl),
-          backgroundColor: Colors.red,
-        ),
-      );
+      ModernSnackbar.showError(
+          context: context,
+          message: "الرجاء إدخال رمز التحقق المكون من 6 أرقام");
     }
   }
 
@@ -70,42 +68,28 @@ class _TechnicianOtpViewState extends State<TechnicianOtpView> {
       body: BlocListener<TechnicianOtpCubit, TechnicianOtpState>(
         listener: (context, state) async {
           if (state is TechnicianOtpFailure) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.error, textDirection: TextDirection.rtl),
-                backgroundColor: Colors.red,
-              ),
-            );
+            ModernSnackbar.showError(context: context, message: state.error);
           } else if (state is TechnicianOtpSuccess) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text(
-                    'تم تفعيل الحساب بنجاح وقبولك كحرفي متحمسين نشوف شغلك!',
-                    textDirection: TextDirection.rtl),
-                backgroundColor: Colors.green,
-              ),
-            );
+            ModernSnackbar.showSuccess(
+                context: context,
+                message:
+                    "تم تفعيل الحساب بنجاح وقبولك كحرفي متحمسين نشوف شغلك!");
             Navigator.pushAndRemoveUntil(
               context,
               SlideRightRouteWithBuild(builder: (_) => const TechHomePage()),
               (route) => false,
             );
           } else if (state is TechnicianOtpResent) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('تم إعادة إرسال كود التحقق بنجاح',
-                    textDirection: TextDirection.rtl),
-                backgroundColor: Colors.green,
-              ),
-            );
+            ModernSnackbar.showSuccess(
+                context: context, message: "تم إعادة إرسال كود التحقق بنجاح");
           }
           if (state is TechnicianOtpPending) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.message, textDirection: TextDirection.rtl),
-                backgroundColor: Colors.blue,
-              ),
-            );
+            ModernSnackbar.show(
+                context: context,
+                message: state.message,
+                color: Colors.blue,
+                title: "في انتظار الموافقة",
+                icon: Iconsax.clock);
             Navigator.pushAndRemoveUntil(
               context,
               SlideRightRouteWithBuild(
@@ -120,12 +104,7 @@ class _TechnicianOtpViewState extends State<TechnicianOtpView> {
               (route) => false,
             );
           } else if (state is TechnicianOtpRejected) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.message, textDirection: TextDirection.rtl),
-                backgroundColor: Colors.red,
-              ),
-            );
+            ModernSnackbar.showError(context: context, message: state.message);
             Navigator.pushAndRemoveUntil(
               context,
               SlideRightRouteWithBuild(
@@ -142,12 +121,7 @@ class _TechnicianOtpViewState extends State<TechnicianOtpView> {
             AuthLocalStorage authStorage = AuthLocalStorage();
             await authStorage.deleteTempToken();
           } else if (state is TechnicianOtpBlocked) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.message, textDirection: TextDirection.rtl),
-                backgroundColor: Colors.red,
-              ),
-            );
+            ModernSnackbar.showError(context: context, message: state.message);
             Navigator.pushAndRemoveUntil(
               context,
               SlideRightRouteWithBuild(

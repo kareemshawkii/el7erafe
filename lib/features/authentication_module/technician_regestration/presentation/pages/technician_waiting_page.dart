@@ -1,5 +1,6 @@
 import 'package:el7erafe/core/services/local_storage/auth_local_storage.dart';
 import 'package:el7erafe/core/utils/animated_navigaton_with_build.dart';
+import 'package:el7erafe/core/utils/modern_snakebar.dart';
 import 'package:el7erafe/features/authentication_module/login/data/repositories/auth_repository.dart';
 import 'package:el7erafe/features/authentication_module/login/presentation/cubit/login_cubit.dart';
 import 'package:el7erafe/features/authentication_module/login/presentation/pages/login_page.dart';
@@ -14,6 +15,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:iconsax/iconsax.dart';
 
 class TechnicianWaitingPage extends StatelessWidget {
   const TechnicianWaitingPage({super.key});
@@ -62,20 +64,18 @@ class _TechnicianWaitingViewState extends State<TechnicianWaitingView> {
         listener: (context, state) async {
           if (state is TechnicianStatusDenied) {
             if (state.status == "تحت المراجعة") {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content:
-                      Text(state.message, textDirection: TextDirection.rtl),
-                  backgroundColor: Colors.blue,
-                ),
+              ModernSnackbar.show(
+                context: context,
+                message:
+                    'طلبك لسه تحت المراجعة ، هتوصلك رسالة لما يتم الرد عليك.',
+                color: Colors.blue,
+                icon: Iconsax.clock,
+                title: "طلبك تحت المراجعة",
               );
             } else if (state.status == "مرفوض") {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content:
-                      Text(state.message, textDirection: TextDirection.rtl),
-                  backgroundColor: Colors.red,
-                ),
+              ModernSnackbar.showError(
+                context: context,
+                message: state.message,
               );
               Navigator.pushAndRemoveUntil(
                 context,
@@ -95,11 +95,9 @@ class _TechnicianWaitingViewState extends State<TechnicianWaitingView> {
               await authStorage.deleteTempToken();
             }
           } else if (state is TechnicianStatusBlocked) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.message, textDirection: TextDirection.rtl),
-                backgroundColor: Colors.red,
-              ),
+            ModernSnackbar.showError(
+              context: context,
+              message: state.message,
             );
             Navigator.pushAndRemoveUntil(
               context,
@@ -117,14 +115,9 @@ class _TechnicianWaitingViewState extends State<TechnicianWaitingView> {
             AuthLocalStorage authStorage = AuthLocalStorage();
             await authStorage.deleteTempToken();
           } else if (state is TechnicianStatusApproved) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text(
-                    'تم قبول حسابك كحرفي متحمسين نشوف نجاحك بالتوفيق.',
-                    textDirection: TextDirection.rtl),
-                backgroundColor: Colors.green,
-              ),
-            );
+            ModernSnackbar.showSuccess(
+                context: context,
+                message: "تم قبول حسابك كحرفي متحمسين نشوف نجاحك بالتوفيق.");
             Navigator.pushAndRemoveUntil(
               context,
               SlideRightRouteWithBuild(
@@ -135,11 +128,9 @@ class _TechnicianWaitingViewState extends State<TechnicianWaitingView> {
             AuthLocalStorage authStorage = AuthLocalStorage();
             await authStorage.deleteTempToken();
           } else if (state is TechnicianStatusError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.error, textDirection: TextDirection.rtl),
-                backgroundColor: Colors.red,
-              ),
+            ModernSnackbar.showError(
+              context: context,
+              message: state.error,
             );
           }
         },

@@ -2,6 +2,7 @@
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:el7erafe/core/utils/animated_navigaton_with_build.dart';
+import 'package:el7erafe/core/utils/modern_snakebar.dart';
 import 'package:el7erafe/features/client_flow/client_home/presentation/pages/client_home_page.dart';
 import 'package:el7erafe/features/client_flow/select_technician/data/models/technicians_model.dart';
 import 'package:el7erafe/features/client_flow/select_technician/presentation/pages/technician_reservation_success_page.dart';
@@ -517,12 +518,7 @@ class TechnicianDetailsPage extends StatelessWidget {
               ),
             );
           } else if (state is TechnicianRequestUnauth) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.message, textDirection: TextDirection.rtl),
-                backgroundColor: Colors.red,
-              ),
-            );
+            ModernSnackbar.showError(context: context, message: state.message);
             Navigator.pushAndRemoveUntil(
               context,
               SlideRightRouteWithBuild(
