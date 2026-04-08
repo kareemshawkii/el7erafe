@@ -1,9 +1,7 @@
 import 'dart:convert';
 import 'package:dartz/dartz.dart';
 import 'package:el7erafe/core/services/local_storage/auth_local_storage.dart';
-import 'package:el7erafe/core/services/notifications/notification_api_service.dart';
 import 'package:el7erafe/features/technician_flow/tech_profile/data/models/tech_schedule_model.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -39,8 +37,6 @@ class TechScheduleRepository {
             data.map((json) => TechScheduleModel.fromJson(json)).toList();
         return Right(schedule);
       } else if (response.statusCode == 401 || response.statusCode == 403) {
-        await FirebaseMessaging.instance.deleteToken();
-        await NotificationApiService.deleteFcmToken();
         await AuthLocalStorage().clearSession();
         return const Left("401");
       } else {
@@ -49,8 +45,6 @@ class TechScheduleRepository {
     } catch (e) {
       final err = e.toString().toLowerCase();
       if (err.contains('401') || err.contains('unauthorized')) {
-        await FirebaseMessaging.instance.deleteToken();
-        await NotificationApiService.deleteFcmToken();
         await AuthLocalStorage().clearSession();
         return const Left("401");
       }
@@ -76,8 +70,6 @@ class TechScheduleRepository {
         await prefs.remove(_cacheKey);
         return const Right("تم حفظ المواعيد بنجاح");
       } else if (response.statusCode == 401 || response.statusCode == 403) {
-        await FirebaseMessaging.instance.deleteToken();
-        await NotificationApiService.deleteFcmToken();
         await AuthLocalStorage().clearSession();
         return const Left("401");
       } else {
@@ -87,8 +79,6 @@ class TechScheduleRepository {
     } catch (e) {
       final err = e.toString().toLowerCase();
       if (err.contains('401') || err.contains('unauthorized')) {
-        await FirebaseMessaging.instance.deleteToken();
-        await NotificationApiService.deleteFcmToken();
         await AuthLocalStorage().clearSession();
         return const Left("401");
       }

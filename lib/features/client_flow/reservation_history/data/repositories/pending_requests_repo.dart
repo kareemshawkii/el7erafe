@@ -1,10 +1,8 @@
 import 'dart:convert';
 import 'package:dartz/dartz.dart';
 import 'package:el7erafe/core/services/local_storage/auth_local_storage.dart';
-import 'package:el7erafe/core/services/notifications/notification_api_service.dart';
 import 'package:el7erafe/features/client_flow/reservation_history/data/models/offers_model.dart';
 import 'package:el7erafe/features/client_flow/reservation_history/data/models/pending_request_model.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:signalr_netcore/signalr_client.dart';
 import 'package:http/http.dart' as http;
 
@@ -18,8 +16,6 @@ class PendingRequestsRepo {
     try {
       final token = await _authLocal.getToken();
       if (token == null || token.isEmpty) {
-        await FirebaseMessaging.instance.deleteToken();
-        await NotificationApiService.deleteFcmToken();
         await _authLocal.clearSession();
         throw Exception("401 Unauthorized");
       }
@@ -47,8 +43,6 @@ class PendingRequestsRepo {
         }
         return [];
       } else if (response.statusCode == 401 || response.statusCode == 403) {
-        await FirebaseMessaging.instance.deleteToken();
-        await NotificationApiService.deleteFcmToken();
         await _authLocal.clearSession();
         throw Exception("401 Unauthorized");
       } else {
@@ -57,8 +51,6 @@ class PendingRequestsRepo {
     } catch (e) {
       final errorString = e.toString().toLowerCase();
       if (errorString.contains('401') || errorString.contains('unauthorized')) {
-        await FirebaseMessaging.instance.deleteToken();
-        await NotificationApiService.deleteFcmToken();
         await _authLocal.clearSession();
         throw Exception("401 Unauthorized");
       }
@@ -128,8 +120,6 @@ class PendingRequestsRepo {
       await _startConnection(onSignalRRefreshNeeded, onForceDisconnect);
     } catch (e) {
       if (e.toString().toLowerCase().contains('401')) {
-        await FirebaseMessaging.instance.deleteToken();
-        await NotificationApiService.deleteFcmToken();
         await _authLocal.clearSession();
         onForceDisconnect();
       } else {
@@ -146,8 +136,6 @@ class PendingRequestsRepo {
       }
     } catch (e) {
       if (e.toString().toLowerCase().contains('401')) {
-        await FirebaseMessaging.instance.deleteToken();
-        await NotificationApiService.deleteFcmToken();
         await _authLocal.clearSession();
         onForceDisconnect();
         return;
@@ -175,8 +163,6 @@ class PendingRequestsRepo {
     try {
       final token = await _authLocal.getToken();
       if (token == null || token.isEmpty) {
-        await FirebaseMessaging.instance.deleteToken();
-        await NotificationApiService.deleteFcmToken();
         await _authLocal.clearSession();
         return const Left("401");
       }
@@ -196,8 +182,6 @@ class PendingRequestsRepo {
             .map((e) => OfferModel.fromJson(e as Map<String, dynamic>))
             .toList());
       } else if (response.statusCode == 401 || response.statusCode == 403) {
-        await FirebaseMessaging.instance.deleteToken();
-        await NotificationApiService.deleteFcmToken();
         await _authLocal.clearSession();
         return const Left("401");
       } else {
@@ -213,8 +197,6 @@ class PendingRequestsRepo {
     try {
       final token = await _authLocal.getToken();
       if (token == null || token.isEmpty) {
-        await FirebaseMessaging.instance.deleteToken();
-        await NotificationApiService.deleteFcmToken();
         await _authLocal.clearSession();
         return const Left("401");
       }
@@ -229,8 +211,6 @@ class PendingRequestsRepo {
         return const Right("تم الغاء الطلب بنجاح");
       }
       if (response.statusCode == 401) {
-        await FirebaseMessaging.instance.deleteToken();
-        await NotificationApiService.deleteFcmToken();
         await _authLocal.clearSession();
         return const Left("401");
       }
@@ -244,8 +224,6 @@ class PendingRequestsRepo {
     try {
       final token = await _authLocal.getToken();
       if (token == null || token.isEmpty) {
-        await FirebaseMessaging.instance.deleteToken();
-        await NotificationApiService.deleteFcmToken();
         await _authLocal.clearSession();
         return const Left("401");
       }
@@ -260,8 +238,6 @@ class PendingRequestsRepo {
         return const Right("تم قبول العرض بنجاح");
       }
       if (response.statusCode == 401) {
-        await FirebaseMessaging.instance.deleteToken();
-        await NotificationApiService.deleteFcmToken();
         await _authLocal.clearSession();
         return const Left("401");
       }
@@ -275,8 +251,6 @@ class PendingRequestsRepo {
     try {
       final token = await _authLocal.getToken();
       if (token == null || token.isEmpty) {
-        await FirebaseMessaging.instance.deleteToken();
-        await NotificationApiService.deleteFcmToken();
         await _authLocal.clearSession();
         return const Left("401");
       }
@@ -291,8 +265,6 @@ class PendingRequestsRepo {
         return const Right("تم رفض العرض");
       }
       if (response.statusCode == 401) {
-        await FirebaseMessaging.instance.deleteToken();
-        await NotificationApiService.deleteFcmToken();
         await _authLocal.clearSession();
         return const Left("401");
       }

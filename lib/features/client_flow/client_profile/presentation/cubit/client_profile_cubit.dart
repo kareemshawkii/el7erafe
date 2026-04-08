@@ -1,6 +1,8 @@
 import 'dart:io';
+import 'package:el7erafe/core/services/notifications/notification_api_service.dart';
 import 'package:el7erafe/features/client_flow/client_profile/data/repositories/client_profile_repo.dart';
 import 'package:el7erafe/features/client_flow/client_profile/presentation/cubit/client_profile_state.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:el7erafe/core/services/local_storage/auth_local_storage.dart';
 
@@ -58,6 +60,7 @@ class ProfileCubit extends Cubit<ProfileState> {
   }
 
   void deleteAccount(String token) async {
+    emit(ProfileLoading());
     final result = await _repo.deleteAccount(token);
     if (isClosed) return;
     result.fold(
@@ -67,6 +70,9 @@ class ProfileCubit extends Cubit<ProfileState> {
   }
 
   void logout(String token) async {
+    emit(ProfileLoading());
+    await FirebaseMessaging.instance.deleteToken();
+    await NotificationApiService.deleteFcmToken();
     final result = await _repo.logout(token);
     if (isClosed) return;
     result.fold(

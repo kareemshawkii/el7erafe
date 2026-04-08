@@ -1,8 +1,6 @@
 import 'dart:convert';
 import 'package:dartz/dartz.dart';
-import 'package:el7erafe/core/services/notifications/notification_api_service.dart';
 import 'package:el7erafe/features/client_flow/client_home/data/models/quick_reservation_request.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:http/http.dart' as http;
 import 'package:el7erafe/core/services/local_storage/auth_local_storage.dart';
 
@@ -70,8 +68,6 @@ class ServiceRequestRepository {
       if (response.statusCode == 200 || response.statusCode == 201) {
         return const Right("تم إرسال الطلب بنجاح");
       } else if (response.statusCode == 401) {
-        await FirebaseMessaging.instance.deleteToken();
-        await NotificationApiService.deleteFcmToken();
         AuthLocalStorage authLocalStorage = AuthLocalStorage();
         await authLocalStorage.clearSession();
         return const Left("401 unauthorized");

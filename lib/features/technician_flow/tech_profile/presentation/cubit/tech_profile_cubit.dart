@@ -1,7 +1,9 @@
 import 'dart:io';
+import 'package:el7erafe/core/services/notifications/notification_api_service.dart';
 import 'package:el7erafe/features/technician_flow/tech_profile/data/repositories/tech_profile_repo.dart';
 import 'package:el7erafe/features/technician_flow/tech_profile/data/models/technician_profile_model.dart';
 import 'package:el7erafe/features/technician_flow/tech_profile/presentation/cubit/tech_profile_state.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class TechProfileCubit extends Cubit<TechProfileState> {
@@ -50,6 +52,7 @@ class TechProfileCubit extends Cubit<TechProfileState> {
   }
 
   void deleteAccount(String token) async {
+    emit(ProfileLoading());
     final result = await _repo.deleteAccount(token);
     if (isClosed) return;
 
@@ -60,6 +63,9 @@ class TechProfileCubit extends Cubit<TechProfileState> {
   }
 
   void logout(String token) async {
+    emit(ProfileLoading());
+    await NotificationApiService.deleteFcmToken();
+    await FirebaseMessaging.instance.deleteToken();
     final result = await _repo.logout(token);
     if (isClosed) return;
 

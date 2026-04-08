@@ -1,9 +1,7 @@
 import 'dart:convert';
 import 'package:dartz/dartz.dart';
 import 'package:el7erafe/core/services/local_storage/auth_local_storage.dart';
-import 'package:el7erafe/core/services/notifications/notification_api_service.dart';
 import 'package:el7erafe/features/chat_system/data/models/inbox_conversation_model.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:http/http.dart' as http;
 import 'package:signalr_netcore/http_connection_options.dart';
 import 'package:signalr_netcore/hub_connection.dart';
@@ -35,8 +33,6 @@ class InboxRepository {
         return Left(
             data.map((json) => InboxConversationModel.fromJson(json)).toList());
       } else if (response.statusCode == 401) {
-        await FirebaseMessaging.instance.deleteToken();
-        await NotificationApiService.deleteFcmToken();
         await authLocalStorage.clearSession();
         return const Right("401 unauthorized");
       } else {

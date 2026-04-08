@@ -1,9 +1,7 @@
 import 'dart:convert';
 import 'package:dartz/dartz.dart';
 import 'package:el7erafe/core/services/local_storage/auth_local_storage.dart';
-import 'package:el7erafe/core/services/notifications/notification_api_service.dart';
 import 'package:el7erafe/features/technician_flow/tech_reservation_history/data/models/technician_calender_model.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:http/http.dart' as http;
 
 class TechCalendarRepo {
@@ -15,8 +13,6 @@ class TechCalendarRepo {
     try {
       final token = await _authLocal.getToken();
       if (token == null || token.isEmpty) {
-        await FirebaseMessaging.instance.deleteToken();
-        await NotificationApiService.deleteFcmToken();
         await AuthLocalStorage().clearSession();
         return const Left("401");
       }
@@ -37,8 +33,6 @@ class TechCalendarRepo {
         }
         return const Right([]);
       } else if (response.statusCode == 401 || response.statusCode == 403) {
-        await FirebaseMessaging.instance.deleteToken();
-        await NotificationApiService.deleteFcmToken();
         await AuthLocalStorage().clearSession();
         return const Left("401");
       } else {
@@ -47,8 +41,6 @@ class TechCalendarRepo {
     } catch (e) {
       final errorString = e.toString().toLowerCase();
       if (errorString.contains('401') || errorString.contains('unauthorized')) {
-        await FirebaseMessaging.instance.deleteToken();
-        await NotificationApiService.deleteFcmToken();
         await AuthLocalStorage().clearSession();
         return const Left("401");
       }
@@ -60,8 +52,6 @@ class TechCalendarRepo {
     try {
       final token = await _authLocal.getToken();
       if (token == null || token.isEmpty) {
-        await FirebaseMessaging.instance.deleteToken();
-        await NotificationApiService.deleteFcmToken();
         await AuthLocalStorage().clearSession();
         return const Left("401");
       }
@@ -79,8 +69,6 @@ class TechCalendarRepo {
       if (response.statusCode == 200 || response.statusCode == 204) {
         return const Right("تم بدء العمل بنجاح");
       } else if (response.statusCode == 401 || response.statusCode == 403) {
-        await FirebaseMessaging.instance.deleteToken();
-        await NotificationApiService.deleteFcmToken();
         await AuthLocalStorage().clearSession();
         return const Left("401");
       } else {
@@ -90,8 +78,6 @@ class TechCalendarRepo {
     } catch (e) {
       final errorString = e.toString().toLowerCase();
       if (errorString.contains('401') || errorString.contains('unauthorized')) {
-        await FirebaseMessaging.instance.deleteToken();
-        await NotificationApiService.deleteFcmToken();
         await AuthLocalStorage().clearSession();
         return const Left("401");
       }

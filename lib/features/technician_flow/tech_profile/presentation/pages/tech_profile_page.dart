@@ -21,6 +21,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:lottie/lottie.dart';
 import 'package:shimmer_ai/shimmer_ai.dart';
 import 'package:iconsax/iconsax.dart';
 
@@ -63,6 +64,7 @@ class _TechProfilePageViewState extends State<TechProfilePageView> {
   String userName = "مستخدم";
   String _displayImage = "";
   String _aboutMe = "";
+  bool _isLoadingDialogOpen = false;
   List<String> _portfolioImages = [];
   bool _hasFetchedProfileOnce = false;
   final Color _primaryBlue = const Color(0xFF3775FA);
@@ -277,13 +279,37 @@ class _TechProfilePageViewState extends State<TechProfilePageView> {
   Widget build(BuildContext context) {
     return BlocConsumer<TechProfileCubit, TechProfileState>(
       listener: (context, state) {
-        if (ModalRoute.of(context)?.isCurrent != true) return;
-        if (state is ProfileUnauth) {
-          _navigateToLogin(context, state.message);
-        } else if (state is ProfileActionSuccess) {
-          _navigateToLogin(context, state.message);
-        } else if (state is ProfileError) {
-          ModernSnackbar.showError(context: context, message: state.message);
+        if (state is ProfileLoading) {
+          _isLoadingDialogOpen = true;
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (context) {
+              return Center(
+                child: Lottie.asset(
+                  'assets/icon/loading.json',
+                  width: 200.w,
+                  height: 200.h,
+                  repeat: true,
+                  animate: true,
+                ),
+              );
+            },
+          ).then((_) {
+            _isLoadingDialogOpen = false;
+          });
+        } else {
+          if (_isLoadingDialogOpen) {
+            Navigator.of(context, rootNavigator: true).pop();
+            _isLoadingDialogOpen = false;
+          }
+          if (state is ProfileUnauth) {
+            _navigateToLogin(context, state.message);
+          } else if (state is ProfileActionSuccess) {
+            _navigateToLogin(context, state.message);
+          } else if (state is ProfileError) {
+            ModernSnackbar.showError(context: context, message: state.message);
+          }
         }
       },
       builder: (context, state) {
@@ -715,7 +741,7 @@ class _TechProfilePageViewState extends State<TechProfilePageView> {
                                         indent: 60.w,
                                         endIndent: 20.w),
                                     _buildSettingItem(
-                                      icon: Icons.logout,
+                                      icon: Icons.delete_outline,
                                       title: "حذف الحساب",
                                       subtitle:
                                           "احذف حسابك وجميع بياناتك نهائياً",

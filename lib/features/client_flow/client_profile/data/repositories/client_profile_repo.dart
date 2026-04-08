@@ -1,8 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:dartz/dartz.dart';
-import 'package:el7erafe/core/services/notifications/notification_api_service.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:http/http.dart' as http;
 import 'package:el7erafe/core/services/local_storage/auth_local_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -39,8 +37,6 @@ class ProfileRepository {
         await prefs.setString(_cacheKey, response.body);
         return Right(data);
       } else if (response.statusCode == 401) {
-        await FirebaseMessaging.instance.deleteToken();
-        await NotificationApiService.deleteFcmToken();
         AuthLocalStorage authLocalStorage = AuthLocalStorage();
         await authLocalStorage.clearSession();
         return const Left("401");
@@ -66,15 +62,11 @@ class ProfileRepository {
       );
 
       if (response.statusCode == 200 || response.statusCode == 204) {
-        await FirebaseMessaging.instance.deleteToken();
-        await NotificationApiService.deleteFcmToken();
         await AuthLocalStorage().clearSession();
         final prefs = await SharedPreferences.getInstance();
         await prefs.remove(_cacheKey);
         return const Right("تم حذف الحساب بنجاح");
       } else if (response.statusCode == 401) {
-        await FirebaseMessaging.instance.deleteToken();
-        await NotificationApiService.deleteFcmToken();
         AuthLocalStorage authLocalStorage = AuthLocalStorage();
         await authLocalStorage.clearSession();
         return const Left("401");
@@ -98,15 +90,11 @@ class ProfileRepository {
       );
 
       if (response.statusCode == 200) {
-        await FirebaseMessaging.instance.deleteToken();
-        await NotificationApiService.deleteFcmToken();
         await AuthLocalStorage().clearSession();
         final prefs = await SharedPreferences.getInstance();
         await prefs.remove(_cacheKey);
         return const Right("تم تسجيل الخروج بنجاح");
       } else if (response.statusCode == 401) {
-        await FirebaseMessaging.instance.deleteToken();
-        await NotificationApiService.deleteFcmToken();
         AuthLocalStorage authLocalStorage = AuthLocalStorage();
         await authLocalStorage.clearSession();
         return const Left("401");
@@ -152,8 +140,6 @@ class ProfileRepository {
         await prefs.remove(_cacheKey);
         return const Right("تم تحديث البيانات بنجاح");
       } else if (response.statusCode == 401) {
-        await FirebaseMessaging.instance.deleteToken();
-        await NotificationApiService.deleteFcmToken();
         AuthLocalStorage authLocalStorage = AuthLocalStorage();
         await authLocalStorage.clearSession();
         return const Left("401");
@@ -184,8 +170,6 @@ class ProfileRepository {
       } else if (response.statusCode == 400) {
         return Left(jsonDecode(response.body)['errorMessage']);
       } else if (response.statusCode == 401) {
-        await FirebaseMessaging.instance.deleteToken();
-        await NotificationApiService.deleteFcmToken();
         AuthLocalStorage authLocalStorage = AuthLocalStorage();
         await authLocalStorage.clearSession();
         return const Left("401");
@@ -216,8 +200,6 @@ class ProfileRepository {
       } else if (response.statusCode == 400) {
         return Left((jsonDecode(response.body)['errorMessage']));
       } else if (response.statusCode == 401) {
-        await FirebaseMessaging.instance.deleteToken();
-        await NotificationApiService.deleteFcmToken();
         AuthLocalStorage authLocalStorage = AuthLocalStorage();
         await authLocalStorage.clearSession();
         return const Left("401");
@@ -250,8 +232,6 @@ class ProfileRepository {
       } else if (response.statusCode == 400) {
         return Left(jsonDecode(response.body)['errorMessage']);
       } else if (response.statusCode == 401) {
-        await FirebaseMessaging.instance.deleteToken();
-        await NotificationApiService.deleteFcmToken();
         AuthLocalStorage authLocalStorage = AuthLocalStorage();
         await authLocalStorage.clearSession();
         return const Left("401");
@@ -285,8 +265,6 @@ class ProfileRepository {
       } else if (response.statusCode == 400) {
         return Left((jsonDecode(response.body)['errorMessage']));
       } else if (response.statusCode == 401) {
-        await FirebaseMessaging.instance.deleteToken();
-        await NotificationApiService.deleteFcmToken();
         AuthLocalStorage authLocalStorage = AuthLocalStorage();
         await authLocalStorage.clearSession();
         return const Left("401");
@@ -321,8 +299,6 @@ class ProfileRepository {
       } else if (response.statusCode == 400) {
         return Left(jsonDecode(response.body)['errorMessage']);
       } else if (response.statusCode == 401) {
-        await FirebaseMessaging.instance.deleteToken();
-        await NotificationApiService.deleteFcmToken();
         AuthLocalStorage authLocalStorage = AuthLocalStorage();
         await authLocalStorage.clearSession();
         return const Left("401");

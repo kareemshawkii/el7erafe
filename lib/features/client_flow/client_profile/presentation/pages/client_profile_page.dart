@@ -15,6 +15,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:lottie/lottie.dart';
 import 'package:shimmer_ai/shimmer_ai.dart';
 
 class ClientProfilePage extends StatelessWidget {
@@ -46,6 +47,7 @@ class _ClientProfilePageViewState extends State<ClientProfilePageView> {
   bool _notificationsEnabled = false;
   String userName = "مستخدم";
   String _displayImage = "";
+  bool _isLoadingDialogOpen = false;
 
   final Color _primaryBlue = const Color(0xFF3775FA);
   final Color _bgGrey = const Color(0xFFF5F7FA);
@@ -204,20 +206,46 @@ class _ClientProfilePageViewState extends State<ClientProfilePageView> {
   Widget build(BuildContext context) {
     return BlocConsumer<ProfileCubit, ProfileState>(
       listener: (context, state) {
-        if (ModalRoute.of(context)?.isCurrent != true) return;
-        if (state is ProfileUnauth) {
-          _navigateToLogin(context, state.message);
-        } else if (state is ProfileActionSuccess) {
-          _navigateToLogin(context, state.message);
-        } else if (state is ProfileError) {
-          ModernSnackbar.showError(context: context, message: state.message);
+        // REMOVED the ModalRoute isCurrent check!
+
+        if (state is ProfileLoading) {
+          _isLoadingDialogOpen = true;
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (context) {
+              return Center(
+                child: Lottie.asset(
+                  'assets/icon/loading.json',
+                  width: 200.w,
+                  height: 200.h,
+                  repeat: true,
+                  animate: true,
+                ),
+              );
+            },
+          ).then((_) {
+            _isLoadingDialogOpen = false;
+          });
+        } else {
+          if (_isLoadingDialogOpen) {
+            Navigator.of(context, rootNavigator: true).pop();
+            _isLoadingDialogOpen = false;
+          }
+
+          if (state is ProfileUnauth) {
+            _navigateToLogin(context, state.message);
+          } else if (state is ProfileActionSuccess) {
+            _navigateToLogin(context, state.message);
+          } else if (state is ProfileError) {
+            ModernSnackbar.showError(context: context, message: state.message);
+          }
         }
       },
       builder: (context, state) {
         if (state is ProfileLoaded) {
           _displayImage = state.imageUrl;
         }
-
         return Directionality(
           textDirection: TextDirection.rtl,
           child: Scaffold(
@@ -478,7 +506,7 @@ class _ClientProfilePageViewState extends State<ClientProfilePageView> {
                                         indent: 60.w,
                                         endIndent: 20.w),
                                     _buildSettingItem(
-                                      icon: Icons.logout,
+                                      icon: Icons.delete_outline,
                                       title: "حذف الحساب",
                                       subtitle:
                                           "احذف حسابك وجميع بياناتك نهائياً",
