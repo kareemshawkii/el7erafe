@@ -1,12 +1,13 @@
 import 'dart:convert';
 import 'package:dartz/dartz.dart';
 import 'package:el7erafe/core/services/local_storage/auth_local_storage.dart';
+import 'package:el7erafe/core/services/notifications/notification_api_service.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:http/http.dart' as http;
 import '../models/service_item.dart';
 
 class HomeRepository {
-  final String baseUrl =
-      "https://el7rafeapp.azurewebsites.net";
+  final String baseUrl = "https://el7rafeapp.azurewebsites.net";
 
   Future<Either<String, List<ServiceItem>>> getServices() async {
     AuthLocalStorage authLocalStorage = AuthLocalStorage();
@@ -33,6 +34,8 @@ class HomeRepository {
           return const Right([]);
         }
       } else if (response.statusCode == 401) {
+        await FirebaseMessaging.instance.deleteToken();
+        await NotificationApiService.deleteFcmToken();
         await authLocalStorage.clearSession();
         return const Left("401 Unauthorized");
       } else {

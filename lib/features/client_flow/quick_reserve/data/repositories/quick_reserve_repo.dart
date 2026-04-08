@@ -1,12 +1,13 @@
 import 'dart:convert';
 import 'package:dartz/dartz.dart';
+import 'package:el7erafe/core/services/notifications/notification_api_service.dart';
 import 'package:el7erafe/features/client_flow/client_home/data/models/quick_reservation_request.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:http/http.dart' as http;
 import 'package:el7erafe/core/services/local_storage/auth_local_storage.dart';
 
 class ServiceRequestRepository {
-  final String baseUrl =
-      "https://el7rafeapp.azurewebsites.net";
+  final String baseUrl = "https://el7rafeapp.azurewebsites.net";
 
   Future<Either<String, String>> submitQuickReservation(
       ReservationRequest request) async {
@@ -25,7 +26,9 @@ class ServiceRequestRepository {
 
       multipartRequest.fields['ServiceId'] = request.serviceId.toString();
       multipartRequest.fields['Description'] = request.description ?? "";
-      if (request.city != null) multipartRequest.fields['CityName'] = request.city!;
+      if (request.city != null) {
+        multipartRequest.fields['CityName'] = request.city!;
+      }
       if (request.street != null) {
         multipartRequest.fields['Street'] = request.street!;
       }
@@ -33,10 +36,8 @@ class ServiceRequestRepository {
         multipartRequest.fields['SpecialSign'] = request.specialSign!;
       }
       if (request.day != null) {
-        multipartRequest.fields['ServiceDate'] = request.day!
-            .toIso8601String()
-            .split('T')
-            .first; 
+        multipartRequest.fields['ServiceDate'] =
+            request.day!.toIso8601String().split('T').first;
       }
 
       multipartRequest.fields['AllDayAvailability'] =
@@ -69,14 +70,15 @@ class ServiceRequestRepository {
       if (response.statusCode == 200 || response.statusCode == 201) {
         return const Right("تم إرسال الطلب بنجاح");
       } else if (response.statusCode == 401) {
+        await FirebaseMessaging.instance.deleteToken();
+        await NotificationApiService.deleteFcmToken();
         AuthLocalStorage authLocalStorage = AuthLocalStorage();
         await authLocalStorage.clearSession();
         return const Left("401 unauthorized");
       } else if (response.statusCode == 409) {
         final Map<String, dynamic> errorBody = jsonDecode(response.body);
-        return  Left("409 ${errorBody['errorMessage']}");
-      }
-      else {
+        return Left("409 ${errorBody['errorMessage']}");
+      } else {
         try {
           final Map<String, dynamic> errorBody = jsonDecode(response.body);
           return Left(errorBody['errorMessage'] ?? "فشل إرسال الطلب");

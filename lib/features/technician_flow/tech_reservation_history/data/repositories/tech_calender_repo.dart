@@ -1,19 +1,25 @@
 import 'dart:convert';
 import 'package:dartz/dartz.dart';
 import 'package:el7erafe/core/services/local_storage/auth_local_storage.dart';
+import 'package:el7erafe/core/services/notifications/notification_api_service.dart';
 import 'package:el7erafe/features/technician_flow/tech_reservation_history/data/models/technician_calender_model.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:http/http.dart' as http;
 
 class TechCalendarRepo {
   final AuthLocalStorage _authLocal = AuthLocalStorage();
-  final String _baseUrl =
-      "https://el7rafeapp.azurewebsites.net";
+  final String _baseUrl = "https://el7rafeapp.azurewebsites.net";
 
   Future<Either<String, List<TechReservationModel>>> getCalendarReservations(
       String date) async {
     try {
       final token = await _authLocal.getToken();
-      if (token == null || token.isEmpty) return const Left("401");
+      if (token == null || token.isEmpty) {
+        await FirebaseMessaging.instance.deleteToken();
+        await NotificationApiService.deleteFcmToken();
+        await AuthLocalStorage().clearSession();
+        return const Left("401");
+      }
 
       final url = Uri.parse("$_baseUrl/api/tech/calendar?date=$date");
       final response = await http.get(url, headers: {
@@ -31,6 +37,9 @@ class TechCalendarRepo {
         }
         return const Right([]);
       } else if (response.statusCode == 401 || response.statusCode == 403) {
+        await FirebaseMessaging.instance.deleteToken();
+        await NotificationApiService.deleteFcmToken();
+        await AuthLocalStorage().clearSession();
         return const Left("401");
       } else {
         return const Left("فشل في جلب الحجوزات");
@@ -38,6 +47,9 @@ class TechCalendarRepo {
     } catch (e) {
       final errorString = e.toString().toLowerCase();
       if (errorString.contains('401') || errorString.contains('unauthorized')) {
+        await FirebaseMessaging.instance.deleteToken();
+        await NotificationApiService.deleteFcmToken();
+        await AuthLocalStorage().clearSession();
         return const Left("401");
       }
       return const Left("فشل الاتصال بالخادم");
@@ -47,7 +59,12 @@ class TechCalendarRepo {
   Future<Either<String, String>> startJob(int reservationId) async {
     try {
       final token = await _authLocal.getToken();
-      if (token == null || token.isEmpty) return const Left("401");
+      if (token == null || token.isEmpty) {
+        await FirebaseMessaging.instance.deleteToken();
+        await NotificationApiService.deleteFcmToken();
+        await AuthLocalStorage().clearSession();
+        return const Left("401");
+      }
 
       final url = Uri.parse("$_baseUrl/api/tech/start-job");
       final response = await http.post(
@@ -62,6 +79,9 @@ class TechCalendarRepo {
       if (response.statusCode == 200 || response.statusCode == 204) {
         return const Right("تم بدء العمل بنجاح");
       } else if (response.statusCode == 401 || response.statusCode == 403) {
+        await FirebaseMessaging.instance.deleteToken();
+        await NotificationApiService.deleteFcmToken();
+        await AuthLocalStorage().clearSession();
         return const Left("401");
       } else {
         return Left(jsonDecode(response.body)['errorMessage'] ??
@@ -70,6 +90,9 @@ class TechCalendarRepo {
     } catch (e) {
       final errorString = e.toString().toLowerCase();
       if (errorString.contains('401') || errorString.contains('unauthorized')) {
+        await FirebaseMessaging.instance.deleteToken();
+        await NotificationApiService.deleteFcmToken();
+        await AuthLocalStorage().clearSession();
         return const Left("401");
       }
       return const Left("فشل الاتصال بالخادم");

@@ -3,13 +3,14 @@ import 'package:el7erafe/core/services/local_storage/auth_local_storage.dart';
 import 'package:el7erafe/core/services/local_storage/rejected_local_storage.dart';
 import 'package:el7erafe/core/services/models/rejected_user.dart';
 import 'package:el7erafe/core/services/models/user.dart';
+import 'package:el7erafe/core/services/notifications/notification_api_service.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:http/http.dart' as http;
 import 'package:el7erafe/core/utils/login_failure.dart';
 import 'package:dartz/dartz.dart';
 
 class AuthRepository {
-  final String _baseUrl =
-      "https://el7rafeapp.azurewebsites.net";
+  final String _baseUrl = "https://el7rafeapp.azurewebsites.net";
 
   Future<Either<Failure, UserModel>> login(
       String phoneNumber, String password) async {
@@ -30,6 +31,23 @@ class AuthRepository {
         final user = UserModel.fromJson(data);
         AuthLocalStorage authLocalStorage = AuthLocalStorage();
         await authLocalStorage.saveUserSession(user);
+        try {
+          final messaging = FirebaseMessaging.instance;
+          NotificationSettings settings = await messaging.requestPermission(
+            alert: true,
+            badge: true,
+            sound: true,
+          );
+          if (settings.authorizationStatus == AuthorizationStatus.authorized ||
+              settings.authorizationStatus == AuthorizationStatus.provisional) {
+            String? fcmToken = await messaging.getToken();
+            if (fcmToken != null) {
+              await NotificationApiService.saveFcmToken(fcmToken);
+            }
+          }
+        } catch (e) {
+          // do nothing
+        }
         return Right(user);
       } else if (response.statusCode == 452) {
         final Map<String, dynamic> data = jsonDecode(response.body);

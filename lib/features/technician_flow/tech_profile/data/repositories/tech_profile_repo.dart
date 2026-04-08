@@ -1,14 +1,15 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:dartz/dartz.dart';
+import 'package:el7erafe/core/services/notifications/notification_api_service.dart';
 import 'package:el7erafe/features/technician_flow/tech_profile/data/models/technician_profile_model.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:http/http.dart' as http;
 import 'package:el7erafe/core/services/local_storage/auth_local_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class TechProfileRepository {
-  final String _baseUrl =
-      'https://el7rafeapp.azurewebsites.net';
+  final String _baseUrl = 'https://el7rafeapp.azurewebsites.net';
   final String _cacheKey = 'tech_profile_cache';
 
   static TechnicianProfileModel? _memoryCache;
@@ -64,6 +65,8 @@ class TechProfileRepository {
 
         return Right(profileModel);
       } else if (response.statusCode == 401) {
+        await FirebaseMessaging.instance.deleteToken();
+        await NotificationApiService.deleteFcmToken();
         AuthLocalStorage authLocalStorage = AuthLocalStorage();
         await authLocalStorage.clearSession();
         await _clearCache();
@@ -89,10 +92,14 @@ class TechProfileRepository {
       );
 
       if (response.statusCode == 200 || response.statusCode == 204) {
+        await FirebaseMessaging.instance.deleteToken();
+        await NotificationApiService.deleteFcmToken();
         await AuthLocalStorage().clearSession();
         await _clearCache();
         return const Right("تم حذف الحساب بنجاح");
       } else if (response.statusCode == 401) {
+        await FirebaseMessaging.instance.deleteToken();
+        await NotificationApiService.deleteFcmToken();
         AuthLocalStorage authLocalStorage = AuthLocalStorage();
         await authLocalStorage.clearSession();
         await _clearCache();
@@ -117,10 +124,14 @@ class TechProfileRepository {
       );
 
       if (response.statusCode == 200) {
+        await FirebaseMessaging.instance.deleteToken();
+        await NotificationApiService.deleteFcmToken();
         await AuthLocalStorage().clearSession();
         await _clearCache();
         return const Right("تم تسجيل الخروج بنجاح");
       } else if (response.statusCode == 401) {
+        await FirebaseMessaging.instance.deleteToken();
+        await NotificationApiService.deleteFcmToken();
         AuthLocalStorage authLocalStorage = AuthLocalStorage();
         await authLocalStorage.clearSession();
         await _clearCache();
@@ -183,6 +194,8 @@ class TechProfileRepository {
         var response1 = await http.Response.fromStream(mediaResponse);
 
         if (response1.statusCode == 401) {
+          await FirebaseMessaging.instance.deleteToken();
+          await NotificationApiService.deleteFcmToken();
           AuthLocalStorage authLocalStorage = AuthLocalStorage();
           await authLocalStorage.clearSession();
           await _clearCache();
@@ -205,6 +218,8 @@ class TechProfileRepository {
         var response2 = await http.Response.fromStream(aboutMeResponse);
 
         if (response2.statusCode == 401) {
+          await FirebaseMessaging.instance.deleteToken();
+          await NotificationApiService.deleteFcmToken();
           AuthLocalStorage authLocalStorage = AuthLocalStorage();
           await authLocalStorage.clearSession();
           await _clearCache();
@@ -227,6 +242,8 @@ class TechProfileRepository {
         var response3 = await http.Response.fromStream(nameResponse);
 
         if (response3.statusCode == 401) {
+          await FirebaseMessaging.instance.deleteToken();
+          await NotificationApiService.deleteFcmToken();
           AuthLocalStorage authLocalStorage = AuthLocalStorage();
           await authLocalStorage.clearSession();
           await _clearCache();
@@ -273,6 +290,8 @@ class TechProfileRepository {
       } else if (response.statusCode == 400) {
         return Left(jsonDecode(response.body)['errorMessage']);
       } else if (response.statusCode == 401) {
+        await FirebaseMessaging.instance.deleteToken();
+        await NotificationApiService.deleteFcmToken();
         AuthLocalStorage authLocalStorage = AuthLocalStorage();
         await authLocalStorage.clearSession();
         await _clearCache();
@@ -304,6 +323,8 @@ class TechProfileRepository {
       } else if (response.statusCode == 400) {
         return Left((jsonDecode(response.body)['errorMessage']));
       } else if (response.statusCode == 401) {
+        await FirebaseMessaging.instance.deleteToken();
+        await NotificationApiService.deleteFcmToken();
         AuthLocalStorage authLocalStorage = AuthLocalStorage();
         await authLocalStorage.clearSession();
         await _clearCache();
@@ -337,6 +358,8 @@ class TechProfileRepository {
       } else if (response.statusCode == 400) {
         return Left(jsonDecode(response.body)['errorMessage']);
       } else if (response.statusCode == 401) {
+        await FirebaseMessaging.instance.deleteToken();
+        await NotificationApiService.deleteFcmToken();
         AuthLocalStorage authLocalStorage = AuthLocalStorage();
         await authLocalStorage.clearSession();
         await _clearCache();
@@ -370,6 +393,8 @@ class TechProfileRepository {
       } else if (response.statusCode == 400) {
         return Left((jsonDecode(response.body)['errorMessage']));
       } else if (response.statusCode == 401) {
+        await FirebaseMessaging.instance.deleteToken();
+        await NotificationApiService.deleteFcmToken();
         AuthLocalStorage authLocalStorage = AuthLocalStorage();
         await authLocalStorage.clearSession();
         await _clearCache();
@@ -404,6 +429,8 @@ class TechProfileRepository {
       } else if (response.statusCode == 400) {
         return Left(jsonDecode(response.body)['errorMessage']);
       } else if (response.statusCode == 401) {
+        await FirebaseMessaging.instance.deleteToken();
+        await NotificationApiService.deleteFcmToken();
         AuthLocalStorage authLocalStorage = AuthLocalStorage();
         await authLocalStorage.clearSession();
         await _clearCache();

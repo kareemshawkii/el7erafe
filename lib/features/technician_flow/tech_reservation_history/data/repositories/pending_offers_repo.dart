@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'package:dartz/dartz.dart';
 import 'package:el7erafe/core/services/local_storage/auth_local_storage.dart';
+import 'package:el7erafe/core/services/notifications/notification_api_service.dart';
 import 'package:el7erafe/features/technician_flow/tech_reservation_history/data/models/pending_offer_model.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:signalr_netcore/signalr_client.dart';
 import 'package:http/http.dart' as http;
 
@@ -14,7 +16,12 @@ class PendingOffersRepo {
   Future<Either<String, List<PendingOfferModel>>> getPendingOffers() async {
     try {
       final token = await _authLocal.getToken();
-      if (token == null || token.isEmpty) return const Left("401");
+      if (token == null || token.isEmpty) {
+        await FirebaseMessaging.instance.deleteToken();
+        await NotificationApiService.deleteFcmToken();
+        await AuthLocalStorage().clearSession();
+        return const Left("401");
+      }
 
       final url = Uri.parse("$_baseUrl/api/tech/pending-offers");
       final response = await http.get(url, headers: {
@@ -30,6 +37,9 @@ class PendingOffersRepo {
             .map((e) => PendingOfferModel.fromJson(e as Map<String, dynamic>))
             .toList());
       } else if (response.statusCode == 401 || response.statusCode == 403) {
+        await FirebaseMessaging.instance.deleteToken();
+        await NotificationApiService.deleteFcmToken();
+        await AuthLocalStorage().clearSession();
         return const Left("401");
       } else {
         return const Left("Failed to fetch pending offers");
@@ -37,6 +47,9 @@ class PendingOffersRepo {
     } catch (e) {
       final errorString = e.toString().toLowerCase();
       if (errorString.contains('401') || errorString.contains('unauthorized')) {
+        await FirebaseMessaging.instance.deleteToken();
+        await NotificationApiService.deleteFcmToken();
+        await AuthLocalStorage().clearSession();
         return const Left("401");
       }
       return const Left("Server connection failed");
@@ -83,6 +96,9 @@ class PendingOffersRepo {
       await _startConnection(onSignalRRefreshNeeded, onForceDisconnect);
     } catch (e) {
       if (e.toString().toLowerCase().contains('401')) {
+        await FirebaseMessaging.instance.deleteToken();
+        await NotificationApiService.deleteFcmToken();
+        await AuthLocalStorage().clearSession();
         onForceDisconnect();
       } else {
         onSignalRRefreshNeeded();
@@ -98,6 +114,9 @@ class PendingOffersRepo {
       }
     } catch (e) {
       if (e.toString().toLowerCase().contains('401')) {
+        await FirebaseMessaging.instance.deleteToken();
+        await NotificationApiService.deleteFcmToken();
+        await AuthLocalStorage().clearSession();
         onForceDisconnect();
         return;
       }

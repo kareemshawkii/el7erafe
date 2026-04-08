@@ -1,8 +1,10 @@
 import 'dart:convert';
 import 'package:dartz/dartz.dart';
 import 'package:el7erafe/core/services/local_storage/auth_local_storage.dart';
+import 'package:el7erafe/core/services/notifications/notification_api_service.dart';
 import 'package:el7erafe/features/client_flow/reservation_history/data/models/offers_model.dart';
 import 'package:el7erafe/features/client_flow/reservation_history/data/models/pending_request_model.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:signalr_netcore/signalr_client.dart';
 import 'package:http/http.dart' as http;
 
@@ -15,7 +17,12 @@ class PendingRequestsRepo {
   Future<List<PendingRequestModel>> getInitialPendingRequests() async {
     try {
       final token = await _authLocal.getToken();
-      if (token == null || token.isEmpty) throw Exception("401 Unauthorized");
+      if (token == null || token.isEmpty) {
+        await FirebaseMessaging.instance.deleteToken();
+        await NotificationApiService.deleteFcmToken();
+        await _authLocal.clearSession();
+        throw Exception("401 Unauthorized");
+      }
 
       final url = Uri.parse("$_baseUrl/api/cf/getpendingservicerequests");
       final response = await http.get(url, headers: {
@@ -40,6 +47,9 @@ class PendingRequestsRepo {
         }
         return [];
       } else if (response.statusCode == 401 || response.statusCode == 403) {
+        await FirebaseMessaging.instance.deleteToken();
+        await NotificationApiService.deleteFcmToken();
+        await _authLocal.clearSession();
         throw Exception("401 Unauthorized");
       } else {
         throw Exception("Failed to fetch pending requests");
@@ -47,6 +57,9 @@ class PendingRequestsRepo {
     } catch (e) {
       final errorString = e.toString().toLowerCase();
       if (errorString.contains('401') || errorString.contains('unauthorized')) {
+        await FirebaseMessaging.instance.deleteToken();
+        await NotificationApiService.deleteFcmToken();
+        await _authLocal.clearSession();
         throw Exception("401 Unauthorized");
       }
       throw Exception("Server connection failed");
@@ -115,6 +128,9 @@ class PendingRequestsRepo {
       await _startConnection(onSignalRRefreshNeeded, onForceDisconnect);
     } catch (e) {
       if (e.toString().toLowerCase().contains('401')) {
+        await FirebaseMessaging.instance.deleteToken();
+        await NotificationApiService.deleteFcmToken();
+        await _authLocal.clearSession();
         onForceDisconnect();
       } else {
         onSignalRRefreshNeeded();
@@ -130,6 +146,9 @@ class PendingRequestsRepo {
       }
     } catch (e) {
       if (e.toString().toLowerCase().contains('401')) {
+        await FirebaseMessaging.instance.deleteToken();
+        await NotificationApiService.deleteFcmToken();
+        await _authLocal.clearSession();
         onForceDisconnect();
         return;
       }
@@ -155,7 +174,12 @@ class PendingRequestsRepo {
   Future<Either<String, List<OfferModel>>> getQuickOffers(int requestId) async {
     try {
       final token = await _authLocal.getToken();
-      if (token == null || token.isEmpty) return const Left("401");
+      if (token == null || token.isEmpty) {
+        await FirebaseMessaging.instance.deleteToken();
+        await NotificationApiService.deleteFcmToken();
+        await _authLocal.clearSession();
+        return const Left("401");
+      }
 
       final url =
           Uri.parse("$_baseUrl/api/cf/offers/quick?requestId=$requestId");
@@ -172,6 +196,9 @@ class PendingRequestsRepo {
             .map((e) => OfferModel.fromJson(e as Map<String, dynamic>))
             .toList());
       } else if (response.statusCode == 401 || response.statusCode == 403) {
+        await FirebaseMessaging.instance.deleteToken();
+        await NotificationApiService.deleteFcmToken();
+        await _authLocal.clearSession();
         return const Left("401");
       } else {
         return const Left("فشل في جلب العروض");
@@ -185,7 +212,12 @@ class PendingRequestsRepo {
   Future<Either<String, String>> cancelRequest(int requestId) async {
     try {
       final token = await _authLocal.getToken();
-      if (token == null || token.isEmpty) return const Left("401");
+      if (token == null || token.isEmpty) {
+        await FirebaseMessaging.instance.deleteToken();
+        await NotificationApiService.deleteFcmToken();
+        await _authLocal.clearSession();
+        return const Left("401");
+      }
       final url = Uri.parse("$_baseUrl/api/cf/cancel-request");
       final response = await http.patch(url,
           headers: {
@@ -196,7 +228,12 @@ class PendingRequestsRepo {
       if (response.statusCode == 200 || response.statusCode == 204) {
         return const Right("تم الغاء الطلب بنجاح");
       }
-      if (response.statusCode == 401) return const Left("401");
+      if (response.statusCode == 401) {
+        await FirebaseMessaging.instance.deleteToken();
+        await NotificationApiService.deleteFcmToken();
+        await _authLocal.clearSession();
+        return const Left("401");
+      }
       return Left(jsonDecode(response.body)['errorMessage'] ?? "حدث خطأ");
     } catch (_) {
       return const Left("فشل الاتصال بالخادم");
@@ -206,7 +243,12 @@ class PendingRequestsRepo {
   Future<Either<String, String>> acceptOffer(int offerId) async {
     try {
       final token = await _authLocal.getToken();
-      if (token == null || token.isEmpty) return const Left("401");
+      if (token == null || token.isEmpty) {
+        await FirebaseMessaging.instance.deleteToken();
+        await NotificationApiService.deleteFcmToken();
+        await _authLocal.clearSession();
+        return const Left("401");
+      }
       final url = Uri.parse("$_baseUrl/api/cf/offers/accept");
       final response = await http.post(url,
           headers: {
@@ -217,7 +259,12 @@ class PendingRequestsRepo {
       if (response.statusCode == 200 || response.statusCode == 204) {
         return const Right("تم قبول العرض بنجاح");
       }
-      if (response.statusCode == 401) return const Left("401");
+      if (response.statusCode == 401) {
+        await FirebaseMessaging.instance.deleteToken();
+        await NotificationApiService.deleteFcmToken();
+        await _authLocal.clearSession();
+        return const Left("401");
+      }
       return Left(jsonDecode(response.body)['errorMessage'] ?? "حدث خطأ");
     } catch (_) {
       return const Left("فشل الاتصال بالخادم");
@@ -227,7 +274,12 @@ class PendingRequestsRepo {
   Future<Either<String, String>> declineOffer(int offerId) async {
     try {
       final token = await _authLocal.getToken();
-      if (token == null || token.isEmpty) return const Left("401");
+      if (token == null || token.isEmpty) {
+        await FirebaseMessaging.instance.deleteToken();
+        await NotificationApiService.deleteFcmToken();
+        await _authLocal.clearSession();
+        return const Left("401");
+      }
       final url = Uri.parse("$_baseUrl/api/cf/offers/decline");
       final response = await http.post(url,
           headers: {
@@ -238,7 +290,12 @@ class PendingRequestsRepo {
       if (response.statusCode == 200 || response.statusCode == 204) {
         return const Right("تم رفض العرض");
       }
-      if (response.statusCode == 401) return const Left("401");
+      if (response.statusCode == 401) {
+        await FirebaseMessaging.instance.deleteToken();
+        await NotificationApiService.deleteFcmToken();
+        await _authLocal.clearSession();
+        return const Left("401");
+      }
       return Left(jsonDecode(response.body)['errorMessage'] ?? "حدث خطأ");
     } catch (_) {
       return const Left("فشل الاتصال بالخادم");
