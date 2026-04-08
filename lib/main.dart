@@ -1,5 +1,6 @@
 import 'package:el7erafe/core/services/notifications/notification_api_service.dart';
 import 'package:el7erafe/core/services/notifications/notification_router.dart';
+import 'package:el7erafe/features/client_flow/reservation_history/data/repositories/current_reservations_repo.dart';
 import 'package:el7erafe/features/client_flow/reservation_history/data/repositories/pending_requests_repo.dart';
 import 'package:el7erafe/features/client_flow/reservation_history/data/repositories/previous_reservations_repo.dart';
 import 'package:el7erafe/features/technician_flow/tech_home/data/repositories/available_requests_repo.dart';
@@ -299,6 +300,7 @@ class _MyAppState extends State<MyApp> {
         RepositoryProvider(create: (context) => TechScheduleRepository()),
         RepositoryProvider(create: (context) => PreviousReservationsRepo()),
         RepositoryProvider(create: (context) => PendingRequestsRepo()),
+        RepositoryProvider(create: (context) => CurrentReservationsRepo()),
       ],
       child: ScreenUtilInit(
         designSize: const Size(393, 852),

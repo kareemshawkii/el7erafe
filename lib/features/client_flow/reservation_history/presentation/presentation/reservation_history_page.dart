@@ -1,3 +1,4 @@
+import 'package:el7erafe/features/client_flow/reservation_history/presentation/presentation/current_reservations_tab.dart';
 import 'package:el7erafe/features/client_flow/reservation_history/presentation/presentation/pending_requests_tab.dart';
 import 'package:el7erafe/features/client_flow/reservation_history/presentation/presentation/previous_reservations_tab.dart';
 import 'package:flutter/material.dart';
@@ -62,7 +63,7 @@ class ReservationHistoryPage extends StatelessWidget {
               const Expanded(
                 child: TabBarView(
                   children: [
-                    Center(child: Text('الطلبات الحالية')),
+                    CurrentReservationsTab(),
                     PendingRequestsTab(),
                     PreviousReservationsTab(),
                   ],

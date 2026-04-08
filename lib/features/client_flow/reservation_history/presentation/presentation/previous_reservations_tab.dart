@@ -105,7 +105,22 @@ class _PreviousReservationsTabState extends State<PreviousReservationsTab>
               separatorBuilder: (context, index) => SizedBox(height: 16.h),
               itemBuilder: (context, index) {
                 final item = state.reservations[index];
-                return _buildReservationCard(item);
+                return TweenAnimationBuilder<double>(
+                  tween: Tween<double>(begin: 0.0, end: 1.0),
+                  duration:
+                      Duration(milliseconds: 400 + (index * 100).clamp(0, 500)),
+                  curve: Curves.easeOutQuart,
+                  builder: (context, value, child) {
+                    return Transform.translate(
+                      offset: Offset(0, 50 * (1 - value)),
+                      child: Opacity(
+                        opacity: value,
+                        child: child,
+                      ),
+                    );
+                  },
+                  child: _buildReservationCard(item),
+                );
               },
             );
           }
@@ -120,7 +135,7 @@ class _PreviousReservationsTabState extends State<PreviousReservationsTab>
     return Container(
       padding: EdgeInsets.all(12.w),
       decoration: BoxDecoration(
-        color:  Colors.white,
+        color: Colors.white,
         borderRadius: BorderRadius.circular(16.r),
         border: Border.all(
           // ignore: deprecated_member_use
@@ -175,10 +190,9 @@ class _PreviousReservationsTabState extends State<PreviousReservationsTab>
                 child: Text(
                   isCancelled ? 'ملغي' : 'تم الانتهاء',
                   style: GoogleFonts.cairo(
-                    fontSize: 13.sp,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black
-                  ),
+                      fontSize: 13.sp,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black),
                 ),
               ),
             ],
@@ -187,28 +201,36 @@ class _PreviousReservationsTabState extends State<PreviousReservationsTab>
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _buildIconText(
-                icon: Icons.kitchen_outlined,
-                text: item.serviceType ?? 'غير محدد',
+              Expanded(
+                child: _buildIconText(
+                  icon: Icons.kitchen_outlined,
+                  text: item.serviceType ?? 'غير محدد',
+                ),
               ),
-              _buildIconText(
-                icon: Icons.payments_outlined,
-                text: '${item.fees ?? 0} جنيه مصري',
-              ),
+              Expanded(
+                child: _buildIconText(
+                  icon: Icons.payments_outlined,
+                  text: '${item.fees ?? 0} جنيه مصري',
+                ),
+              )
             ],
           ),
           SizedBox(height: 16.h),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _buildIconText(
-                icon: Icons.access_time_rounded,
-                text: item.techTimeInterval ?? 'غير محدد',
+              Expanded(
+                child: _buildIconText(
+                  icon: Icons.access_time_rounded,
+                  text: item.techTimeInterval ?? 'غير محدد',
+                ),
               ),
-              _buildIconText(
-                icon: Icons.calendar_today_outlined,
-                text: item.day ?? 'غير محدد',
-              ),
+              Expanded(
+                child: _buildIconText(
+                  icon: Icons.calendar_today_outlined,
+                  text: item.day ?? 'غير محدد',
+                ),
+              )
             ],
           ),
         ],
