@@ -35,7 +35,7 @@ class PreviousJobsRepo {
         return Left(data['errorMessage'] ?? "فشل في جلب الطلبات السابقة");
       }
     } catch (e) {
-      return const Left("خطأ في الاتصال، يرجى المحاولة لاحقًا");
+      return  Left(e.toString());
     }
   }
 }

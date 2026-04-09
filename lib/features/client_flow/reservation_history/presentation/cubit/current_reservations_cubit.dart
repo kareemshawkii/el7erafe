@@ -19,24 +19,23 @@ class CurrentReservationsCubit extends Cubit<CurrentReservationsState> {
     emit(CurrentLoading());
     try {
       _currentList = await repository.getCurrentReservations();
-      emit(CurrentLoaded(_currentList));
+      if (!isClosed) emit(CurrentLoaded(_currentList));
     } catch (e) {
       if (e.toString().contains('UNAUTH')) {
-        emit(CurrentUnauth());
+        if (!isClosed) emit(CurrentUnauth());
       } else {
-        emit(CurrentError(e.toString().replaceAll('Exception: ', '')));
+        if (!isClosed) {
+          emit(CurrentError(e.toString().replaceAll('Exception: ', '')));
+        }
       }
     }
   }
 
   Future<void> _connectSignalR() async {
     await repository.connectToHub(
-      onJobStarted: (id) => _updateStatus(id, "قيد التنفيذ"),
-      onJobCompleted: (id) => _updateStatus(id, "انتظار الدفع"),
-      onReservationCancelled: (id) {
-        _currentList.removeWhere((r) => r.reservationId == id);
-        if (!isClosed) emit(CurrentLoaded(List.from(_currentList)));
-      },
+      onJobStarted: (id) => _refreshReservationsSilently(),
+      onJobCompleted: (id) => _refreshReservationsSilently(),
+      onReservationCancelled: (id) => _refreshReservationsSilently(),
       onHttpFallback: (fallbackList) {
         _currentList = fallbackList;
         if (!isClosed) {
@@ -46,11 +45,18 @@ class CurrentReservationsCubit extends Cubit<CurrentReservationsState> {
     );
   }
 
-  void _updateStatus(int id, String newStatus) {
-    final index = _currentList.indexWhere((r) => r.reservationId == id);
-    if (index != -1) {
-      _currentList[index] = _currentList[index].copyWith(type: newStatus);
-      if (!isClosed) emit(CurrentLoaded(List.from(_currentList)));
+  Future<void> _refreshReservationsSilently() async {
+    await Future.delayed(const Duration(milliseconds: 500));
+    try {
+      _currentList = await repository.getCurrentReservations();
+      if (!isClosed) {
+        emit(CurrentLoaded(List.from(_currentList)));
+      }
+    } catch (e) {
+      if (e.toString().contains('UNAUTH')) {
+        if (!isClosed) emit(CurrentUnauth());
+      }
+      // Ignore background errors
     }
   }
 
@@ -59,11 +65,12 @@ class CurrentReservationsCubit extends Cubit<CurrentReservationsState> {
     try {
       await repository.cancelReservation(id);
       _currentList.removeWhere((r) => r.reservationId == id);
+
       emit(CurrentActionSuccess("تم إلغاء الحجز بنجاح"));
-      emit(CurrentLoaded(List.from(_currentList)));
+      if (!isClosed) emit(CurrentLoaded(List.from(_currentList)));
     } catch (e) {
       emit(CurrentActionError(e.toString().replaceAll('Exception: ', '')));
-      emit(CurrentLoaded(List.from(_currentList)));
+      if (!isClosed) emit(CurrentLoaded(List.from(_currentList)));
     }
   }
 
@@ -72,29 +79,34 @@ class CurrentReservationsCubit extends Cubit<CurrentReservationsState> {
     try {
       await repository.payReservation(reservationId);
       _currentList.removeWhere((r) => r.reservationId == reservationId);
+
       emit(PaymentSuccess(reservationId));
-      emit(CurrentLoaded(List.from(_currentList)));
+      if (!isClosed) emit(CurrentLoaded(List.from(_currentList)));
     } catch (e) {
       if (e.toString().contains('UNAUTH')) {
-        emit(CurrentUnauth());
+        if (!isClosed) emit(CurrentUnauth());
       } else {
         emit(PaymentError(e.toString().replaceAll('Exception: ', '')));
-        emit(CurrentLoaded(List.from(_currentList)));
+        if (!isClosed) emit(CurrentLoaded(List.from(_currentList)));
       }
     }
   }
 
   Future<void> submitRating(
       {required int rate, required int reservationId}) async {
+    if (isClosed) return;
+
     emit(RatingLoading());
     try {
       await repository.rateJob(rate: rate, reservationId: reservationId);
-      emit(RatingSuccess());
+      if (!isClosed) emit(RatingSuccess());
     } catch (e) {
-      if (e.toString().contains('UNAUTH')) {
-        emit(CurrentUnauth());
-      } else {
-        emit(RatingError(e.toString().replaceAll('Exception: ', '')));
+      if (!isClosed) {
+        if (e.toString().contains('UNAUTH')) {
+          emit(CurrentUnauth());
+        } else {
+          emit(RatingError(e.toString().replaceAll('Exception: ', '')));
+        }
       }
     }
   }

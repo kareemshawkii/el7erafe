@@ -96,8 +96,8 @@ class RatingSuccessPage extends StatelessWidget {
                               SizedBox(height: 24.h),
                               _buildAnimatedWidget(
                                 delayIndex: 0,
-                                child: SvgPicture.asset(
-                                  'images/rating.svg',
+                                child: Image.asset(
+                                  'images/rating.png',
                                   height: 250.h,
                                   fit: BoxFit.contain,
                                 ),
@@ -120,12 +120,12 @@ class RatingSuccessPage extends StatelessWidget {
                                 child: Container(
                                   height: 45.h,
                                   width: double.infinity,
-                                  padding: EdgeInsets.all(2.r), 
+                                  padding: EdgeInsets.all(2.r),
                                   decoration: BoxDecoration(
                                     color: Colors.white,
                                     borderRadius: BorderRadius.circular(14.r),
                                     border: Border.all(
-                                      color: const Color(0xFF3775FA), 
+                                      color: const Color(0xFF3775FA),
                                       width: 1.w,
                                     ),
                                   ),
@@ -133,7 +133,8 @@ class RatingSuccessPage extends StatelessWidget {
                                     onPressed: () {
                                       Navigator.pushAndRemoveUntil(
                                         context,
-                                        SlideRightRoute(page: const ClientHomePage()),
+                                        SlideRightRoute(
+                                            page: const ClientHomePage()),
                                         (route) => false,
                                       );
                                     },
@@ -149,9 +150,11 @@ class RatingSuccessPage extends StatelessWidget {
                                     ),
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: const Color(0xFF3775FA),
-                                      padding: EdgeInsets.symmetric(vertical: 10.h),
+                                      padding:
+                                          EdgeInsets.symmetric(vertical: 10.h),
                                       shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(10.r), 
+                                        borderRadius:
+                                            BorderRadius.circular(10.r),
                                       ),
                                       elevation: 0,
                                     ),

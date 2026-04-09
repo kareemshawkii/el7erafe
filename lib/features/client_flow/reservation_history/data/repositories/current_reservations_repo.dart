@@ -7,6 +7,7 @@ import 'package:el7erafe/core/services/local_storage/auth_local_storage.dart';
 class CurrentReservationsRepo {
   final String _baseUrl = 'https://el7rafeapp.azurewebsites.net';
   HubConnection? _hubConnection;
+  final String _hubUrl = "https://el7rafeapp.azurewebsites.net/clientHub";
 
   Future<List<CurrentReservationModel>> getCurrentReservations() async {
     final token = await _getTokenOrThrow();
@@ -44,7 +45,7 @@ class CurrentReservationsRepo {
     if (response.statusCode == 400) {
       final data = jsonDecode(response.body);
       throw Exception(data['errorMessage'] ?? 'لا يمكن إلغاء الحجز حالياً');
-    } else {
+    } else if (response.statusCode != 200 && response.statusCode != 204) {
       final data = jsonDecode(response.body);
       throw Exception(
           data['errorMessage'] ?? 'فشل إلغاء الحجز، يرجى المحاولة لاحقاً');
@@ -82,12 +83,17 @@ class CurrentReservationsRepo {
         'Authorization': 'Bearer $token',
       },
     );
+
     if (response.statusCode == 401) throw Exception('UNAUTH');
-    if (response.statusCode == 400 ||
-        (response.statusCode != 200 && response.statusCode != 401)) {
-      final data = jsonDecode(response.body);
-      throw Exception(
-          data['errorMessage'] ?? 'الطلب لم يكتمل بعد أو تم التقييم مسبقاً');
+
+    if (response.statusCode != 200 && response.statusCode != 204) {
+      try {
+        final data = jsonDecode(response.body);
+        throw Exception(
+            data['errorMessage'] ?? 'الطلب لم يكتمل بعد أو تم التقييم مسبقاً');
+      } catch (_) {
+        throw Exception('الطلب لم يكتمل بعد أو تم التقييم مسبقاً');
+      }
     }
   }
 
@@ -97,10 +103,11 @@ class CurrentReservationsRepo {
     required Function(int) onReservationCancelled,
     required Function(List<CurrentReservationModel>) onHttpFallback,
   }) async {
+    final token = await _getTokenOrThrow();
+
     try {
-      final token = await _getTokenOrThrow();
       _hubConnection = HubConnectionBuilder()
-          .withUrl('$_baseUrl/clientHub',
+          .withUrl(_hubUrl,
               options: HttpConnectionOptions(
                 accessTokenFactory: () async => token,
               ))
@@ -151,14 +158,18 @@ class CurrentReservationsRepo {
     } catch (e) {
       Future.doWhile(() async {
         await Future.delayed(const Duration(seconds: 10));
+
         if (_hubConnection?.state == HubConnectionState.Connected) {
           return false;
         }
+
         try {
           final fallbackData = await getCurrentReservations();
           onHttpFallback(fallbackData);
         } catch (httpError) {
-          //do nothing
+          if (httpError.toString().contains('UNAUTH')) {
+            return false;
+          }
         }
         return true;
       });
