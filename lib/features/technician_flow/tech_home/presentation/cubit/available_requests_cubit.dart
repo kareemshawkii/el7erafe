@@ -54,10 +54,8 @@ class AvailableRequestsCubit extends Cubit<AvailableRequestsState> {
             } catch (_) {}
           }
         },
-        onPaymentReceived: (reservationId) {
-          if (!isClosed) {
-            emit(PaymentReceivedSuccess(reservationId));
-          }
+        onPaymentReceived: () {
+          emit(PaymentReceivedSuccess());
         },
         onForceDisconnect: () {
           if (!isClosed) emit(AvailableRequestsUnauthorized());
@@ -148,6 +146,7 @@ class AvailableRequestsCubit extends Cubit<AvailableRequestsState> {
     emit(CompleteJobLoading());
     final result = await repository.completeJob(reservationId);
     if (isClosed) return;
+
     result.fold(
       (error) {
         if (error == "401") {
@@ -159,7 +158,6 @@ class AvailableRequestsCubit extends Cubit<AvailableRequestsState> {
       },
       (successMessage) {
         emit(CompleteJobSuccess(successMessage, reservationId));
-        fetchAvailableRequests();
       },
     );
   }

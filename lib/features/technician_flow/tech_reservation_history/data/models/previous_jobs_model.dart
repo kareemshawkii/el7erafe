@@ -23,7 +23,9 @@ class PreviousJobsModel {
       clientName: json['clientName'],
       clientImage: json['clientImage'],
       serviceType: json['serviceType'],
-      fees: json['fees'] as int,
+      fees: json['fees'] != null 
+          ? double.tryParse(json['fees'].toString())?.toInt() 
+          : null,
       day: json['day'],
       techTimeInterval: json['techTimeInterval'],
     );

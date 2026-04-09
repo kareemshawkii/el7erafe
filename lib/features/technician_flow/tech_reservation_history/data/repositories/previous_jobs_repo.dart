@@ -35,7 +35,7 @@ class PreviousJobsRepo {
         return Left(data['errorMessage'] ?? "فشل في جلب الطلبات السابقة");
       }
     } catch (e) {
-      return  Left(e.toString());
+      return  Left("حدث خطأ في الاتصال بالخادم برجاء المحاولة لاحقًا");
     }
   }
 }

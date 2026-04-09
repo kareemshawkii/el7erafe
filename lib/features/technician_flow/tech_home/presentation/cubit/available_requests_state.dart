@@ -58,7 +58,4 @@ final class CompleteJobError extends AvailableRequestsState {
   CompleteJobError(this.error);
 }
 
-class PaymentReceivedSuccess extends AvailableRequestsState {
-  final int reservationId;
-  PaymentReceivedSuccess(this.reservationId);
-}
+class PaymentReceivedSuccess extends AvailableRequestsState {}

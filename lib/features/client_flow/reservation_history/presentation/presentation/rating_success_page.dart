@@ -2,7 +2,6 @@ import 'package:el7erafe/core/utils/animated_navigation.dart';
 import 'package:el7erafe/features/client_flow/client_home/presentation/pages/client_home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class RatingSuccessPage extends StatelessWidget {

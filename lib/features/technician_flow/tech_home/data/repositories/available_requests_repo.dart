@@ -75,7 +75,7 @@ class AvailableRequestsRepo {
   Future<void> connectAndListen({
     required Function(AvailableRequestModel) onNewRequestReceived,
     required Function() onSignalRRefreshNeeded,
-    required Function(int) onPaymentReceived,
+    required Function() onPaymentReceived,
     required Function() onForceDisconnect,
   }) async {
     try {
@@ -90,10 +90,14 @@ class AvailableRequestsRepo {
         await _hubConnection!.stop();
       }
 
+      final urlWithToken =
+          "$_hubUrl?access_token=${Uri.encodeComponent(token)}";
+
       _hubConnection = HubConnectionBuilder()
-          .withUrl(_hubUrl,
-              options:
-                  HttpConnectionOptions(accessTokenFactory: () async => token))
+          .withUrl(urlWithToken,
+              options: HttpConnectionOptions(
+                accessTokenFactory: () async => token,
+              ))
           .withAutomaticReconnect()
           .build();
 
@@ -120,16 +124,7 @@ class AvailableRequestsRepo {
       _hubConnection!.on("JobCompleted", (_) => onSignalRRefreshNeeded());
 
       _hubConnection?.on("PaymentCompleted", (arguments) {
-        if (arguments != null && arguments.isNotEmpty) {
-          final payload = arguments[0];
-          if (payload is Map) {
-            final int id =
-                payload['ReservationId'] ?? payload['reservationId'] ?? 0;
-            onPaymentReceived(id);
-          } else if (payload is int) {
-            onPaymentReceived(payload);
-          }
-        }
+        onPaymentReceived();
       });
 
       _hubConnection!.on("ForceDisconnect", (_) => onForceDisconnect());

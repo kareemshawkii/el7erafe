@@ -128,16 +128,16 @@ class _TechHomePageViewState extends State<TechHomePageView> {
             context: context,
             message: state.message,
           );
-          Navigator.pushAndRemoveUntil(
-              context,
-              SlideRightRouteWithBuild(
-                builder: (_) => BlocProvider.value(
-                  value: context.read<AvailableRequestsCubit>(),
-                  child:
-                      WaitingForPaymentPage(reservationId: state.reservationId),
-                ),
+          Navigator.push(
+            context,
+            SlideRightRouteWithBuild(
+              builder: (_) => BlocProvider.value(
+                value: context.read<AvailableRequestsCubit>(),
+                child:
+                    WaitingForPaymentPage(reservationId: state.reservationId),
               ),
-              (route) => false);
+            ),
+          );
         } else if (state is CompleteJobError) {
           ModernSnackbar.showError(
             context: context,

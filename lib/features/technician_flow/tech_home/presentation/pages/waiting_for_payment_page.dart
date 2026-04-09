@@ -36,14 +36,12 @@ class WaitingForPaymentPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocListener<AvailableRequestsCubit, AvailableRequestsState>(
       listener: (context, state) {
-        if (state is PaymentReceivedSuccess &&
-            state.reservationId == reservationId) {
-          Navigator.pushAndRemoveUntil(
+        if (state is PaymentReceivedSuccess) {
+          Navigator.pushReplacement(
             context,
             SlideRightRouteWithBuild(
               builder: (_) => const TechPaymentSuccessPage(),
             ),
-            (route) => false,
           );
         }
       },
