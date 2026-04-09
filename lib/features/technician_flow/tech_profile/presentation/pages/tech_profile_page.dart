@@ -1,5 +1,4 @@
 // ignore_for_file: deprecated_member_use
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:el7erafe/core/services/local_storage/auth_local_storage.dart';
 import 'package:el7erafe/core/services/notifications/notification_api_service.dart';
 import 'package:el7erafe/core/utils/animated_navigaton_with_build.dart';
@@ -122,19 +121,6 @@ class _TechProfilePageViewState extends State<TechProfilePageView> {
     }
   }
 
-  String _getValidImageUrl(String? url) {
-    if (url == null ||
-        url.trim().isEmpty ||
-        url.trim().toLowerCase() == 'null') {
-      return "";
-    }
-    if (url.startsWith('http://') || url.startsWith('https://')) {
-      return url;
-    }
-    const baseUrl = 'https://el7rafeapp.azurewebsites.net';
-    return url.startsWith('/') ? '$baseUrl$url' : '$baseUrl/$url';
-  }
-
   void _navigateToLogin(BuildContext context, String message) {
     ModernSnackbar.showError(context: context, message: message);
     Navigator.pushAndRemoveUntil(
@@ -188,13 +174,9 @@ class _TechProfilePageViewState extends State<TechProfilePageView> {
 
   Future<void> _loadLocalData() async {
     String? storedName = await AuthLocalStorage().getUserName();
-    String? storedImage = await AuthLocalStorage().getUserProfileImage();
     if (mounted) {
       setState(() {
         userName = storedName ?? widget.name ?? "مستخدم";
-        if (storedImage != null && storedImage.isNotEmpty) {
-          _displayImage = storedImage;
-        }
       });
     }
   }
@@ -325,8 +307,6 @@ class _TechProfilePageViewState extends State<TechProfilePageView> {
         bool showWarning = _hasFetchedProfileOnce &&
             (_aboutMe.isEmpty || _portfolioImages.isEmpty);
 
-        String safeAvatarUrl = _getValidImageUrl(_displayImage);
-
         return Directionality(
           textDirection: TextDirection.rtl,
           child: Scaffold(
@@ -367,7 +347,7 @@ class _TechProfilePageViewState extends State<TechProfilePageView> {
                                     Border.all(color: Colors.white, width: 4.w),
                               ),
                               child: ClipOval(
-                                child: safeAvatarUrl.isEmpty
+                                child: _displayImage.isEmpty
                                     ? Container(
                                         width: 100.w,
                                         height: 100.h,
@@ -376,7 +356,7 @@ class _TechProfilePageViewState extends State<TechProfilePageView> {
                                             color: Colors.grey, size: 50),
                                       )
                                     : Image.network(
-                                        safeAvatarUrl,
+                                        _displayImage,
                                         fit: BoxFit.cover,
                                         width: 100.w,
                                         height: 100.h,
@@ -394,6 +374,17 @@ class _TechProfilePageViewState extends State<TechProfilePageView> {
                                             width: 100,
                                             height: 100,
                                             borderRadius: 50,
+                                          );
+                                        },
+                                        errorBuilder:
+                                            (context, error, stackTrace) {
+                                          return Container(
+                                            width: 100.w,
+                                            height: 100.h,
+                                            color: Colors.grey.shade300,
+                                            child: Icon(Icons.person,
+                                                color: Colors.white,
+                                                size: 50.sp),
                                           );
                                         },
                                       ),
@@ -482,7 +473,7 @@ class _TechProfilePageViewState extends State<TechProfilePageView> {
                                                         ? state.profile?.name ??
                                                             userName
                                                         : userName,
-                                                currentImageUrl: safeAvatarUrl,
+                                                currentImageUrl: _displayImage,
                                                 token: widget.token ?? "",
                                                 initialAboutMe: _aboutMe,
                                                 initialPortfolioImages:
@@ -499,14 +490,9 @@ class _TechProfilePageViewState extends State<TechProfilePageView> {
                                             ),
                                           ),
                                         );
-                                        try {
-                                          if (safeAvatarUrl.isNotEmpty) {
-                                            await CachedNetworkImage
-                                                .evictFromCache(safeAvatarUrl);
-                                          }
-                                        } catch (_) {}
-
                                         await _loadLocalData();
+                                        profileCubit.loadProfile(
+                                            widget.token ?? "", userName);
                                       },
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor:
@@ -892,34 +878,47 @@ class _TechProfilePageViewState extends State<TechProfilePageView> {
 
   Widget _buildImageItem(
       BuildContext context, List<String> images, int index, double? width) {
-    String safePortUrl = _getValidImageUrl(images[index]);
+    String imageUrl = images[index];
 
     return GestureDetector(
       onTap: () => _showImageGallery(context, images),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(8.r),
-        child: safePortUrl.isEmpty
+        child: imageUrl.isEmpty
             ? Container(
                 width: width,
                 height: 80.h,
                 color: Colors.grey.shade200,
                 child: const Icon(Icons.image, color: Colors.grey),
               )
-            : CachedNetworkImage(
-                imageUrl: safePortUrl,
+            : Image.network(
+                imageUrl,
                 width: width,
                 height: 80.h,
                 fit: BoxFit.cover,
-                placeholder: (context, url) => Container(
-                  width: width,
-                  height: 80.h,
-                  color: Colors.white,
-                ).withShimmerAi(
-                  loading: true,
-                  width: width,
-                  height: 80,
-                  borderRadius: 8,
-                ),
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) {
+                    return child;
+                  }
+                  return Container(
+                    width: width,
+                    height: 80.h,
+                    color: Colors.white,
+                  ).withShimmerAi(
+                    loading: true,
+                    width: width ?? 80, // Default if expanded
+                    height: 80,
+                    borderRadius: 8,
+                  );
+                },
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    width: width,
+                    height: 80.h,
+                    color: Colors.grey.shade300,
+                    child: const Icon(Icons.broken_image, color: Colors.grey),
+                  );
+                },
               ),
       ),
     );
@@ -974,7 +973,7 @@ class _TechProfilePageViewState extends State<TechProfilePageView> {
                     ),
                     itemCount: images.length,
                     itemBuilder: (context, index) {
-                      String safePortUrl = _getValidImageUrl(images[index]);
+                      String imageUrl = images[index];
 
                       return Container(
                         decoration: BoxDecoration(
@@ -986,22 +985,35 @@ class _TechProfilePageViewState extends State<TechProfilePageView> {
                         ),
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(12.r),
-                          child: safePortUrl.isEmpty
+                          child: imageUrl.isEmpty
                               ? Container(
                                   color: Colors.grey.shade200,
                                   child: const Icon(Icons.image,
                                       color: Colors.grey))
-                              : CachedNetworkImage(
-                                  imageUrl: safePortUrl,
+                              : Image.network(
+                                  imageUrl,
                                   fit: BoxFit.cover,
-                                  placeholder: (context, url) => Container(
-                                    color: Colors.white,
-                                  ).withShimmerAi(
-                                    loading: true,
-                                    width: double.infinity,
-                                    height: double.infinity,
-                                    borderRadius: 12,
-                                  ),
+                                  loadingBuilder:
+                                      (context, child, loadingProgress) {
+                                    if (loadingProgress == null) {
+                                      return child;
+                                    }
+                                    return Container(
+                                      color: Colors.white,
+                                    ).withShimmerAi(
+                                      loading: true,
+                                      width: double.infinity,
+                                      height: double.infinity,
+                                      borderRadius: 12,
+                                    );
+                                  },
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Container(
+                                      color: Colors.grey.shade300,
+                                      child: const Icon(Icons.broken_image,
+                                          color: Colors.grey),
+                                    );
+                                  },
                                 ),
                         ),
                       );

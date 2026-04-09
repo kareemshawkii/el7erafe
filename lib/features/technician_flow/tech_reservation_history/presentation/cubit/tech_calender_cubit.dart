@@ -58,4 +58,27 @@ class TechCalendarCubit extends Cubit<TechCalendarState> {
       },
     );
   }
+
+  void cancelReservation(int reservationId) async {
+    emit(ActionLoading());
+
+    final result = await repository.cancelReservation(reservationId);
+
+    if (isClosed) return;
+
+    result.fold(
+      (error) {
+        if (error == "401") {
+          emit(TechCalendarUnauthorized());
+        } else {
+          emit(ActionError(error));
+          fetchReservationsForDate(_selectedDate);
+        }
+      },
+      (successMessage) {
+        emit(ActionSuccess(successMessage));
+        fetchReservationsForDate(_selectedDate);
+      },
+    );
+  }
 }

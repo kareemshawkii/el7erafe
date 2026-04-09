@@ -4,7 +4,6 @@ import 'package:el7erafe/features/client_flow/client_profile/data/repositories/c
 import 'package:el7erafe/features/client_flow/client_profile/presentation/cubit/client_profile_state.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:el7erafe/core/services/local_storage/auth_local_storage.dart';
 
 class ProfileCubit extends Cubit<ProfileState> {
   final ProfileRepository _repo;
@@ -29,11 +28,6 @@ class ProfileCubit extends Cubit<ProfileState> {
   void loadProfile(String token, String defaultName) async {
     _safeEmit(ProfileLoading());
 
-    String localImage = await AuthLocalStorage().getUserProfileImage() ?? "";
-    if (localImage.isNotEmpty) {
-      _safeEmit(ProfileLoaded(imageUrl: localImage));
-    }
-
     final result = await _repo.getProfileData(token);
 
     if (isClosed) return;
@@ -44,14 +38,11 @@ class ProfileCubit extends Cubit<ProfileState> {
           _safeEmit(ProfileUnauth(
               "انتهت صلاحية الجلسة، الرجاء تسجيل الدخول مرة أخرى."));
         } else {
-          if (localImage.isEmpty) _safeEmit(ProfileError(error));
+          _safeEmit(ProfileError(error));
         }
       },
       (data) async {
         String freshImageUrl = data['imageURL'] ?? "";
-        if (freshImageUrl.isNotEmpty && freshImageUrl != localImage) {
-          await AuthLocalStorage().saveUserProfileImage(freshImageUrl);
-        }
         if (!isClosed) {
           _safeEmit(ProfileLoaded(imageUrl: freshImageUrl));
         }

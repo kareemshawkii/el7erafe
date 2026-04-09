@@ -156,13 +156,9 @@ class _ClientProfilePageViewState extends State<ClientProfilePageView> {
 
   Future<void> _loadLocalData() async {
     String? storedName = await AuthLocalStorage().getUserName();
-    String? storedImage = await AuthLocalStorage().getUserProfileImage();
     if (mounted) {
       setState(() {
         userName = storedName ?? widget.name ?? "مستخدم";
-        if (storedImage != null && storedImage.isNotEmpty) {
-          _displayImage = storedImage;
-        }
       });
     }
   }
@@ -206,8 +202,6 @@ class _ClientProfilePageViewState extends State<ClientProfilePageView> {
   Widget build(BuildContext context) {
     return BlocConsumer<ProfileCubit, ProfileState>(
       listener: (context, state) {
-        // REMOVED the ModalRoute isCurrent check!
-
         if (state is ProfileLoading) {
           _isLoadingDialogOpen = true;
           showDialog(
@@ -318,6 +312,17 @@ class _ClientProfilePageViewState extends State<ClientProfilePageView> {
                                             width: 100,
                                             height: 100,
                                             borderRadius: 50,
+                                          );
+                                        },
+                                        errorBuilder:
+                                            (context, error, stackTrace) {
+                                          return Container(
+                                            width: 100.w,
+                                            height: 100.h,
+                                            color: Colors.grey.shade300,
+                                            child: Icon(Icons.person,
+                                                color: Colors.white,
+                                                size: 50.sp),
                                           );
                                         },
                                       ),
@@ -467,8 +472,6 @@ class _ClientProfilePageViewState extends State<ClientProfilePageView> {
                                           value: _notificationsEnabled,
                                           activeThumbColor: _primaryBlue,
                                           onChanged: (val) {
-                                            // Optimistically update UI for a snappy feel,
-                                            // the function will revert it if permission is denied.
                                             setState(() =>
                                                 _notificationsEnabled = val);
                                             _handleNotificationToggle(val);

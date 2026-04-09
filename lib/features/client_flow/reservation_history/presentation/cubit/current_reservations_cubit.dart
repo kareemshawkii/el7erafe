@@ -72,28 +72,29 @@ class CurrentReservationsCubit extends Cubit<CurrentReservationsState> {
     try {
       await repository.payReservation(reservationId);
       _currentList.removeWhere((r) => r.reservationId == reservationId);
-      emit(PaymentSuccess());
+      emit(PaymentSuccess(reservationId));
       emit(CurrentLoaded(List.from(_currentList)));
     } catch (e) {
       if (e.toString().contains('UNAUTH')) {
         emit(CurrentUnauth());
       } else {
-        emit(PaymentError("حدث خطأ أثناء الدفع، يرجى المحاولة لاحقًا"));
+        emit(PaymentError(e.toString().replaceAll('Exception: ', '')));
         emit(CurrentLoaded(List.from(_currentList)));
       }
     }
   }
 
-  Future<void> submitRating({required int rate}) async {
+  Future<void> submitRating(
+      {required int rate, required int reservationId}) async {
     emit(RatingLoading());
     try {
-      await repository.rateJob(rate: rate);
+      await repository.rateJob(rate: rate, reservationId: reservationId);
       emit(RatingSuccess());
     } catch (e) {
       if (e.toString().contains('UNAUTH')) {
         emit(CurrentUnauth());
       } else {
-        emit(RatingError("حدث خطأ أثناء إرسال التقييم، يرجى المحاولة لاحقًا"));
+        emit(RatingError(e.toString().replaceAll('Exception: ', '')));
       }
     }
   }

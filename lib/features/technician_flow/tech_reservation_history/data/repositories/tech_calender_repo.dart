@@ -84,4 +84,41 @@ class TechCalendarRepo {
       return const Left("فشل الاتصال بالخادم");
     }
   }
+
+  Future<Either<String, String>> cancelReservation(int reservationId) async {
+    try {
+      final token = await _authLocal.getToken();
+      if (token == null || token.isEmpty) {
+        await AuthLocalStorage().clearSession();
+        return const Left("401");
+      }
+
+      final url =
+          Uri.parse("$_baseUrl/api/tcf/cancelreservation/$reservationId");
+      final response = await http.put(
+        url,
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        return const Right("تم إلغاء الحجز بنجاح");
+      } else if (response.statusCode == 401 || response.statusCode == 403) {
+        await AuthLocalStorage().clearSession();
+        return const Left("401");
+      } else {
+        return Left(jsonDecode(response.body)['errorMessage'] ??
+            "حدث خطأ أثناء إلغاء الحجز");
+      }
+    } catch (e) {
+      final errorString = e.toString().toLowerCase();
+      if (errorString.contains('401') || errorString.contains('unauthorized')) {
+        await AuthLocalStorage().clearSession();
+        return const Left("401");
+      }
+      return const Left("فشل الاتصال بالخادم");
+    }
+  }
 }

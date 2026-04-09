@@ -49,10 +49,16 @@ final class CompleteJobLoading extends AvailableRequestsState {}
 
 final class CompleteJobSuccess extends AvailableRequestsState {
   final String message;
-  CompleteJobSuccess(this.message);
+  final int reservationId;
+  CompleteJobSuccess(this.message, this.reservationId);
 }
 
 final class CompleteJobError extends AvailableRequestsState {
   final String error;
   CompleteJobError(this.error);
+}
+
+class PaymentReceivedSuccess extends AvailableRequestsState {
+  final int reservationId;
+  PaymentReceivedSuccess(this.reservationId);
 }

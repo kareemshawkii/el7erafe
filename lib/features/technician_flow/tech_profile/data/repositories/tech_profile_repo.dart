@@ -4,45 +4,13 @@ import 'package:dartz/dartz.dart';
 import 'package:el7erafe/features/technician_flow/tech_profile/data/models/technician_profile_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:el7erafe/core/services/local_storage/auth_local_storage.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class TechProfileRepository {
   final String _baseUrl = 'https://el7rafeapp.azurewebsites.net';
-  final String _cacheKey = 'tech_profile_cache';
-
-  static TechnicianProfileModel? _memoryCache;
-
-  Future<void> _clearCache() async {
-    _memoryCache = null;
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove(_cacheKey);
-  }
-
-  Future<void> _saveToCache(
-      String jsonString, TechnicianProfileModel model) async {
-    _memoryCache = model;
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_cacheKey, jsonString);
-  }
 
   Future<Either<String, TechnicianProfileModel>> getProfileData(String token,
       {bool forceRefresh = false}) async {
     try {
-      if (!forceRefresh) {
-        if (_memoryCache != null) {
-          return Right(_memoryCache!);
-        }
-
-        final prefs = await SharedPreferences.getInstance();
-        final cachedData = prefs.getString(_cacheKey);
-
-        if (cachedData != null) {
-          final data = json.decode(cachedData);
-          _memoryCache = TechnicianProfileModel.fromJson(data);
-          return Right(_memoryCache!);
-        }
-      }
-
       final response = await http.get(
         Uri.parse('$_baseUrl/api/tech/profile'),
         headers: {
@@ -55,17 +23,13 @@ class TechProfileRepository {
         final data = json.decode(response.body);
         await AuthLocalStorage().saveEmail(data['email'] ?? "");
         await AuthLocalStorage().savePhoneNumber(data['phone'] ?? "");
-        await AuthLocalStorage()
-            .saveUserProfileImage(data['profileImage'] ?? "");
 
         final profileModel = TechnicianProfileModel.fromJson(data);
-        await _saveToCache(response.body, profileModel);
 
         return Right(profileModel);
       } else if (response.statusCode == 401) {
         AuthLocalStorage authLocalStorage = AuthLocalStorage();
         await authLocalStorage.clearSession();
-        await _clearCache();
         return const Left("401");
       } else {
         return const Left(
@@ -89,12 +53,10 @@ class TechProfileRepository {
 
       if (response.statusCode == 200 || response.statusCode == 204) {
         await AuthLocalStorage().clearSession();
-        await _clearCache();
         return const Right("تم حذف الحساب بنجاح");
       } else if (response.statusCode == 401) {
         AuthLocalStorage authLocalStorage = AuthLocalStorage();
         await authLocalStorage.clearSession();
-        await _clearCache();
         return const Left("401");
       } else {
         return const Left("فشل حذف الحساب الرجاء المحاولة مرة اخرى.");
@@ -117,12 +79,10 @@ class TechProfileRepository {
 
       if (response.statusCode == 200) {
         await AuthLocalStorage().clearSession();
-        await _clearCache();
         return const Right("تم تسجيل الخروج بنجاح");
       } else if (response.statusCode == 401) {
         AuthLocalStorage authLocalStorage = AuthLocalStorage();
         await authLocalStorage.clearSession();
-        await _clearCache();
         return const Left("401");
       } else {
         return const Left("فشل تسجيل الخروج الرجاء المحاولة مرة اخرى.");
@@ -184,7 +144,6 @@ class TechProfileRepository {
         if (response1.statusCode == 401) {
           AuthLocalStorage authLocalStorage = AuthLocalStorage();
           await authLocalStorage.clearSession();
-          await _clearCache();
           return const Left("401");
         } else if (response1.statusCode != 200 && response1.statusCode != 204) {
           return Left(
@@ -206,7 +165,6 @@ class TechProfileRepository {
         if (response2.statusCode == 401) {
           AuthLocalStorage authLocalStorage = AuthLocalStorage();
           await authLocalStorage.clearSession();
-          await _clearCache();
           return const Left("401");
         } else if (response2.statusCode != 200 && response2.statusCode != 204) {
           return Left(
@@ -228,7 +186,6 @@ class TechProfileRepository {
         if (response3.statusCode == 401) {
           AuthLocalStorage authLocalStorage = AuthLocalStorage();
           await authLocalStorage.clearSession();
-          await _clearCache();
           return const Left("401");
         } else if (response3.statusCode != 200 && response3.statusCode != 204) {
           return Left(
@@ -240,12 +197,6 @@ class TechProfileRepository {
 
         await AuthLocalStorage().saveUserName(name);
       }
-
-      if (profileImage != null) {
-        await AuthLocalStorage().deleteUserProfileImage();
-      }
-
-      await _clearCache();
 
       return const Right("تم تحديث البيانات بنجاح");
     } catch (e) {
@@ -274,7 +225,6 @@ class TechProfileRepository {
       } else if (response.statusCode == 401) {
         AuthLocalStorage authLocalStorage = AuthLocalStorage();
         await authLocalStorage.clearSession();
-        await _clearCache();
         return const Left("401");
       } else {
         return Left(jsonDecode(response.body)['errorMessage']);
@@ -305,7 +255,6 @@ class TechProfileRepository {
       } else if (response.statusCode == 401) {
         AuthLocalStorage authLocalStorage = AuthLocalStorage();
         await authLocalStorage.clearSession();
-        await _clearCache();
         return const Left("401");
       } else {
         return const Left(
@@ -338,7 +287,6 @@ class TechProfileRepository {
       } else if (response.statusCode == 401) {
         AuthLocalStorage authLocalStorage = AuthLocalStorage();
         await authLocalStorage.clearSession();
-        await _clearCache();
         return const Left("401");
       } else {
         return Left(jsonDecode(response.body)['errorMessage']);
@@ -364,14 +312,12 @@ class TechProfileRepository {
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        await _clearCache();
         return const Right('تم التحقق من الكود بنجاح');
       } else if (response.statusCode == 400) {
         return Left((jsonDecode(response.body)['errorMessage']));
       } else if (response.statusCode == 401) {
         AuthLocalStorage authLocalStorage = AuthLocalStorage();
         await authLocalStorage.clearSession();
-        await _clearCache();
         return const Left("401");
       } else {
         return const Left(
@@ -398,14 +344,12 @@ class TechProfileRepository {
         }),
       );
       if (response.statusCode == 200) {
-        await _clearCache();
         return const Right('تم تحديث رقم الهاتف بنجاح.');
       } else if (response.statusCode == 400) {
         return Left(jsonDecode(response.body)['errorMessage']);
       } else if (response.statusCode == 401) {
         AuthLocalStorage authLocalStorage = AuthLocalStorage();
         await authLocalStorage.clearSession();
-        await _clearCache();
         return const Left("401");
       } else {
         return Left(jsonDecode(response.body)['errorMessage']);

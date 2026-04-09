@@ -14,7 +14,8 @@ import 'package:iconsax/iconsax.dart';
 import 'package:lottie/lottie.dart';
 
 class SubmitRatingPage extends StatefulWidget {
-  const SubmitRatingPage({super.key});
+  final int reservationId;
+  const SubmitRatingPage({super.key, required this.reservationId});
 
   @override
   State<SubmitRatingPage> createState() => _SubmitRatingPageState();
@@ -67,10 +68,11 @@ class _SubmitRatingPageState extends State<SubmitRatingPage> {
         } else {
           _closeDialog();
           if (state is RatingSuccess) {
-            Navigator.pushReplacement(
+            Navigator.pushAndRemoveUntil(
               context,
               SlideRightRouteWithBuild(
                   builder: (_) => const RatingSuccessPage()),
+              (route) => false,
             );
           } else if (state is RatingError) {
             ModernSnackbar.showError(context: context, message: state.message);
@@ -258,6 +260,8 @@ class _SubmitRatingPageState extends State<SubmitRatingPage> {
                                                       CurrentReservationsCubit>()
                                                   .submitRating(
                                                     rate: _selectedStars,
+                                                    reservationId:
+                                                        widget.reservationId,
                                                   );
                                             },
                                       style: ElevatedButton.styleFrom(

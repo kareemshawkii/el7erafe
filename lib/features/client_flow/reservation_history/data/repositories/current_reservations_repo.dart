@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:el7erafe/features/client_flow/reservation_history/data/models/current_reservation_model.dart';
-import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:signalr_netcore/signalr_client.dart';
 import 'package:el7erafe/core/services/local_storage/auth_local_storage.dart';
@@ -27,7 +26,8 @@ class CurrentReservationsRepo {
     } else if (response.statusCode == 401) {
       throw Exception('UNAUTH');
     } else {
-      throw Exception('حدث خطأ أثناء جلب البيانات');
+      final data = jsonDecode(response.body);
+      throw Exception(data['errorMessage'] ?? 'حدث خطأ أثناء جلب البيانات');
     }
   }
 
@@ -44,9 +44,10 @@ class CurrentReservationsRepo {
     if (response.statusCode == 400) {
       final data = jsonDecode(response.body);
       throw Exception(data['errorMessage'] ?? 'لا يمكن إلغاء الحجز حالياً');
-    }
-    if (response.statusCode != 200) {
-      throw Exception('فشل إلغاء الحجز، يرجى المحاولة لاحقاً');
+    } else {
+      final data = jsonDecode(response.body);
+      throw Exception(
+          data['errorMessage'] ?? 'فشل إلغاء الحجز، يرجى المحاولة لاحقاً');
     }
   }
 
@@ -68,26 +69,26 @@ class CurrentReservationsRepo {
     if (response.statusCode == 200) {
       return;
     }
-    throw Exception('فشل في بدء عملية الدفع');
+    final data = jsonDecode(response.body);
+    throw Exception(data['errorMessage'] ?? 'فشل في بدء عملية الدفع');
   }
 
-  Future<void> rateJob({required int rate}) async {
+  Future<void> rateJob({required int rate, required int reservationId}) async {
     final token = await _getTokenOrThrow();
     final response = await http.post(
-      Uri.parse('$_baseUrl/api/reservations/rate?ratingValue=$rate'),
+      Uri.parse('$_baseUrl/api/cf/rate/$reservationId?ratingValue=$rate'),
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token',
       },
     );
-    debugPrint('Rating response: ${response.statusCode} - ${response.body}');
     if (response.statusCode == 401) throw Exception('UNAUTH');
-    if (response.statusCode == 400) {
+    if (response.statusCode == 400 ||
+        (response.statusCode != 200 && response.statusCode != 401)) {
       final data = jsonDecode(response.body);
       throw Exception(
           data['errorMessage'] ?? 'الطلب لم يكتمل بعد أو تم التقييم مسبقاً');
     }
-    if (response.statusCode != 200) throw Exception('فشل في إرسال التقييم');
   }
 
   Future<void> connectToHub({
@@ -148,27 +149,18 @@ class CurrentReservationsRepo {
         await _hubConnection?.start();
       }
     } catch (e) {
-      debugPrint("SignalR Connection Error: $e. Starting HTTP Fallback...");
-
-      // Fallback: Poll the HTTP endpoint every 10 seconds
       Future.doWhile(() async {
         await Future.delayed(const Duration(seconds: 10));
-
-        // If SignalR magically reconnects later, stop polling
         if (_hubConnection?.state == HubConnectionState.Connected) {
           return false;
         }
-
         try {
-          // Call the endpoint
           final fallbackData = await getCurrentReservations();
-          // Send the fresh list back to the UI
           onHttpFallback(fallbackData);
         } catch (httpError) {
-          debugPrint("HTTP Fallback Error: $httpError");
+          //do nothing
         }
-
-        return true; // Keep the loop running
+        return true;
       });
     }
   }

@@ -32,7 +32,6 @@ class ProfileRepository {
         final data = json.decode(response.body);
         await AuthLocalStorage().saveEmail(data['email']);
         await AuthLocalStorage().savePhoneNumber(data['phoneNumber']);
-        await AuthLocalStorage().saveUserProfileImage(data['imageURL'] ?? "");
 
         await prefs.setString(_cacheKey, response.body);
         return Right(data);
@@ -133,9 +132,7 @@ class ProfileRepository {
         if (name.isNotEmpty) {
           await AuthLocalStorage().saveUserName(name);
         }
-        if (imageFile != null) {
-          await AuthLocalStorage().deleteUserProfileImage();
-        }
+
         final prefs = await SharedPreferences.getInstance();
         await prefs.remove(_cacheKey);
         return const Right("تم تحديث البيانات بنجاح");

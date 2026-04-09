@@ -1,7 +1,7 @@
 name: el7erafe
 description: "Software Solution for fixing the gap between the users and technicians."
 publish_to: 'none'
-version: 1.0.0+19
+version: 1.0.0+20
 
 environment:
   sdk: '>=3.0.0 <4.0.0' 
@@ -98,3 +98,5 @@ flutter:
     - images/nochat.png
     - images/norequests.png
     - images/rating.png
+    - images/waiting_payment.png
+    - images/payment_done.png

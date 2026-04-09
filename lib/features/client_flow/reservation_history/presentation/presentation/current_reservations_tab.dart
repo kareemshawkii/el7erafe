@@ -118,14 +118,15 @@ class _CurrentReservationsTabState extends State<CurrentReservationsTab>
             ).then((_) => _isLoadingDialogOpen = false);
           } else if (state is PaymentSuccess) {
             _closeDialog();
-            Navigator.push(
+            Navigator.pushAndRemoveUntil(
               context,
               SlideRightRouteWithBuild(
                 builder: (_) => BlocProvider.value(
                   value: _cubit,
-                  child: SubmitRatingPage(),
+                  child: SubmitRatingPage(reservationId: state.reservationId),
                 ),
               ),
+              (route) => false,
             );
           } else if (state is PaymentError) {
             _closeDialog();

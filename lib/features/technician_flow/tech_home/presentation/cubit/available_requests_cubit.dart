@@ -54,6 +54,11 @@ class AvailableRequestsCubit extends Cubit<AvailableRequestsState> {
             } catch (_) {}
           }
         },
+        onPaymentReceived: (reservationId) {
+          if (!isClosed) {
+            emit(PaymentReceivedSuccess(reservationId));
+          }
+        },
         onForceDisconnect: () {
           if (!isClosed) emit(AvailableRequestsUnauthorized());
         },
@@ -153,7 +158,7 @@ class AvailableRequestsCubit extends Cubit<AvailableRequestsState> {
         }
       },
       (successMessage) {
-        emit(CompleteJobSuccess(successMessage));
+        emit(CompleteJobSuccess(successMessage, reservationId));
         fetchAvailableRequests();
       },
     );

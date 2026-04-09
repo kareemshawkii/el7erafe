@@ -497,7 +497,14 @@ class _TechCurrentReservationsTabState extends State<TechCurrentReservationsTab>
                   height: 44.h,
                   child: OutlinedButton(
                     onPressed: () {
-                      // To be added when done: Cancel Reservation Logic
+                      showCancelConfirmationDialog(
+                        context,
+                        onConfirm: () {
+                          context
+                              .read<TechCalendarCubit>()
+                              .cancelReservation(reservation.reservationId);
+                        },
+                      );
                     },
                     style: OutlinedButton.styleFrom(
                       side: BorderSide(color: Colors.grey.shade400, width: 1.w),
@@ -527,4 +534,175 @@ class _TechCurrentReservationsTabState extends State<TechCurrentReservationsTab>
       ),
     );
   }
+}
+
+Future<void> showCancelConfirmationDialog(
+  BuildContext context, {
+  required VoidCallback onConfirm,
+}) {
+  return showGeneralDialog(
+    context: context,
+    barrierDismissible: true,
+    barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
+    barrierColor: Colors.black54,
+    transitionDuration: const Duration(milliseconds: 300),
+    pageBuilder: (context, animation, secondaryAnimation) {
+      return Dialog(
+        elevation: 0,
+        backgroundColor: Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20.r),
+        ),
+        child: Padding(
+          padding: EdgeInsets.all(20.w),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Align(
+                alignment: Alignment.centerRight,
+                child: InkWell(
+                  onTap: () => Navigator.of(context).pop(),
+                  child: Container(
+                    padding: EdgeInsets.all(4.w),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Color(0xFF3775FA)),
+                      borderRadius: BorderRadius.circular(8.r),
+                    ),
+                    child:
+                        Icon(Icons.close, size: 20.sp, color: Colors.black87),
+                  ),
+                ),
+              ),
+              Container(
+                padding: EdgeInsets.all(12.w),
+                decoration: BoxDecoration(
+                  // ignore: deprecated_member_use
+                  color: Colors.red.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Container(
+                  padding: EdgeInsets.all(16.w),
+                  decoration: BoxDecoration(
+                    // ignore: deprecated_member_use
+                    color: Colors.red.withOpacity(0.15),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Container(
+                    padding: EdgeInsets.all(10.w),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.black87, width: 1.5),
+                    ),
+                    child: Icon(
+                      Icons.priority_high_rounded,
+                      color: Colors.black87,
+                      size: 24.sp,
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(height: 24.h),
+              Text(
+                'هل أنت متأكد إنك عايز تلغي الطلب ده؟',
+                textAlign: TextAlign.center,
+                style: GoogleFonts.cairo(
+                  fontSize: 16.sp,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
+              ),
+              SizedBox(height: 8.h),
+              Text(
+                'لو لغيت هنبلغ العميل والطلب هيتم إلغاؤه',
+                textAlign: TextAlign.center,
+                style: GoogleFonts.cairo(
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black54,
+                ),
+              ),
+              SizedBox(height: 24.h),
+              Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          onConfirm();
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF3775FA),
+                          padding: EdgeInsets.symmetric(vertical: 12.h),
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10.r),
+                          ),
+                        ),
+                        child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.done,
+                                  size: 18.sp, color: Colors.white),
+                              SizedBox(width: 6.w),
+                              Text(
+                                'الغي الطلب',
+                                style: GoogleFonts.cairo(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15.sp,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ])),
+                  ),
+                  SizedBox(width: 12.w),
+                  Expanded(
+                    child: OutlinedButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        style: OutlinedButton.styleFrom(
+                          padding: EdgeInsets.symmetric(vertical: 12.h),
+                          side: BorderSide(
+                              color: const Color(0xFF3775FA), width: 1.w),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10.r),
+                          ),
+                        ),
+                        child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.close,
+                                  size: 18.sp, color: Colors.black87),
+                              SizedBox(width: 6.w),
+                              Text(
+                                'رجوع',
+                                style: GoogleFonts.cairo(
+                                  color: Colors.black87,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15.sp,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ])),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      );
+    },
+    transitionBuilder: (context, animation, secondaryAnimation, child) {
+      final curve =
+          CurvedAnimation(parent: animation, curve: Curves.easeOutQuart);
+      return Transform.scale(
+        scale: 0.8 + (0.2 * curve.value),
+        child: Opacity(
+          opacity: animation.value,
+          child: child,
+        ),
+      );
+    },
+  );
 }

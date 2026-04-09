@@ -6,6 +6,7 @@ import 'package:el7erafe/features/client_flow/reservation_history/data/repositor
 import 'package:el7erafe/features/technician_flow/tech_home/data/repositories/available_requests_repo.dart';
 import 'package:el7erafe/features/technician_flow/tech_home/presentation/pages/tech_home_page.dart';
 import 'package:el7erafe/features/technician_flow/tech_profile/data/repositories/tech_schedule_repository.dart';
+import 'package:el7erafe/features/technician_flow/tech_reservation_history/data/repositories/previous_jobs_repo.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -146,12 +147,10 @@ class _MyAppState extends State<MyApp> {
       }
     });
 
-    // 2. App is in the background, and user taps notification
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
       NotificationRouter.processAndRoute(message);
     });
 
-    // 3. App is currently open (Foreground)
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       final context = globalNavigatorKey.currentContext;
       if (context == null) return;
@@ -190,13 +189,12 @@ class _MyAppState extends State<MyApp> {
                 border: Border.all(
                   color: const Color(0xFF3775FA)
                       // ignore: deprecated_member_use
-                      .withOpacity(0.3), // Light primary color border
+                      .withOpacity(0.3),
                   width: 1,
                 ),
               ),
               child: Row(
                 children: [
-                  // Icon Container
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
@@ -211,7 +209,6 @@ class _MyAppState extends State<MyApp> {
                     ),
                   ),
                   const SizedBox(width: 16),
-                  // Text Content
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -219,11 +216,10 @@ class _MyAppState extends State<MyApp> {
                       children: [
                         Text(
                           title,
-                          style: const TextStyle(
+                          style: GoogleFonts.cairo(
                             color: Colors.black87,
                             fontWeight: FontWeight.bold,
                             fontSize: 15,
-                            fontFamily: 'Cairo',
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -231,11 +227,10 @@ class _MyAppState extends State<MyApp> {
                         const SizedBox(height: 4),
                         Text(
                           body,
-                          style: const TextStyle(
+                          style: GoogleFonts.cairo(
                             color: Colors.black54,
                             fontWeight: FontWeight.w600,
                             fontSize: 13,
-                            fontFamily: 'Cairo',
                           ),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
@@ -301,6 +296,7 @@ class _MyAppState extends State<MyApp> {
         RepositoryProvider(create: (context) => PreviousReservationsRepo()),
         RepositoryProvider(create: (context) => PendingRequestsRepo()),
         RepositoryProvider(create: (context) => CurrentReservationsRepo()),
+        RepositoryProvider(create: (context) => PreviousJobsRepo()),
       ],
       child: ScreenUtilInit(
         designSize: const Size(393, 852),

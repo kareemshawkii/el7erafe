@@ -1,5 +1,6 @@
 import 'package:el7erafe/features/technician_flow/tech_reservation_history/presentation/pages/calender_tab.dart';
 import 'package:el7erafe/features/technician_flow/tech_reservation_history/presentation/pages/pending_offers_tab.dart';
+import 'package:el7erafe/features/technician_flow/tech_reservation_history/presentation/pages/tech_previous_jobs_tab.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -64,7 +65,7 @@ class TechReservationHistoryPage extends StatelessWidget {
                   children: [
                     TechCurrentReservationsTab(),
                     PendingOffersTab(),
-                    Center(child: Text('الطلبات المكتملة')),
+                    TechPreviousJobsTab(),
                   ],
                 ),
               ),

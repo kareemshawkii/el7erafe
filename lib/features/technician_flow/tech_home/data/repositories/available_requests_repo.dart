@@ -75,6 +75,7 @@ class AvailableRequestsRepo {
   Future<void> connectAndListen({
     required Function(AvailableRequestModel) onNewRequestReceived,
     required Function() onSignalRRefreshNeeded,
+    required Function(int) onPaymentReceived,
     required Function() onForceDisconnect,
   }) async {
     try {
@@ -117,6 +118,19 @@ class AvailableRequestsRepo {
           .on("RemoveCanceledRequest", (_) => onSignalRRefreshNeeded());
 
       _hubConnection!.on("JobCompleted", (_) => onSignalRRefreshNeeded());
+
+      _hubConnection?.on("PaymentCompleted", (arguments) {
+        if (arguments != null && arguments.isNotEmpty) {
+          final payload = arguments[0];
+          if (payload is Map) {
+            final int id =
+                payload['ReservationId'] ?? payload['reservationId'] ?? 0;
+            onPaymentReceived(id);
+          } else if (payload is int) {
+            onPaymentReceived(payload);
+          }
+        }
+      });
 
       _hubConnection!.on("ForceDisconnect", (_) => onForceDisconnect());
 

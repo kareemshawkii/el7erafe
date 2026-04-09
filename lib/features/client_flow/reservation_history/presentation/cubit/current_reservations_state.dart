@@ -32,7 +32,10 @@ class CurrentActionError extends CurrentReservationsState {
 
 class PaymentLoading extends CurrentReservationsState {}
 
-class PaymentSuccess extends CurrentReservationsState {}
+class PaymentSuccess extends CurrentReservationsState {
+  final int reservationId;
+  PaymentSuccess(this.reservationId);
+}
 
 class PaymentError extends CurrentReservationsState {
   final String message;

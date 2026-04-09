@@ -13,6 +13,7 @@ import 'package:el7erafe/features/technician_flow/tech_home/data/repositories/av
 import 'package:el7erafe/features/technician_flow/tech_home/presentation/cubit/available_requests_cubit.dart';
 import 'package:el7erafe/features/technician_flow/tech_home/presentation/cubit/available_requests_state.dart';
 import 'package:el7erafe/features/technician_flow/tech_home/presentation/cubit/tech_home_cubit.dart';
+import 'package:el7erafe/features/technician_flow/tech_home/presentation/pages/waiting_for_payment_page.dart';
 import 'package:el7erafe/features/technician_flow/tech_profile/presentation/pages/tech_profile_page.dart';
 import 'package:el7erafe/features/technician_flow/tech_reservation_history/presentation/pages/tech_reservation_history_page.dart';
 import 'package:flutter/material.dart';
@@ -127,6 +128,16 @@ class _TechHomePageViewState extends State<TechHomePageView> {
             context: context,
             message: state.message,
           );
+          Navigator.pushAndRemoveUntil(
+              context,
+              SlideRightRouteWithBuild(
+                builder: (_) => BlocProvider.value(
+                  value: context.read<AvailableRequestsCubit>(),
+                  child:
+                      WaitingForPaymentPage(reservationId: state.reservationId),
+                ),
+              ),
+              (route) => false);
         } else if (state is CompleteJobError) {
           ModernSnackbar.showError(
             context: context,
