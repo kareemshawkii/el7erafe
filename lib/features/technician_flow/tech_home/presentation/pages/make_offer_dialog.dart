@@ -105,7 +105,10 @@ class _MakeOfferDialogState extends State<MakeOfferDialog> {
     return TimeOfDay(hour: hour, minute: 0);
   }
 
-  String _formatTimeForApi(TimeOfDay time) {
+  String _formatTimeForApi(TimeOfDay time, {bool isEndTime = false}) {
+    if (isEndTime && (time.hour == 0 || time.hour == 12)) {
+      return "23:59:00";
+    }
     return "${time.hour.toString().padLeft(2, '0')}:00:00";
   }
 
@@ -187,8 +190,10 @@ class _MakeOfferDialogState extends State<MakeOfferDialog> {
       _showErrorDialog("يرجى تحديد وقت بداية ونهاية العمل.");
       return;
     }
+    int effectiveToHour =
+        (_toTime!.hour == 0 || _toTime!.hour == 12) ? 24 : _toTime!.hour;
 
-    if (_fromTime!.hour >= _toTime!.hour) {
+    if (_fromTime!.hour >= effectiveToHour) {
       _showErrorDialog("وقت النهاية يجب أن يكون بعد وقت البداية.");
       return;
     }
@@ -196,7 +201,7 @@ class _MakeOfferDialogState extends State<MakeOfferDialog> {
     final now = DateTime.now();
     final isToday = _isDateToday(widget.requestDate);
 
-    if (isToday && _toTime!.hour < now.hour) {
+    if (isToday && effectiveToHour < now.hour) {
       _showErrorDialog(
           "وقت النهاية يجب أن يكون بعد الوقت الحالي لأن الطلب لليوم.");
       return;
@@ -212,16 +217,23 @@ class _MakeOfferDialogState extends State<MakeOfferDialog> {
           requestId: widget.requestId,
           fees: int.parse(_feesController.text.trim()),
           fromTime: _formatTimeForApi(_fromTime!),
-          toTime: _formatTimeForApi(_toTime!),
+          toTime: _formatTimeForApi(_toTime!, isEndTime: true),
           numberOfDays: _needsMultipleDays ? _selectedDays : null,
         );
   }
 
   Widget _buildTimePickerField(
       String label, TimeOfDay? currentValue, Function(TimeOfDay) onSave) {
-    String displayTime = currentValue != null
-        ? '${currentValue.hourOfPeriod == 0 ? 12 : currentValue.hourOfPeriod.toString().padLeft(2, '0')}  ${currentValue.period == DayPeriod.am ? 'صباحاً' : 'مساءً'}'
-        : '-- ';
+    String displayTime = '-- ';
+    if (currentValue != null) {
+      if (label == "الي" &&
+          (currentValue.hour == 0 || currentValue.hour == 12)) {
+        displayTime = '12  مساءً';
+      } else {
+        displayTime =
+            '${currentValue.hourOfPeriod == 0 ? 12 : currentValue.hourOfPeriod.toString().padLeft(2, '0')}  ${currentValue.period == DayPeriod.am ? 'صباحاً' : 'مساءً'}';
+      }
+    }
 
     return InkWell(
       onTap: () async {
@@ -279,8 +291,17 @@ class _MakeOfferDialogState extends State<MakeOfferDialog> {
           TimeOfDay selected = TimeOfDay(hour: t.hour, minute: 0);
 
           if (!_isAllDayAvailable) {
-            if (selected.hour < _clientStartTime!.hour ||
-                selected.hour > _clientEndTime!.hour) {
+            int effectiveSelectedHour =
+                (label == "الي" && (selected.hour == 0 || selected.hour == 12))
+                    ? 24
+                    : selected.hour;
+            int effectiveClientEndHour =
+                (_clientEndTime!.hour == 0 || _clientEndTime!.hour == 12)
+                    ? 24
+                    : _clientEndTime!.hour;
+
+            if (effectiveSelectedHour < _clientStartTime!.hour ||
+                effectiveSelectedHour > effectiveClientEndHour) {
               _showErrorDialog("الوقت المختار خارج نطاق وقت العميل المسموح.");
               return;
             }

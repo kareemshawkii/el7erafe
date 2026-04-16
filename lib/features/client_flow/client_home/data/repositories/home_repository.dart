@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:dartz/dartz.dart';
 import 'package:el7erafe/core/services/local_storage/auth_local_storage.dart';
+import 'package:el7erafe/core/services/signal_r/signal_r_service.dart';
 import 'package:http/http.dart' as http;
 import '../models/service_item.dart';
 
@@ -33,6 +34,7 @@ class HomeRepository {
         }
       } else if (response.statusCode == 401) {
         await authLocalStorage.clearSession();
+        SignalRService.instance.disconnect();
         return const Left("401 Unauthorized");
       } else {
         return const Left("فشل تحميل الخدمات الرجاء المحاولة مرة اخرى.");

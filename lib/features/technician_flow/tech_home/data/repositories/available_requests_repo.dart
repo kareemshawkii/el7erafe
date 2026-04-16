@@ -1,16 +1,17 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:dartz/dartz.dart';
 import 'package:el7erafe/core/services/local_storage/auth_local_storage.dart';
 import 'package:el7erafe/features/technician_flow/tech_home/data/models/available_request_model.dart';
 import 'package:el7erafe/features/technician_flow/tech_home/data/models/in_progress_reservation_model.dart';
-import 'package:signalr_netcore/signalr_client.dart';
 import 'package:http/http.dart' as http;
+import 'package:el7erafe/core/services/signal_r/signal_r_service.dart';
+import 'package:el7erafe/core/utils/app_event_bus.dart';
 
 class AvailableRequestsRepo {
-  HubConnection? _hubConnection;
   final AuthLocalStorage _authLocal = AuthLocalStorage();
   final String _baseUrl = "https://el7rafeapp.azurewebsites.net";
-  final String _hubUrl = "https://el7rafeapp.azurewebsites.net/technicianHub";
+  StreamSubscription? _fcmSubscription;
 
   Future<List<AvailableRequestModel>> getInitialAvailableRequests() async {
     try {
@@ -35,14 +36,10 @@ class AvailableRequestsRepo {
         await _authLocal.clearSession();
         throw Exception("401 Unauthorized");
       } else {
-        throw Exception("فشل في جلب الطلبات المتاحة");
+        throw Exception("Error");
       }
     } catch (e) {
-      if (e.toString().toLowerCase().contains('401')) {
-        await _authLocal.clearSession();
-        throw Exception("401 Unauthorized");
-      }
-      throw Exception("فشل الاتصال بالخادم");
+      throw Exception("Error");
     }
   }
 
@@ -78,102 +75,74 @@ class AvailableRequestsRepo {
     required Function() onPaymentReceived,
     required Function() onForceDisconnect,
   }) async {
-    try {
-      final token = await _authLocal.getToken();
-      if (token == null || token.isEmpty) {
-        onForceDisconnect();
-        return;
+    _fcmSubscription?.cancel();
+    _fcmSubscription = AppEventBus().stream.listen((action) {
+      if (action == 'PAYMENT_COMPLETED') {
+        onPaymentReceived();
+      } else if (action == 'NEW_REQUEST' ||
+          action == 'REQUEST_CANCELLED' ||
+          action == 'JOB_COMPLETED') {
+        onSignalRRefreshNeeded();
       }
+    });
 
-      if (_hubConnection != null &&
-          _hubConnection!.state != HubConnectionState.Disconnected) {
-        await _hubConnection!.stop();
-      }
+    final hub = SignalRService.instance.techHub;
+    if (hub == null) {
+      await SignalRService.instance.initAndConnect();
+    }
 
-      final urlWithToken =
-          "$_hubUrl?access_token=${Uri.encodeComponent(token)}";
+    final activeHub = SignalRService.instance.techHub;
+    if (activeHub == null) return;
 
-      _hubConnection = HubConnectionBuilder()
-          .withUrl(urlWithToken,
-              options: HttpConnectionOptions(
-                accessTokenFactory: () async => token,
-              ))
-          .withAutomaticReconnect()
-          .build();
+    activeHub.off("ReceiveNewQuickRequest");
+    activeHub.off("ReceiveNewDirectRequest");
+    activeHub.off("RemoveCanceledRequest");
+    activeHub.off("JobCompleted");
+    activeHub.off("PaymentCompleted");
+    activeHub.off("ForceDisconnect");
 
-      _hubConnection!.serverTimeoutInMilliseconds = 60000;
-      _hubConnection!.keepAliveIntervalInMilliseconds = 30000;
-
-      void handleNewData(List<dynamic>? parameters) {
-        if (parameters != null && parameters.isNotEmpty) {
-          if (parameters.first is Map) {
-            try {
-              onNewRequestReceived(AvailableRequestModel.fromJson(
-                  Map<String, dynamic>.from(parameters.first)));
-            } catch (_) {}
-          }
+    void handleNewData(List<dynamic>? parameters) {
+      if (parameters != null && parameters.isNotEmpty) {
+        if (parameters.first is Map) {
+          try {
+            onNewRequestReceived(AvailableRequestModel.fromJson(
+                Map<String, dynamic>.from(parameters.first)));
+          } catch (_) {}
         }
       }
-
-      _hubConnection!.on("ReceiveNewQuickRequest", handleNewData);
-      _hubConnection!.on("ReceiveNewDirectRequest", handleNewData);
-
-      _hubConnection!
-          .on("RemoveCanceledRequest", (_) => onSignalRRefreshNeeded());
-
-      _hubConnection!.on("JobCompleted", (_) => onSignalRRefreshNeeded());
-
-      _hubConnection?.on("PaymentCompleted", (arguments) {
-        onPaymentReceived();
-      });
-
-      _hubConnection!.on("ForceDisconnect", (_) => onForceDisconnect());
-
-      _hubConnection!.onclose(({error}) async {
-        onSignalRRefreshNeeded();
-        _reconnectLoop(onSignalRRefreshNeeded, onForceDisconnect);
-      });
-
-      await _startConnection(onSignalRRefreshNeeded, onForceDisconnect);
-    } catch (e) {
-      if (e.toString().toLowerCase().contains('401')) {
-        await _authLocal.clearSession();
-        onForceDisconnect();
-      } else {
-        onSignalRRefreshNeeded();
-      }
     }
-  }
 
-  Future<void> _startConnection(
-      Function() onFallback, Function() onForceDisconnect) async {
-    try {
-      if (_hubConnection?.state == HubConnectionState.Disconnected) {
-        await _hubConnection!.start();
-      }
-    } catch (e) {
-      if (e.toString().toLowerCase().contains('401')) {
-        await _authLocal.clearSession();
-        onForceDisconnect();
-        return;
-      }
-      onFallback();
-      _reconnectLoop(onFallback, onForceDisconnect);
-    }
-  }
+    activeHub.on("ReceiveNewQuickRequest", handleNewData);
+    activeHub.on("ReceiveNewDirectRequest", handleNewData);
+    activeHub.on("RemoveCanceledRequest", (_) => onSignalRRefreshNeeded());
+    activeHub.on("JobCompleted", (_) => onSignalRRefreshNeeded());
 
-  void _reconnectLoop(
-      Function() onFallback, Function() onForceDisconnect) async {
-    await Future.delayed(const Duration(seconds: 5));
-    if (_hubConnection?.state == HubConnectionState.Disconnected) {
-      await _startConnection(onFallback, onForceDisconnect);
-    }
+    activeHub.on("PaymentCompleted", (arguments) {
+      onPaymentReceived();
+    });
+
+    activeHub.on("ForceDisconnect", (_) => onForceDisconnect());
+
+    activeHub.onclose(({error}) {
+      onSignalRRefreshNeeded();
+    });
+
+    activeHub.onreconnected(({connectionId}) {
+      onSignalRRefreshNeeded();
+    });
   }
 
   Future<void> disconnect() async {
-    if (_hubConnection?.state == HubConnectionState.Connected) {
-      await _hubConnection!.stop();
-    }
+    _fcmSubscription?.cancel();
+    _fcmSubscription = null;
+    final hub = SignalRService.instance.techHub;
+    if (hub == null) return;
+    hub.off("ReceiveNewQuickRequest");
+    hub.off("ReceiveNewDirectRequest");
+    hub.off("RemoveCanceledRequest");
+    hub.off("JobCompleted");
+    hub.off("PaymentCompleted");
+    hub.off("ForceDisconnect");
   }
 
   Future<Either<String, String>> submitOffer({
@@ -184,10 +153,7 @@ class AvailableRequestsRepo {
     int? numberOfDays,
   }) async {
     final token = await _authLocal.getToken();
-    if (token == null || token.isEmpty) {
-      await _authLocal.clearSession();
-      return const Left("401");
-    }
+    if (token == null || token.isEmpty) return const Left("401");
     try {
       final response = await http.post(
         Uri.parse('$_baseUrl/api/tech/make-offer'),
@@ -200,31 +166,23 @@ class AvailableRequestsRepo {
           "fees": fees,
           "fromTime": fromTime,
           "toTime": toTime,
-          "numberOfDays": numberOfDays,
+          "numberOfDays": numberOfDays
         }),
       );
       if (response.statusCode == 200 || response.statusCode == 204) {
         return const Right("تم تقديم العرض بنجاح");
       }
-      if (response.statusCode == 401) {
-        await _authLocal.clearSession();
-        return const Left("401");
-      }
-      return Left(jsonDecode(response.body)['errorMessage'] ??
-          "فشل تقديم العرض، حاول مرة أخرى.");
+      if (response.statusCode == 401) return const Left("401");
+      return Left(jsonDecode(response.body)['errorMessage'] ?? "Error");
     } catch (_) {
-      return const Left(
-          "يوجد خطأ في الاتصال بالإنترنت. الرجاء التحقق من اتصالك.");
+      return const Left("Error");
     }
   }
 
   Future<Either<String, String>> declineRequest(int requestId) async {
     try {
       final token = await _authLocal.getToken();
-      if (token == null || token.isEmpty) {
-        await _authLocal.clearSession();
-        return const Left("401");
-      }
+      if (token == null || token.isEmpty) return const Left("401");
       final response = await http.patch(
         Uri.parse("$_baseUrl/api/tech/decline-request"),
         headers: {
@@ -237,28 +195,18 @@ class AvailableRequestsRepo {
         return const Right("تم رفض الطلب بنجاح");
       }
       if (response.statusCode == 401 || response.statusCode == 403) {
-        await _authLocal.clearSession();
         return const Left("401");
       }
-      return Left(jsonDecode(response.body)['errorMessage'] ??
-          "حدث خطأ أثناء رفض الطلب");
+      return Left(jsonDecode(response.body)['errorMessage'] ?? "Error");
     } catch (e) {
-      if (e.toString().toLowerCase().contains('401')) {
-        await _authLocal.clearSession();
-        return const Left("401");
-      }
-      return const Left(
-          "فشل في الاتصال بالخادم برجاء التحقق من اتصالك بالانترنت");
+      return const Left("Error");
     }
   }
 
   Future<Either<String, String>> completeJob(int reservationId) async {
     try {
       final token = await _authLocal.getToken();
-      if (token == null || token.isEmpty) {
-        await _authLocal.clearSession();
-        return const Left("401");
-      }
+      if (token == null || token.isEmpty) return const Left("401");
       final response = await http.post(
         Uri.parse("$_baseUrl/api/tech/complete-job"),
         headers: {
@@ -268,21 +216,14 @@ class AvailableRequestsRepo {
         body: jsonEncode({'reservationId': reservationId}),
       );
       if (response.statusCode == 200 || response.statusCode == 204) {
-        return const Right("تم انهاء العمل بنجاح وفي انتظار الدفع");
+        return const Right("تم إكمال الوظيفة بنجاح ,في انتظار الدفع");
       }
       if (response.statusCode == 401 || response.statusCode == 403) {
-        await _authLocal.clearSession();
         return const Left("401");
       }
-      return Left(jsonDecode(response.body)['errorMessage'] ??
-          "حدث خطأ أثناء إنهاء العمل");
+      return Left(jsonDecode(response.body)['errorMessage'] ?? "Error");
     } catch (e) {
-      if (e.toString().toLowerCase().contains('401')) {
-        await _authLocal.clearSession();
-        return const Left("401");
-      }
-      return const Left(
-          "فشل في الاتصال بالخادم برجاء التحقق من اتصالك بالانترنت");
+      return const Left("Error");
     }
   }
 }

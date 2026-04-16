@@ -1,3 +1,4 @@
+import 'package:el7erafe/core/services/signal_r/signal_r_service.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:el7erafe/core/services/models/user.dart'
     show TempTechnician, User;
@@ -155,5 +156,6 @@ class AuthLocalStorage {
     await _storage.delete(key: _emailKey);
     await _storage.delete(key: _phoneNumberKey);
     await _storage.delete(key: _userProfileImage);
+    SignalRService.instance.disconnect();
   }
 }

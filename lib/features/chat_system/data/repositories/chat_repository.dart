@@ -1,172 +1,66 @@
+import 'dart:async';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:el7erafe/core/services/local_storage/auth_local_storage.dart';
 import 'package:el7erafe/features/chat_system/data/models/chat_message_model.dart';
-import 'package:signalr_netcore/signalr_client.dart';
+import 'package:el7erafe/core/services/signal_r/signal_r_service.dart';
+import 'package:el7erafe/core/utils/app_event_bus.dart';
 
 class ChatRepository {
-  final String hubUrl = "https://el7rafeapp.azurewebsites.net/chatHub";
-  HubConnection? _hubConnection;
+  final String baseUrl = "https://el7rafeapp.azurewebsites.net";
+  StreamSubscription? _fcmSubscription;
 
-  Future<void> initConnection({
-    Function(ChatMessageModel)? onMessageReceived,
-    Function(int messageId, String newStatus)? onMessageStatusUpdated,
-    Function(int chatId, List<int> messageIds, String newStatus)?
-        onMessagesRead,
-    Function(String)? onUserOnline,
-    Function(String)? onUserOffline,
-  }) async {
-    try {
-      String? token = await AuthLocalStorage().getToken();
-      if (token == null || token.isEmpty) return;
+  Future<int> initChat(int reservationId) async {
+    String? token = await AuthLocalStorage().getToken();
+    if (token == null || token.isEmpty) throw Exception("Unauthorized");
 
-      if (_hubConnection != null &&
-          _hubConnection!.state != HubConnectionState.Disconnected) {
-        await _hubConnection!.stop();
+    final response = await http.post(
+      Uri.parse('$baseUrl/api/tcf/chat/init/$reservationId'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final int? rawId = int.tryParse(response.body.trim());
+      if (rawId != null) return rawId;
+
+      try {
+        final decodedData = jsonDecode(response.body);
+        return (decodedData['id'] ?? decodedData['chatId']) as int;
+      } catch (_) {
+        throw Exception("Error");
       }
-
-      _hubConnection = HubConnectionBuilder()
-          .withUrl(hubUrl,
-              options: HttpConnectionOptions(
-                accessTokenFactory: () async => token,
-              ))
-          .withAutomaticReconnect()
-          .build();
-
-      _hubConnection?.serverTimeoutInMilliseconds = 60000;
-      _hubConnection?.keepAliveIntervalInMilliseconds = 30000;
-
-      _hubConnection?.on("ReceiveMessage", (arguments) {
-        if (arguments != null && arguments.isNotEmpty) {
-          try {
-            final message =
-                ChatMessageModel.fromJson(arguments[0] as Map<String, dynamic>);
-            if (onMessageReceived != null) onMessageReceived(message);
-          } catch (_) {}
-        }
-      });
-
-      _hubConnection?.on("MessageStatusUpdated", (arguments) {
-        if (arguments != null && arguments.length >= 2) {
-          try {
-            final int messageId = arguments[0] as int;
-            final String newStatus = arguments[1] as String;
-            if (onMessageStatusUpdated != null) {
-              onMessageStatusUpdated(messageId, newStatus);
-            }
-          } catch (_) {}
-        }
-      });
-
-      _hubConnection?.on("MessagesRead", (arguments) {
-        if (arguments != null && arguments.length >= 3) {
-          try {
-            final int chatId = arguments[0] as int;
-            final List<int> updatedMessageIds =
-                (arguments[1] as List<dynamic>).map((e) => e as int).toList();
-            final String newStatus = arguments[2] as String;
-
-            if (onMessagesRead != null) {
-              onMessagesRead(chatId, updatedMessageIds, newStatus);
-            }
-          } catch (_) {}
-        }
-      });
-
-      _hubConnection?.on("UserOnline", (arguments) {
-        if (arguments != null && arguments.isNotEmpty) {
-          if (onUserOnline != null) onUserOnline(arguments[0].toString());
-        }
-      });
-
-      _hubConnection?.on("UserOffline", (arguments) {
-        if (arguments != null && arguments.isNotEmpty) {
-          if (onUserOffline != null) onUserOffline(arguments[0].toString());
-        }
-      });
-
-      _hubConnection!.onclose(({error}) async {
-        _reconnectLoop(
-          onMessageReceived: onMessageReceived,
-          onMessageStatusUpdated: onMessageStatusUpdated,
-          onMessagesRead: onMessagesRead,
-          onUserOnline: onUserOnline,
-          onUserOffline: onUserOffline,
-        );
-      });
-
-      await _startConnection(
-        onMessageReceived: onMessageReceived,
-        onMessageStatusUpdated: onMessageStatusUpdated,
-        onMessagesRead: onMessagesRead,
-        onUserOnline: onUserOnline,
-        onUserOffline: onUserOffline,
-      );
-    } catch (_) {
-      _reconnectLoop(
-        onMessageReceived: onMessageReceived,
-        onMessageStatusUpdated: onMessageStatusUpdated,
-        onMessagesRead: onMessagesRead,
-        onUserOnline: onUserOnline,
-        onUserOffline: onUserOffline,
-      );
-    }
-  }
-
-  Future<void> _startConnection({
-    Function(ChatMessageModel)? onMessageReceived,
-    Function(int messageId, String newStatus)? onMessageStatusUpdated,
-    Function(int chatId, List<int> messageIds, String newStatus)?
-        onMessagesRead,
-    Function(String)? onUserOnline,
-    Function(String)? onUserOffline,
-  }) async {
-    try {
-      if (_hubConnection?.state == HubConnectionState.Disconnected) {
-        await _hubConnection!.start();
+    } else {
+      try {
+        final decodedData = jsonDecode(response.body);
+        throw Exception(decodedData['errorMessage'] ?? 'Error');
+      } catch (_) {
+        throw Exception("Error");
       }
-    } catch (e) {
-      if (e.toString().toLowerCase().contains('401')) {
-        return;
-      }
-      _reconnectLoop(
-        onMessageReceived: onMessageReceived,
-        onMessageStatusUpdated: onMessageStatusUpdated,
-        onMessagesRead: onMessagesRead,
-        onUserOnline: onUserOnline,
-        onUserOffline: onUserOffline,
-      );
-    }
-  }
-
-  void _reconnectLoop({
-    Function(ChatMessageModel)? onMessageReceived,
-    Function(int messageId, String newStatus)? onMessageStatusUpdated,
-    Function(int chatId, List<int> messageIds, String newStatus)?
-        onMessagesRead,
-    Function(String)? onUserOnline,
-    Function(String)? onUserOffline,
-  }) async {
-    await Future.delayed(const Duration(seconds: 5));
-    if (_hubConnection?.state == HubConnectionState.Disconnected) {
-      await _startConnection(
-        onMessageReceived: onMessageReceived,
-        onMessageStatusUpdated: onMessageStatusUpdated,
-        onMessagesRead: onMessagesRead,
-        onUserOnline: onUserOnline,
-        onUserOffline: onUserOffline,
-      );
     }
   }
 
   Future<List<ChatMessageModel>> getChatHistory(
       int chatId, int page, int pageSize) async {
-    if (_hubConnection?.state != HubConnectionState.Connected) {
-      await initConnection();
-    }
     try {
-      final result = await _hubConnection
-          ?.invoke("GetChatHistory", args: [chatId, page, pageSize]);
-      if (result != null) {
-        final List<dynamic> data = result as List<dynamic>;
+      String? token = await AuthLocalStorage().getToken();
+      if (token == null || token.isEmpty) return [];
+
+      final response = await http.get(
+        Uri.parse(
+            '$baseUrl/api/tcf/chat/history/$chatId?page=$page&pageSize=$pageSize'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final decodedData = jsonDecode(response.body);
+        final List<dynamic> data =
+            decodedData is List ? decodedData : (decodedData['data'] ?? []);
         return data
             .map((json) =>
                 ChatMessageModel.fromJson(json as Map<String, dynamic>))
@@ -174,36 +68,145 @@ class ChatRepository {
       }
       return [];
     } catch (e) {
-      throw Exception("فشل في جلب سجل المحادثة");
+      throw Exception("Error");
     }
   }
 
-  Future<void> sendMessage(String receiverId, String content) async {
-    if (_hubConnection?.state != HubConnectionState.Connected) {
-      await initConnection();
+  Future<void> initConnection({
+    Function(ChatMessageModel)? onMessageReceived,
+    Function(ChatMessageModel)? onMessageSent,
+    Function(int messageId, String newStatus)? onMessageStatusUpdated,
+    Function(List<int> messageIds, String newStatus)? onMessagesDelivered,
+    Function(int chatId, List<int> messageIds, String newStatus)?
+        onMessagesRead,
+    Function(String)? onUserOnline,
+    Function(String)? onUserOffline,
+    Function()? onFcmRefresh,
+  }) async {
+    _fcmSubscription?.cancel();
+    _fcmSubscription = AppEventBus().stream.listen((action) {
+      if (action == 'CHAT_MESSAGE' && onFcmRefresh != null) {
+        onFcmRefresh();
+      }
+    });
+
+    final hub = SignalRService.instance.chatHub;
+    if (hub == null) {
+      await SignalRService.instance.initAndConnect();
     }
+
+    final activeHub = SignalRService.instance.chatHub;
+    if (activeHub == null) return;
+
+    activeHub.off("ReceiveMessage");
+    activeHub.off("MessageSent");
+    activeHub.off("MessageStatusUpdated");
+    activeHub.off("MessagesDelivered");
+    activeHub.off("MessagesRead");
+    activeHub.off("UserOnline");
+    activeHub.off("UserOffline");
+
+    activeHub.on("ReceiveMessage", (arguments) {
+      if (arguments != null && arguments.isNotEmpty) {
+        try {
+          if (onMessageReceived != null) {
+            onMessageReceived(ChatMessageModel.fromJson(
+                arguments[0] as Map<String, dynamic>));
+          }
+        } catch (_) {}
+      }
+    });
+
+    activeHub.on("MessageSent", (arguments) {
+      if (arguments != null && arguments.isNotEmpty) {
+        try {
+          if (onMessageSent != null) {
+            onMessageSent(ChatMessageModel.fromJson(
+                arguments[0] as Map<String, dynamic>));
+          }
+        } catch (_) {}
+      }
+    });
+
+    activeHub.on("MessageStatusUpdated", (arguments) {
+      if (arguments != null && arguments.length >= 2) {
+        try {
+          if (onMessageStatusUpdated != null) {
+            onMessageStatusUpdated(arguments[0] as int, arguments[1] as String);
+          }
+        } catch (_) {}
+      }
+    });
+
+    activeHub.on("MessagesDelivered", (arguments) {
+      if (arguments != null && arguments.length >= 2) {
+        try {
+          if (onMessagesDelivered != null) {
+            onMessagesDelivered(
+                (arguments[0] as List<dynamic>).map((e) => e as int).toList(),
+                arguments[1] as String);
+          }
+        } catch (_) {}
+      }
+    });
+
+    activeHub.on("MessagesRead", (arguments) {
+      if (arguments != null && arguments.length >= 3) {
+        try {
+          if (onMessagesRead != null) {
+            onMessagesRead(
+                arguments[0] as int,
+                (arguments[1] as List<dynamic>).map((e) => e as int).toList(),
+                arguments[2] as String);
+          }
+        } catch (_) {}
+      }
+    });
+
+    activeHub.on("UserOnline", (arguments) {
+      if (arguments != null && arguments.isNotEmpty) {
+        if (onUserOnline != null) onUserOnline(arguments[0].toString());
+      }
+    });
+
+    activeHub.on("UserOffline", (arguments) {
+      if (arguments != null && arguments.isNotEmpty) {
+        if (onUserOffline != null) onUserOffline(arguments[0].toString());
+      }
+    });
+  }
+
+  Future<void> sendMessage(int chatId, String content) async {
+    final hub = SignalRService.instance.chatHub;
+    if (hub == null) throw Exception("Error");
     try {
-      await _hubConnection?.invoke("SendMessage", args: [
-        {"receiverId": receiverId, "content": content, "messageType": "Text"}
+      await hub.invoke("SendMessage", args: [
+        {"chatId": chatId, "content": content, "messageType": "Text"}
       ]);
     } catch (e) {
-      throw Exception("فشل في إرسال الرسالة");
+      throw Exception("Error");
     }
   }
 
-  Future<void> markMessagesAsRead(int chatId, String otherUserId) async {
-    if (_hubConnection?.state != HubConnectionState.Connected) {
-      await initConnection();
-    }
+  Future<void> markMessagesAsRead(int chatId) async {
+    final hub = SignalRService.instance.chatHub;
+    if (hub == null) return;
     try {
-      await _hubConnection
-          ?.invoke("MarkMessagesAsRead", args: [chatId, otherUserId]);
-    } catch (e) {
-      throw Exception("فشل في تحديد الرسائل كمقروءة");
-    }
+      await hub.invoke("MarkMessagesAsRead", args: [chatId]);
+    } catch (_) {}
   }
 
   void disconnect() {
-    _hubConnection?.stop();
+    _fcmSubscription?.cancel();
+    _fcmSubscription = null;
+    final hub = SignalRService.instance.chatHub;
+    if (hub == null) return;
+    hub.off("ReceiveMessage");
+    hub.off("MessageSent");
+    hub.off("MessageStatusUpdated");
+    hub.off("MessagesDelivered");
+    hub.off("MessagesRead");
+    hub.off("UserOnline");
+    hub.off("UserOffline");
   }
 }

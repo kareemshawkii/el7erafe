@@ -37,7 +37,6 @@ class NotificationRouter {
             SlideRightRouteWithBuild(
               builder: (context) => ChatRoomPage(
                 chatId: chatId,
-                receiverId: receiverId,
                 receiverName: receiverName,
                 receiverImage: receiverImage,
               ),

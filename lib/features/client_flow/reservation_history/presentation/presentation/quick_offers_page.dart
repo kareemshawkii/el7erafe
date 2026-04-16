@@ -264,12 +264,15 @@ class OffersView extends StatelessWidget {
       ],
       primaryButtonText: 'قبول العرض',
       primaryButtonIcon: Iconsax.tick_circle,
-      onPrimaryPressed: () {
+      onPrimaryPressed: () async {
         Navigator.pop(context);
         context.read<PendingRequestsCubit>().acceptOffer(offer.offerId);
-        context.read<PendingRequestsCubit>().fetchPendingRequests();
         ModernSnackbar.showSuccess(
             context: context, message: 'تم قبول العرض بنجاح');
+        await Future.delayed(const Duration(milliseconds: 200));
+        if (context.mounted) {
+          context.read<PendingRequestsCubit>().fetchPendingRequests();
+        }
       },
       secondaryButtonText: 'رفض العرض',
       secondaryButtonIcon: Iconsax.close_circle,

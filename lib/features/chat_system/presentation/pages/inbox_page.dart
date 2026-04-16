@@ -324,7 +324,6 @@ class _AnimatedChatCardItemState extends State<AnimatedChatCardItem> {
                       SlideRightRouteWithBuild(
                         builder: (context) => ChatRoomPage(
                           chatId: widget.chat.chatId,
-                          receiverId: widget.chat.receiverId,
                           receiverName: widget.chat.receiverName,
                           receiverImage: widget.chat.receiverImage,
                         ),

@@ -1,13 +1,14 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:el7erafe/features/client_flow/reservation_history/data/models/current_reservation_model.dart';
 import 'package:http/http.dart' as http;
-import 'package:signalr_netcore/signalr_client.dart';
 import 'package:el7erafe/core/services/local_storage/auth_local_storage.dart';
+import 'package:el7erafe/core/services/signal_r/signal_r_service.dart';
+import 'package:el7erafe/core/utils/app_event_bus.dart';
 
 class CurrentReservationsRepo {
   final String _baseUrl = 'https://el7rafeapp.azurewebsites.net';
-  HubConnection? _hubConnection;
-  final String _hubUrl = "https://el7rafeapp.azurewebsites.net/clientHub";
+  StreamSubscription? _fcmSubscription;
 
   Future<List<CurrentReservationModel>> getCurrentReservations() async {
     final token = await _getTokenOrThrow();
@@ -28,7 +29,7 @@ class CurrentReservationsRepo {
       throw Exception('UNAUTH');
     } else {
       final data = jsonDecode(response.body);
-      throw Exception(data['errorMessage'] ?? 'حدث خطأ أثناء جلب البيانات');
+      throw Exception(data['errorMessage'] ?? 'Error');
     }
   }
 
@@ -42,13 +43,9 @@ class CurrentReservationsRepo {
       },
     );
     if (response.statusCode == 401) throw Exception('UNAUTH');
-    if (response.statusCode == 400) {
+    if (response.statusCode != 200 && response.statusCode != 204) {
       final data = jsonDecode(response.body);
-      throw Exception(data['errorMessage'] ?? 'لا يمكن إلغاء الحجز حالياً');
-    } else if (response.statusCode != 200 && response.statusCode != 204) {
-      final data = jsonDecode(response.body);
-      throw Exception(
-          data['errorMessage'] ?? 'فشل إلغاء الحجز، يرجى المحاولة لاحقاً');
+      throw Exception(data['errorMessage'] ?? 'Error');
     }
   }
 
@@ -62,16 +59,9 @@ class CurrentReservationsRepo {
       },
     );
     if (response.statusCode == 401) throw Exception('UNAUTH');
-    if (response.statusCode == 400) {
-      final data = jsonDecode(response.body);
-      throw Exception(data['errorMessage'] ??
-          'الطلب ليس في حالة انتظار الدفع أو تم الدفع مسبقاً');
-    }
-    if (response.statusCode == 200) {
-      return;
-    }
+    if (response.statusCode == 200) return;
     final data = jsonDecode(response.body);
-    throw Exception(data['errorMessage'] ?? 'فشل في بدء عملية الدفع');
+    throw Exception(data['errorMessage'] ?? 'Error');
   }
 
   Future<void> rateJob({required int rate, required int reservationId}) async {
@@ -83,17 +73,9 @@ class CurrentReservationsRepo {
         'Authorization': 'Bearer $token',
       },
     );
-
     if (response.statusCode == 401) throw Exception('UNAUTH');
-
     if (response.statusCode != 200 && response.statusCode != 204) {
-      try {
-        final data = jsonDecode(response.body);
-        throw Exception(
-            data['errorMessage'] ?? 'الطلب لم يكتمل بعد أو تم التقييم مسبقاً');
-      } catch (_) {
-        throw Exception('الطلب لم يكتمل بعد أو تم التقييم مسبقاً');
-      }
+      throw Exception('Error');
     }
   }
 
@@ -103,83 +85,91 @@ class CurrentReservationsRepo {
     required Function(int) onReservationCancelled,
     required Function(List<CurrentReservationModel>) onHttpFallback,
   }) async {
-    final token = await _getTokenOrThrow();
-
-    try {
-      _hubConnection = HubConnectionBuilder()
-          .withUrl(_hubUrl,
-              options: HttpConnectionOptions(
-                accessTokenFactory: () async => token,
-              ))
-          .withAutomaticReconnect()
-          .build();
-
-      _hubConnection?.on("JobStarted", (arguments) {
-        if (arguments != null && arguments.isNotEmpty) {
-          final payload = arguments[0];
-          if (payload is Map) {
-            final int id = payload['requestId'] ?? payload['RequestId'] ?? 0;
-            onJobStarted(id);
-          } else if (payload is int) {
-            onJobStarted(payload);
-          }
-        }
-      });
-
-      _hubConnection?.on("JobCompleted", (arguments) {
-        if (arguments != null && arguments.isNotEmpty) {
-          final payload = arguments[0];
-          if (payload is Map) {
-            final int id =
-                payload['ReservationId'] ?? payload['reservationId'] ?? 0;
-            onJobCompleted(id);
-          } else if (payload is int) {
-            onJobCompleted(payload);
-          }
-        }
-      });
-
-      _hubConnection?.on("ReservationCancelled", (arguments) {
-        if (arguments != null && arguments.isNotEmpty) {
-          final payload = arguments[0];
-          if (payload is Map) {
-            final int id =
-                payload['reservationId'] ?? payload['ReservationId'] ?? 0;
-            onReservationCancelled(id);
-          } else if (payload is int) {
-            onReservationCancelled(payload);
-          }
-        }
-      });
-
-      if (_hubConnection?.state == HubConnectionState.Disconnected) {
-        await _hubConnection?.start();
-      }
-    } catch (e) {
-      Future.doWhile(() async {
-        await Future.delayed(const Duration(seconds: 10));
-
-        if (_hubConnection?.state == HubConnectionState.Connected) {
-          return false;
-        }
-
+    _fcmSubscription?.cancel();
+    _fcmSubscription = AppEventBus().stream.listen((action) async {
+      if (action == 'JOB_STARTED' ||
+          action == 'JOB_COMPLETED' ||
+          action == 'RESERVATION_CANCELLED') {
         try {
           final fallbackData = await getCurrentReservations();
           onHttpFallback(fallbackData);
-        } catch (httpError) {
-          if (httpError.toString().contains('UNAUTH')) {
-            return false;
-          }
-        }
-        return true;
-      });
+        } catch (_) {}
+      }
+    });
+
+    final hub = SignalRService.instance.clientHub;
+    if (hub == null) {
+      await SignalRService.instance.initAndConnect();
     }
+
+    final activeHub = SignalRService.instance.clientHub;
+    if (activeHub == null) return;
+
+    activeHub.off("JobStarted");
+    activeHub.off("JobCompleted");
+    activeHub.off("ReservationCancelled");
+
+    activeHub.on("JobStarted", (arguments) {
+      if (arguments != null && arguments.isNotEmpty) {
+        final payload = arguments[0];
+        if (payload is Map) {
+          final int id = payload['requestId'] ?? payload['RequestId'] ?? 0;
+          onJobStarted(id);
+        } else if (payload is int) {
+          onJobStarted(payload);
+        }
+      }
+    });
+
+    activeHub.on("JobCompleted", (arguments) {
+      if (arguments != null && arguments.isNotEmpty) {
+        final payload = arguments[0];
+        if (payload is Map) {
+          final int id =
+              payload['ReservationId'] ?? payload['reservationId'] ?? 0;
+          onJobCompleted(id);
+        } else if (payload is int) {
+          onJobCompleted(payload);
+        }
+      }
+    });
+
+    activeHub.on("ReservationCancelled", (arguments) {
+      if (arguments != null && arguments.isNotEmpty) {
+        final payload = arguments[0];
+        if (payload is Map) {
+          final int id =
+              payload['reservationId'] ?? payload['ReservationId'] ?? 0;
+          onReservationCancelled(id);
+        } else if (payload is int) {
+          onReservationCancelled(payload);
+        }
+      }
+    });
+
+    activeHub.onclose(({error}) async {
+      try {
+        final fallbackData = await getCurrentReservations();
+        onHttpFallback(fallbackData);
+      } catch (_) {}
+    });
+
+    activeHub.onreconnected(({connectionId}) async {
+      try {
+        final fallbackData = await getCurrentReservations();
+        onHttpFallback(fallbackData);
+      } catch (_) {}
+    });
   }
 
   Future<void> disconnectHub() async {
-    if (_hubConnection?.state == HubConnectionState.Connected) {
-      await _hubConnection?.stop();
-    }
+    _fcmSubscription?.cancel();
+    _fcmSubscription = null;
+    final hub = SignalRService.instance.clientHub;
+    if (hub == null) return;
+    hub.off("JobStarted");
+    hub.off("JobCompleted");
+    hub.off("ReservationCancelled");
   }
 
   Future<String> _getTokenOrThrow() async {

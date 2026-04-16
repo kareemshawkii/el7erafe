@@ -1,5 +1,7 @@
 import 'package:el7erafe/core/services/notifications/notification_api_service.dart';
 import 'package:el7erafe/core/services/notifications/notification_router.dart';
+import 'package:el7erafe/core/services/signal_r/signal_r_service.dart';
+import 'package:el7erafe/core/utils/app_event_bus.dart';
 import 'package:el7erafe/features/client_flow/reservation_history/data/repositories/current_reservations_repo.dart';
 import 'package:el7erafe/features/client_flow/reservation_history/data/repositories/pending_requests_repo.dart';
 import 'package:el7erafe/features/client_flow/reservation_history/data/repositories/previous_reservations_repo.dart';
@@ -108,6 +110,7 @@ Future<InitialRoute> _determineInitialRoute() async {
   final String? userType = results[2];
 
   if (token != null && token.isNotEmpty) {
+    await SignalRService.instance.initAndConnect();
     if (userType == "C") return InitialRoute.clientHome;
     if (userType == "T") return InitialRoute.technicianHome;
   }
@@ -158,6 +161,11 @@ class _MyAppState extends State<MyApp> {
       final title = message.notification?.title ?? 'إشعار جديد';
       final body =
           message.notification?.body ?? 'لديك تحديث جديد، اضغط للتفاصيل.';
+
+      final action = message.data['Action'] ?? message.data['action'] ?? '';
+      if (action.isNotEmpty) {
+        AppEventBus().emit(action);
+      }
 
       // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(

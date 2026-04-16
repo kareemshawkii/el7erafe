@@ -5,6 +5,8 @@ import 'package:el7erafe/core/utils/modern_snakebar.dart';
 import 'package:el7erafe/features/authentication_module/login/data/repositories/auth_repository.dart';
 import 'package:el7erafe/features/authentication_module/login/presentation/cubit/login_cubit.dart';
 import 'package:el7erafe/features/authentication_module/login/presentation/pages/login_page.dart';
+import 'package:el7erafe/features/chat_system/data/repositories/chat_repository.dart';
+import 'package:el7erafe/features/chat_system/presentation/pages/chat_room_page.dart';
 import 'package:el7erafe/features/technician_flow/tech_home/presentation/pages/tech_home_page.dart';
 import 'package:el7erafe/features/technician_flow/tech_reservation_history/data/models/technician_calender_model.dart';
 import 'package:el7erafe/features/technician_flow/tech_reservation_history/data/repositories/tech_calender_repo.dart';
@@ -358,8 +360,26 @@ class _TechCurrentReservationsTabState extends State<TechCurrentReservationsTab>
                 ],
               ),
               OutlinedButton.icon(
-                onPressed: () {
-                  // To be added when done: Contact User Logic (e.g., open chat or dial)
+                onPressed: () async {
+                  try {
+                    int chatId = await getChatId(reservation.reservationId);
+                    Navigator.push(
+                      // ignore: use_build_context_synchronously
+                      context,
+                      SlideRightRouteWithBuild(
+                        builder: (context) => ChatRoomPage(
+                          chatId: chatId,
+                          receiverName: reservation.clientName ?? 'فني الصيانة',
+                          receiverImage: reservation.clientImage ?? '',
+                        ),
+                      ),
+                    );
+                  } catch (e) {
+                    ModernSnackbar.showError(
+                        // ignore: use_build_context_synchronously
+                        context: context,
+                        message: 'فشل إنشاء المحادثة. حاول مرة أخرى.');
+                  }
                 },
                 icon: Icon(Iconsax.send_2, color: Colors.black87, size: 16.r),
                 label: Text(
@@ -705,4 +725,9 @@ Future<void> showCancelConfirmationDialog(
       );
     },
   );
+}
+
+Future<int> getChatId(int reservationId) async {
+  final int chatId = (await ChatRepository().initChat(reservationId));
+  return chatId;
 }

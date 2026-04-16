@@ -50,10 +50,19 @@ class _EditScheduleBottomSheetState extends State<EditScheduleBottomSheet> {
 
   TimeOfDay _parseApiTime(String timeString) {
     final parts = timeString.split(':');
-    return TimeOfDay(hour: int.parse(parts[0]), minute: 0);
+    int hour = int.parse(parts[0]);
+    int minute = parts.length > 1 ? int.parse(parts[1]) : 0;
+
+    if (hour == 23 && minute >= 50) {
+      return const TimeOfDay(hour: 12, minute: 0);
+    }
+    return TimeOfDay(hour: hour, minute: 0);
   }
 
-  String _formatTimeForApi(TimeOfDay time) {
+  String _formatTimeForApi(TimeOfDay time, {bool isEndTime = false}) {
+    if (isEndTime && (time.hour == 0 || time.hour == 12)) {
+      return "23:59:00";
+    }
     return "${time.hour.toString().padLeft(2, '0')}:00:00";
   }
 
@@ -90,14 +99,20 @@ class _EditScheduleBottomSheetState extends State<EditScheduleBottomSheet> {
         _showError("يرجى تحديد وقت البداية والنهاية");
         return;
       }
-      if (_allWeekFrom!.hour >= _allWeekTo!.hour) {
+
+      int effectiveAllWeekToHour =
+          (_allWeekTo!.hour == 0 || _allWeekTo!.hour == 12)
+              ? 24
+              : _allWeekTo!.hour;
+
+      if (_allWeekFrom!.hour >= effectiveAllWeekToHour) {
         _showError("وقت البداية يجب أن يكون قبل وقت النهاية");
         return;
       }
       scheduleToSave.add(TechScheduleModel(
         dayOfWeek: null,
         fromTime: _formatTimeForApi(_allWeekFrom!),
-        toTime: _formatTimeForApi(_allWeekTo!),
+        toTime: _formatTimeForApi(_allWeekTo!, isEndTime: true),
       ));
     } else {
       bool hasSelectedDay = false;
@@ -108,7 +123,13 @@ class _EditScheduleBottomSheetState extends State<EditScheduleBottomSheet> {
             _showError("يرجى تحديد الأوقات لجميع الأيام المختارة");
             return;
           }
-          if (day.fromTime!.hour >= day.toTime!.hour) {
+
+          int effectiveDayToHour =
+              (day.toTime!.hour == 0 || day.toTime!.hour == 12)
+                  ? 24
+                  : day.toTime!.hour;
+
+          if (day.fromTime!.hour >= effectiveDayToHour) {
             _showError(
                 "وقت البداية يجب أن يكون قبل وقت النهاية في يوم ${day.name}");
             return;
@@ -116,7 +137,7 @@ class _EditScheduleBottomSheetState extends State<EditScheduleBottomSheet> {
           scheduleToSave.add(TechScheduleModel(
             dayOfWeek: day.backendId,
             fromTime: _formatTimeForApi(day.fromTime!),
-            toTime: _formatTimeForApi(day.toTime!),
+            toTime: _formatTimeForApi(day.toTime!, isEndTime: true),
           ));
         }
       }
@@ -181,9 +202,17 @@ class _EditScheduleBottomSheetState extends State<EditScheduleBottomSheet> {
 
   Widget _buildTimePickerField(BuildContext context, String label,
       TimeOfDay? currentValue, Function(TimeOfDay) onSave) {
-    String displayTime = currentValue != null
-        ? '${currentValue.hourOfPeriod == 0 ? 12 : currentValue.hourOfPeriod.toString().padLeft(2, '0')} ${currentValue.period == DayPeriod.am ? 'صباحا' : 'مساء'}'
-        : '--';
+    String displayTime = '-- ';
+    if (currentValue != null) {
+      if (label == "الي" &&
+          (currentValue.hour == 0 || currentValue.hour == 12)) {
+        displayTime = '12  مساءً';
+      } else {
+        displayTime =
+            '${currentValue.hourOfPeriod == 0 ? 12 : currentValue.hourOfPeriod.toString().padLeft(2, '0')} ${currentValue.period == DayPeriod.am ? 'صباحاً' : 'مساءً'}';
+      }
+    }
+
     return InkWell(
       onTap: () async {
         FocusScope.of(context).unfocus();

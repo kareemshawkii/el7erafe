@@ -3,13 +3,13 @@ import 'package:dartz/dartz.dart';
 import 'package:el7erafe/core/services/local_storage/auth_local_storage.dart';
 import 'package:el7erafe/core/services/local_storage/rejected_local_storage.dart';
 import 'package:el7erafe/core/services/models/rejected_user.dart';
+import 'package:el7erafe/core/services/signal_r/signal_r_service.dart';
 import 'package:el7erafe/core/utils/login_failure.dart';
 import 'package:el7erafe/core/services/models/user.dart';
 import 'package:http/http.dart' as http;
 
 class OtpRepository {
-  final String _baseUrl =
-      "https://el7rafeapp.azurewebsites.net";
+  final String _baseUrl = "https://el7rafeapp.azurewebsites.net";
 
   Future<Either<Failure, User>> verifyOtp(String email, String otpCode) async {
     final Uri verifyUrl = Uri.parse('$_baseUrl/api/auth/confirm-email');
@@ -29,6 +29,7 @@ class OtpRepository {
         AuthLocalStorage authLocalStorage = AuthLocalStorage();
         await authLocalStorage.deleteEmail();
         await authLocalStorage.saveUserSession(user);
+        await SignalRService.instance.initAndConnect();
         return Right(user);
       } else if (response.statusCode == 400) {
         return Left(Failure(jsonDecode(response.body)['errorMessage']));

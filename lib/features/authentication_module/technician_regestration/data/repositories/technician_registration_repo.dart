@@ -3,6 +3,7 @@ import 'package:dartz/dartz.dart';
 import 'package:el7erafe/core/services/local_storage/auth_local_storage.dart';
 import 'package:el7erafe/core/services/local_storage/rejected_local_storage.dart';
 import 'package:el7erafe/core/services/models/rejected_user.dart';
+import 'package:el7erafe/core/services/signal_r/signal_r_service.dart';
 import 'package:el7erafe/core/utils/login_failure.dart';
 import 'package:el7erafe/core/services/models/user.dart';
 import 'package:el7erafe/features/authentication_module/technician_regestration/data/model/rejected_technician_model.dart';
@@ -10,8 +11,7 @@ import 'package:el7erafe/features/authentication_module/technician_regestration/
 import 'package:http/http.dart' as http;
 
 class TechnicianRegRepository {
-  final String _baseUrl =
-      "https://el7rafeapp.azurewebsites.net";
+  final String _baseUrl = "https://el7rafeapp.azurewebsites.net";
 
   Future<Either<Failure, List<String>>> getServices() async {
     final Uri url = Uri.parse('$_baseUrl/api/public/services');
@@ -106,6 +106,7 @@ class TechnicianRegRepository {
         final user = UserModel.fromJson(data);
         AuthLocalStorage authLocalStorage = AuthLocalStorage();
         await authLocalStorage.saveUserSession(user);
+        await SignalRService.instance.initAndConnect();
         return Right(user);
       } else if (response.statusCode == 460) {
         return Left(Failure('PENDING'));

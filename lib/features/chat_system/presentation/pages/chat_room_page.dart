@@ -1,3 +1,4 @@
+import 'package:el7erafe/core/services/local_storage/auth_local_storage.dart';
 import 'package:el7erafe/core/utils/modern_snakebar.dart';
 import 'package:el7erafe/features/chat_system/data/models/chat_message_model.dart';
 import 'package:el7erafe/features/chat_system/data/repositories/chat_repository.dart';
@@ -15,14 +16,12 @@ import 'package:url_launcher/url_launcher.dart';
 
 class ChatRoomPage extends StatelessWidget {
   final int chatId;
-  final String receiverId;
   final String receiverName;
   final String receiverImage;
 
   const ChatRoomPage({
     super.key,
     required this.chatId,
-    required this.receiverId,
     required this.receiverName,
     required this.receiverImage,
   });
@@ -33,10 +32,8 @@ class ChatRoomPage extends StatelessWidget {
       create: (context) => ChatCubit(
         ChatRepository(),
         chatId: chatId,
-        receiverId: receiverId,
       )..connectAndLoadHistory(),
       child: ChatRoomView(
-        receiverId: receiverId,
         receiverName: receiverName,
         receiverImage: receiverImage,
       ),
@@ -45,13 +42,11 @@ class ChatRoomPage extends StatelessWidget {
 }
 
 class ChatRoomView extends StatefulWidget {
-  final String receiverId;
   final String receiverName;
   final String receiverImage;
 
   const ChatRoomView({
     super.key,
-    required this.receiverId,
     required this.receiverName,
     required this.receiverImage,
   });
@@ -64,11 +59,24 @@ class _ChatRoomViewState extends State<ChatRoomView>
     with WidgetsBindingObserver {
   final TextEditingController _messageController = TextEditingController();
   bool _isSendingLocation = false;
+  String currentUserId = "";
+  bool _isLoadingUser = true; 
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    _loadUserId();
+  }
+
+  void _loadUserId() async {
+    final id = await AuthLocalStorage().getUserId();
+    if (mounted) {
+      setState(() {
+        currentUserId = id ?? "";
+        _isLoadingUser = false; 
+      });
+    }
   }
 
   @override
@@ -154,6 +162,15 @@ class _ChatRoomViewState extends State<ChatRoomView>
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoadingUser) {
+      return Scaffold(
+        backgroundColor: Colors.white,
+        body: Center(
+          child: CircularProgressIndicator(color: const Color(0xFF3775FA)),
+        ),
+      );
+    }
+
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
@@ -185,25 +202,19 @@ class _ChatRoomViewState extends State<ChatRoomView>
                         child: Text(state.message,
                             style: GoogleFonts.cairo(color: Colors.red)));
                   } else if (state is ChatLoaded) {
-                    final sortedMessages =
-                        List<ChatMessageModel>.from(state.messages);
-                    sortedMessages
-                        .sort((a, b) => b.createdAt.compareTo(a.createdAt));
-
-                    return Align(
-                      alignment: Alignment.topCenter,
-                      child: ListView.builder(
-                        reverse: true,
-                        shrinkWrap: true,
-                        padding: EdgeInsets.symmetric(
-                            horizontal: 16.w, vertical: 8.h),
-                        itemCount: sortedMessages.length,
-                        itemBuilder: (context, index) {
-                          final message = sortedMessages[index];
-                          final isMe = message.senderId != widget.receiverId;
-                          return _buildChatBubble(message, isMe, index);
-                        },
-                      ),
+                    final messages = state.messages.reversed.toList(); 
+                    return ListView.builder(
+                      reverse: true, 
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 16.w, vertical: 8.h),
+                      itemCount: messages.length,
+                      itemBuilder: (context, index) {
+                        final message = messages[index];
+                        final isMe = message.senderId == "ME" ||
+                            message.senderId == currentUserId;
+                            
+                        return _buildChatBubble(message, isMe, index);
+                      },
                     );
                   }
                   return const SizedBox();

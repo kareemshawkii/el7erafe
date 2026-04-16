@@ -1,23 +1,21 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:dartz/dartz.dart';
 import 'package:el7erafe/core/services/local_storage/auth_local_storage.dart';
 import 'package:el7erafe/features/technician_flow/tech_reservation_history/data/models/pending_offer_model.dart';
-import 'package:signalr_netcore/signalr_client.dart';
 import 'package:http/http.dart' as http;
+import 'package:el7erafe/core/services/signal_r/signal_r_service.dart';
+import 'package:el7erafe/core/utils/app_event_bus.dart';
 
 class PendingOffersRepo {
-  HubConnection? _hubConnection;
   final AuthLocalStorage _authLocal = AuthLocalStorage();
   final String _baseUrl = "https://el7rafeapp.azurewebsites.net";
-  final String _hubUrl = "https://el7rafeapp.azurewebsites.net/technicianHub";
+  StreamSubscription? _fcmSubscription;
 
   Future<Either<String, List<PendingOfferModel>>> getPendingOffers() async {
     try {
       final token = await _authLocal.getToken();
-      if (token == null || token.isEmpty) {
-        await AuthLocalStorage().clearSession();
-        return const Left("401");
-      }
+      if (token == null || token.isEmpty) return const Left("401");
 
       final url = Uri.parse("$_baseUrl/api/tech/pending-offers");
       final response = await http.get(url, headers: {
@@ -33,18 +31,12 @@ class PendingOffersRepo {
             .map((e) => PendingOfferModel.fromJson(e as Map<String, dynamic>))
             .toList());
       } else if (response.statusCode == 401 || response.statusCode == 403) {
-        await AuthLocalStorage().clearSession();
         return const Left("401");
       } else {
-        return const Left("Failed to fetch pending offers");
+        return const Left("Error");
       }
     } catch (e) {
-      final errorString = e.toString().toLowerCase();
-      if (errorString.contains('401') || errorString.contains('unauthorized')) {
-        await AuthLocalStorage().clearSession();
-        return const Left("401");
-      }
-      return const Left("Server connection failed");
+      return const Left("Error");
     }
   }
 
@@ -52,78 +44,45 @@ class PendingOffersRepo {
     required Function() onSignalRRefreshNeeded,
     required Function() onForceDisconnect,
   }) async {
-    try {
-      final token = await _authLocal.getToken();
-      if (token == null || token.isEmpty) {
-        onForceDisconnect();
-        return;
-      }
-
-      if (_hubConnection != null &&
-          _hubConnection!.state != HubConnectionState.Disconnected) {
-        await _hubConnection!.stop();
-      }
-
-      _hubConnection = HubConnectionBuilder()
-          .withUrl(_hubUrl,
-              options: HttpConnectionOptions(
-                accessTokenFactory: () async => token,
-              ))
-          .withAutomaticReconnect()
-          .build();
-
-      _hubConnection!.serverTimeoutInMilliseconds = 60000;
-      _hubConnection!.keepAliveIntervalInMilliseconds = 30000;
-
-      _hubConnection!.on("OfferRejected", (_) => onSignalRRefreshNeeded());
-      _hubConnection!.on("OfferAccepted", (_) => onSignalRRefreshNeeded());
-
-      _hubConnection!.on("ForceDisconnect", (_) => onForceDisconnect());
-
-      _hubConnection!.onclose(({error}) async {
-        onSignalRRefreshNeeded();
-        _reconnectLoop(onSignalRRefreshNeeded, onForceDisconnect);
-      });
-
-      await _startConnection(onSignalRRefreshNeeded, onForceDisconnect);
-    } catch (e) {
-      if (e.toString().toLowerCase().contains('401')) {
-        await AuthLocalStorage().clearSession();
-        onForceDisconnect();
-      } else {
+    _fcmSubscription?.cancel();
+    _fcmSubscription = AppEventBus().stream.listen((action) {
+      if (action == 'OFFER_ACCEPTED' || action == 'OFFER_REJECTED') {
         onSignalRRefreshNeeded();
       }
-    }
-  }
+    });
 
-  Future<void> _startConnection(
-      Function() onFallback, Function() onForceDisconnect) async {
-    try {
-      if (_hubConnection?.state == HubConnectionState.Disconnected) {
-        await _hubConnection!.start();
-      }
-    } catch (e) {
-      if (e.toString().toLowerCase().contains('401')) {
-        await AuthLocalStorage().clearSession();
-        onForceDisconnect();
-        return;
-      }
-      onFallback();
-      _reconnectLoop(onFallback, onForceDisconnect);
+    final hub = SignalRService.instance.techHub;
+    if (hub == null) {
+      await SignalRService.instance.initAndConnect();
     }
-  }
 
-  void _reconnectLoop(
-      Function() onFallback, Function() onForceDisconnect) async {
-    await Future.delayed(const Duration(seconds: 5));
-    if (_hubConnection?.state == HubConnectionState.Disconnected) {
-      await _startConnection(onFallback, onForceDisconnect);
-    }
+    final activeHub = SignalRService.instance.techHub;
+    if (activeHub == null) return;
+
+    activeHub.off("OfferRejected");
+    activeHub.off("OfferAccepted");
+    activeHub.off("ForceDisconnect");
+
+    activeHub.on("OfferRejected", (_) => onSignalRRefreshNeeded());
+    activeHub.on("OfferAccepted", (_) => onSignalRRefreshNeeded());
+    activeHub.on("ForceDisconnect", (_) => onForceDisconnect());
+
+    activeHub.onclose(({error}) {
+      onSignalRRefreshNeeded();
+    });
+
+    activeHub.onreconnected(({connectionId}) {
+      onSignalRRefreshNeeded();
+    });
   }
 
   Future<void> disconnect() async {
-    if (_hubConnection?.state == HubConnectionState.Connected) {
-      await _hubConnection!.stop();
-    }
+    _fcmSubscription?.cancel();
+    _fcmSubscription = null;
+    final hub = SignalRService.instance.techHub;
+    if (hub == null) return;
+    hub.off("OfferRejected");
+    hub.off("OfferAccepted");
+    hub.off("ForceDisconnect");
   }
 }

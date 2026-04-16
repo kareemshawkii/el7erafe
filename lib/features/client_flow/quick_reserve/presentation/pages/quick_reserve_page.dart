@@ -521,11 +521,27 @@ class _ServiceRequestPageState extends State<ServiceRequestPage> {
                                   _buildToggleOption(
                                       text: "طول اليوم",
                                       isSelected: model.allDayAvailability,
-                                      onTap: () => cubit.toggleAllDay(true)),
+                                      onTap: () {
+                                        cubit.toggleAllDay(true);
+                                        setState(() {
+                                          selectedStartTime = null;
+                                          selectedEndTime = null;
+                                          model.availableFrom = null;
+                                          model.availableTo = null;
+                                        });
+                                      } ),
                                   _buildToggleOption(
                                       text: "من إلى (وقت محدد)",
                                       isSelected: !model.allDayAvailability,
-                                      onTap: () => cubit.toggleAllDay(false)),
+                                      onTap: () {
+                                        cubit.toggleAllDay(false);
+                                        setState(() {
+                                          selectedStartTime = null;
+                                          selectedEndTime = null;
+                                          model.availableFrom = null;
+                                          model.availableTo = null;
+                                        });
+                                      }),
                                 ],
                               ),
                             ),
@@ -618,71 +634,63 @@ class _ServiceRequestPageState extends State<ServiceRequestPage> {
                                         selectedEndTime,
                                         (TimeOfDay t) {
                                           final now = DateTime.now();
-
                                           bool isToday = false;
                                           if (model.day != null) {
-                                            isToday = (model.day!.year ==
-                                                    now.year &&
+                                            isToday = (model.day!.year == now.year &&
                                                 model.day!.month == now.month &&
                                                 model.day!.day == now.day);
                                           }
 
+                                          int effectiveEndHour = (t.hour == 0 || t.hour == 12) ? 24 : t.hour;
+
                                           if (model.availableFrom != null &&
                                               model.availableFrom!.isNotEmpty) {
-                                            int startHour = int.parse(model
-                                                .availableFrom!
-                                                .split(":")[0]);
+                                            int startHour = int.parse(model.availableFrom!.split(":")[0]);
 
-                                            if (t.hour <= startHour) {
+                                            if (effectiveEndHour <= startHour) {
                                               ModernSnackbar.showError(
                                                   context: context,
-                                                  message:
-                                                      "وقت النهاية يجب أن يكون بعد وقت البداية");
+                                                  message: "وقت النهاية يجب أن يكون بعد وقت البداية");
                                               return;
                                             }
                                           }
 
-                                          if (isToday && t.hour < now.hour) {
+                                          if (isToday && effectiveEndHour < now.hour) {
                                             ModernSnackbar.showError(
                                                 context: context,
-                                                message:
-                                                    "لا يمكن اختيار وقت نهاية في الماضي");
+                                                message: "لا يمكن اختيار وقت نهاية في الماضي");
                                             return;
                                           }
 
-                                          if (isToday && t.hour == now.hour) {
+                                          if (isToday && effectiveEndHour == now.hour) {
                                             ModernSnackbar.showError(
                                                 context: context,
-                                                message:
-                                                    "يجب اخيار ساعه تكون بعد الساعه الحالية");
+                                                message: "يجب اختيار ساعة تكون بعد الساعة الحالية");
                                             return;
                                           }
 
                                           setState(() {
-                                            final localizations =
-                                                MaterialLocalizations.of(
-                                                    context);
-                                            TimeOfDay timeWithZeroMinutes =
-                                                TimeOfDay(
-                                                    hour: t.hour, minute: 0);
+                                            if (t.hour == 0 || t.hour == 12) {
+                                              selectedEndTime = "12:00 مساءً";
+                                              model.availableTo = "23:59";
+                                            } else {
+                                              final localizations = MaterialLocalizations.of(context);
+                                              TimeOfDay timeWithZeroMinutes = TimeOfDay(hour: t.hour, minute: 0);
 
-                                            String formattedTime =
-                                                localizations.formatTimeOfDay(
-                                              timeWithZeroMinutes,
-                                              alwaysUse24HourFormat: false,
-                                            );
+                                              String formattedTime = localizations.formatTimeOfDay(
+                                                timeWithZeroMinutes,
+                                                alwaysUse24HourFormat: false,
+                                              );
 
-                                            selectedEndTime = formattedTime
-                                                .replaceAll('AM', 'صباحاً')
-                                                .replaceAll('am', 'صباحاً')
-                                                .replaceAll('PM', 'مساءً')
-                                                .replaceAll('pm', 'مساءً');
+                                              selectedEndTime = formattedTime
+                                                  .replaceAll('AM', 'صباحاً')
+                                                  .replaceAll('am', 'صباحاً')
+                                                  .replaceAll('PM', 'مساءً')
+                                                  .replaceAll('pm', 'مساءً');
 
-                                            String hour24 = timeWithZeroMinutes
-                                                .hour
-                                                .toString()
-                                                .padLeft(2, '0');
-                                            model.availableTo = "$hour24:00";
+                                              String hour24 = timeWithZeroMinutes.hour.toString().padLeft(2, '0');
+                                              model.availableTo = "$hour24:00";
+                                            }
                                           });
                                         },
                                       ),
@@ -832,7 +840,7 @@ class _ServiceRequestPageState extends State<ServiceRequestPage> {
                                               "برجاء كتابة وصف أكثر تفصيلاً لا يقل عن 10 حروف ولا يتجاوز 200 حرف");
                                       return;
                                     }
-
+                                    debugPrint("Navigating to TechnicianReservePage with requestModel: ${"${requestModel.availableFrom} - ${requestModel.availableTo}"}");
                                     Navigator.push(
                                       context,
                                       SlideRightRoute(

@@ -5,6 +5,8 @@ import 'package:el7erafe/core/utils/modern_snakebar.dart';
 import 'package:el7erafe/features/authentication_module/login/data/repositories/auth_repository.dart';
 import 'package:el7erafe/features/authentication_module/login/presentation/cubit/login_cubit.dart';
 import 'package:el7erafe/features/authentication_module/login/presentation/pages/login_page.dart';
+import 'package:el7erafe/features/chat_system/data/repositories/chat_repository.dart';
+import 'package:el7erafe/features/chat_system/presentation/pages/chat_room_page.dart';
 import 'package:el7erafe/features/client_flow/reservation_history/data/models/current_reservation_model.dart';
 import 'package:el7erafe/features/client_flow/reservation_history/data/repositories/current_reservations_repo.dart';
 import 'package:el7erafe/features/client_flow/reservation_history/presentation/cubit/current_reservations_cubit.dart';
@@ -285,7 +287,27 @@ class _CurrentReservationsTabState extends State<CurrentReservationsTab>
               children: [
                 Expanded(
                   child: ElevatedButton.icon(
-                    onPressed: () {},
+                    onPressed: () async {
+                      try {
+                        int chatId = await getChatId(item.reservationId);
+                        Navigator.push(
+                          // ignore: use_build_context_synchronously
+                          context,
+                          SlideRightRouteWithBuild(
+                            builder: (context) => ChatRoomPage(
+                              chatId: chatId,
+                              receiverName: item.techName ?? 'فني الصيانة',
+                              receiverImage: item.techImage ?? '',
+                            ),
+                          ),
+                        );
+                      } catch (e) {
+                        ModernSnackbar.showError(
+                            // ignore: use_build_context_synchronously
+                            context: context,
+                            message: e.toString());
+                      }
+                    },
                     icon: Icon(Iconsax.send, size: 16.sp, color: Colors.white),
                     label: Text('تواصل مع الفني',
                         style: GoogleFonts.cairo(
@@ -544,4 +566,9 @@ Future<void> showCancelConfirmationDialog(
       );
     },
   );
+}
+
+Future<int> getChatId(int reservationId) async {
+  final int chatId = (await ChatRepository().initChat(reservationId));
+  return chatId;
 }

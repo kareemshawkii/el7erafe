@@ -1,23 +1,20 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:dartz/dartz.dart';
 import 'package:el7erafe/core/services/local_storage/auth_local_storage.dart';
 import 'package:el7erafe/features/chat_system/data/models/inbox_conversation_model.dart';
 import 'package:http/http.dart' as http;
-import 'package:signalr_netcore/http_connection_options.dart';
-import 'package:signalr_netcore/hub_connection.dart';
-import 'package:signalr_netcore/hub_connection_builder.dart';
+import 'package:el7erafe/core/services/signal_r/signal_r_service.dart';
+import 'package:el7erafe/core/utils/app_event_bus.dart';
 
 class InboxRepository {
   final String baseUrl = "https://el7rafeapp.azurewebsites.net";
-  final String hubUrl = "https://el7rafeapp.azurewebsites.net/chatHub";
-  HubConnection? _hubConnection;
+  StreamSubscription? _fcmSubscription;
 
   Future<Either<List<InboxConversationModel>, String>> getInbox() async {
     AuthLocalStorage authLocalStorage = AuthLocalStorage();
     String? token = await authLocalStorage.getToken();
-    String? userType = await authLocalStorage.getUserType();
-
-    String endpoint = (userType == 'T') ? '/api/tech/inbox' : '/api/cf/inbox';
+    String endpoint = '/api/tcf/chat/inbox';
 
     try {
       final response = await http.get(
@@ -36,86 +33,55 @@ class InboxRepository {
         await authLocalStorage.clearSession();
         return const Right("401 unauthorized");
       } else {
-        return const Right("فشل في تحميل المحادثات");
+        return const Right("Error");
       }
     } catch (e) {
-      return const Right("خطأ في الاتصال، تأكد من الإنترنت");
+      return const Right("Error");
     }
   }
 
   Future<void> initSignalR({
     Function(List<InboxConversationModel>)? onInboxUpdated,
   }) async {
-    try {
-      String? token = await AuthLocalStorage().getToken();
-      if (token == null || token.isEmpty) return;
-
-      if (_hubConnection != null &&
-          _hubConnection!.state != HubConnectionState.Disconnected) {
-        await _hubConnection!.stop();
+    _fcmSubscription?.cancel();
+    _fcmSubscription = AppEventBus().stream.listen((action) {
+      if (action == 'CHAT_MESSAGE') {
+        _fallbackToApi(onInboxUpdated);
       }
+    });
 
-      _hubConnection = HubConnectionBuilder()
-          .withUrl(hubUrl,
-              options: HttpConnectionOptions(
-                accessTokenFactory: () async => token,
-              ))
-          .withAutomaticReconnect()
-          .build();
-
-      _hubConnection?.serverTimeoutInMilliseconds = 60000;
-      _hubConnection?.keepAliveIntervalInMilliseconds = 30000;
-
-      _hubConnection?.on("InboxUpdated", (arguments) {
-        if (arguments != null && arguments.isNotEmpty) {
-          try {
-            final List<dynamic> data = arguments[0] as List<dynamic>;
-
-            final updatedInbox = data
-                .map((json) => InboxConversationModel.fromJson(
-                    json as Map<String, dynamic>))
-                .toList();
-
-            if (onInboxUpdated != null) {
-              onInboxUpdated(updatedInbox);
-            }
-          } catch (_) {}
-        }
-      });
-
-      _hubConnection!.onclose(({error}) async {
-        await _fallbackToApi(onInboxUpdated);
-        _reconnectLoop(onInboxUpdated);
-      });
-
-      await _startConnection(onInboxUpdated);
-    } catch (_) {
-      await _fallbackToApi(onInboxUpdated);
-      _reconnectLoop(onInboxUpdated);
+    final hub = SignalRService.instance.chatHub;
+    if (hub == null) {
+      await SignalRService.instance.initAndConnect();
     }
-  }
 
-  Future<void> _startConnection(
-      Function(List<InboxConversationModel>)? onInboxUpdated) async {
-    try {
-      if (_hubConnection?.state == HubConnectionState.Disconnected) {
-        await _hubConnection!.start();
+    final activeHub = SignalRService.instance.chatHub;
+    if (activeHub == null) return;
+
+    activeHub.off("InboxUpdated");
+
+    activeHub.on("InboxUpdated", (arguments) {
+      if (arguments != null && arguments.isNotEmpty) {
+        try {
+          final List<dynamic> data = arguments[0] as List<dynamic>;
+          final updatedInbox = data
+              .map((json) =>
+                  InboxConversationModel.fromJson(json as Map<String, dynamic>))
+              .toList();
+          if (onInboxUpdated != null) {
+            onInboxUpdated(updatedInbox);
+          }
+        } catch (_) {}
       }
-    } catch (e) {
-      if (e.toString().toLowerCase().contains('401')) {
-        return;
-      }
-      await _fallbackToApi(onInboxUpdated);
-      _reconnectLoop(onInboxUpdated);
-    }
-  }
+    });
 
-  void _reconnectLoop(
-      Function(List<InboxConversationModel>)? onInboxUpdated) async {
-    await Future.delayed(const Duration(seconds: 5));
-    if (_hubConnection?.state == HubConnectionState.Disconnected) {
-      await _startConnection(onInboxUpdated);
-    }
+    activeHub.onclose(({error}) {
+      _fallbackToApi(onInboxUpdated);
+    });
+
+    activeHub.onreconnected(({connectionId}) {
+      _fallbackToApi(onInboxUpdated);
+    });
   }
 
   Future<void> _fallbackToApi(
@@ -130,6 +96,10 @@ class InboxRepository {
   }
 
   void disconnect() {
-    _hubConnection?.stop();
+    _fcmSubscription?.cancel();
+    _fcmSubscription = null;
+    final hub = SignalRService.instance.chatHub;
+    if (hub == null) return;
+    hub.off("InboxUpdated");
   }
 }
