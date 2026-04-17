@@ -76,6 +76,7 @@ class ChatRepository {
     Function(ChatMessageModel)? onMessageReceived,
     Function(ChatMessageModel)? onMessageSent,
     Function(int messageId, String newStatus)? onMessageStatusUpdated,
+    Function(Map<String, dynamic>)? onMessageRejected,
     Function(List<int> messageIds, String newStatus)? onMessagesDelivered,
     Function(int chatId, List<int> messageIds, String newStatus)?
         onMessagesRead,
@@ -105,6 +106,7 @@ class ChatRepository {
     activeHub.off("MessagesRead");
     activeHub.off("UserOnline");
     activeHub.off("UserOffline");
+    activeHub.off("MessageRejected");
 
     activeHub.on("ReceiveMessage", (arguments) {
       if (arguments != null && arguments.isNotEmpty) {
@@ -145,6 +147,16 @@ class ChatRepository {
             onMessagesDelivered(
                 (arguments[0] as List<dynamic>).map((e) => e as int).toList(),
                 arguments[1] as String);
+          }
+        } catch (_) {}
+      }
+    });
+
+    activeHub.on("MessageRejected", (arguments) {
+      if (arguments != null && arguments.isNotEmpty) {
+        try {
+          if (onMessageRejected != null) {
+            onMessageRejected(arguments[0] as Map<String, dynamic>);
           }
         } catch (_) {}
       }
@@ -208,5 +220,6 @@ class ChatRepository {
     hub.off("MessagesRead");
     hub.off("UserOnline");
     hub.off("UserOffline");
+    hub.off("MessageRejected");
   }
 }

@@ -17,8 +17,9 @@ class ChatCubit extends Cubit<ChatState> {
   Future<void> connectAndLoadHistory() async {
     emit(ChatLoading());
     try {
-      _messages =
+      final rawMessages =
           await repository.getChatHistory(chatId, currentPage, _pageSize);
+      _messages = rawMessages.reversed.toList();
 
       if (!isClosed) {
         emit(ChatLoaded(
@@ -57,6 +58,18 @@ class ChatCubit extends Cubit<ChatState> {
             _messages.insert(0, savedMessage);
           }
           if (!isClosed) {
+            emit(ChatLoaded(List.from(_messages), isOnline: _isReceiverOnline));
+          }
+        },
+        onMessageRejected: (payload) {
+          int index = _messages
+              .indexWhere((m) => m.senderId == "ME" && m.id > 1000000000);
+          if (index != -1) {
+            _messages.removeAt(index);
+          }
+          if (!isClosed) {
+            emit(ChatModerationRejected(List.from(_messages),
+                isOnline: _isReceiverOnline));
             emit(ChatLoaded(List.from(_messages), isOnline: _isReceiverOnline));
           }
         },
@@ -147,8 +160,8 @@ class ChatCubit extends Cubit<ChatState> {
     } catch (_) {
       _messages.remove(optimisticMessage);
       if (!isClosed) {
-        emit(ChatLoaded(List.from(_messages), isOnline: _isReceiverOnline));
         emit(ChatError("فشل في إرسال الرسالة"));
+        emit(ChatLoaded(List.from(_messages), isOnline: _isReceiverOnline));
       }
     }
   }

@@ -60,7 +60,7 @@ class _ChatRoomViewState extends State<ChatRoomView>
   final TextEditingController _messageController = TextEditingController();
   bool _isSendingLocation = false;
   String currentUserId = "";
-  bool _isLoadingUser = true; 
+  bool _isLoadingUser = true;
 
   @override
   void initState() {
@@ -74,7 +74,7 @@ class _ChatRoomViewState extends State<ChatRoomView>
     if (mounted) {
       setState(() {
         currentUserId = id ?? "";
-        _isLoadingUser = false; 
+        _isLoadingUser = false;
       });
     }
   }
@@ -180,7 +180,76 @@ class _ChatRoomViewState extends State<ChatRoomView>
             _buildCustomAppBar(context),
             _buildWarningBanner(),
             Expanded(
-              child: BlocBuilder<ChatCubit, ChatState>(
+              child: BlocConsumer<ChatCubit, ChatState>(
+                listener: (context, state) {
+                  if (state is ChatModerationRejected) {
+                    FocusManager.instance.primaryFocus?.unfocus();
+                    showGeneralDialog(
+                      context: context,
+                      barrierDismissible: false,
+                      barrierLabel: '',
+                      transitionDuration: const Duration(milliseconds: 300),
+                      pageBuilder: (context, anim1, anim2) => const SizedBox(),
+                      transitionBuilder: (context, anim1, anim2, child) {
+                        return ScaleTransition(
+                          scale: Tween<double>(begin: 0.5, end: 1.0).animate(
+                              CurvedAnimation(
+                                  parent: anim1, curve: Curves.easeOutBack)),
+                          child: FadeTransition(
+                            opacity: anim1,
+                            child: AlertDialog(
+                              backgroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20.r)),
+                              contentPadding: EdgeInsets.all(24.r),
+                              content: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.warning_rounded,
+                                      color: Colors.red, size: 60.r),
+                                  SizedBox(height: 16.h),
+                                  Text("تحذير هام",
+                                      style: GoogleFonts.cairo(
+                                          fontSize: 18.sp,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.red)),
+                                  SizedBox(height: 12.h),
+                                  Text(
+                                    "يمنع منعاً باتاً إرسال أي أرقام هواتف أو وسائل تواصل خارجية. تكرار هذا الأمر سيؤدي إلى حظر حسابك نهائياً.",
+                                    textAlign: TextAlign.center,
+                                    style: GoogleFonts.cairo(
+                                        fontSize: 14.sp,
+                                        color: Colors.black87,
+                                        fontWeight: FontWeight.w600),
+                                  ),
+                                  SizedBox(height: 20.h),
+                                  SizedBox(
+                                    width: double.infinity,
+                                    child: ElevatedButton(
+                                      onPressed: () => Navigator.pop(context),
+                                      style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.red,
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(12.r))),
+                                      child: Text("حسناً، فهمت",
+                                          style: GoogleFonts.cairo(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.bold)),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    );
+                  }
+                  else if (state is ChatError) {
+                    _showSnackBar(state.message);
+                  }
+                },
                 builder: (context, state) {
                   if (state is ChatLoading) {
                     return Center(
@@ -197,22 +266,21 @@ class _ChatRoomViewState extends State<ChatRoomView>
                         ],
                       ),
                     );
-                  } else if (state is ChatError) {
-                    return Center(
-                        child: Text(state.message,
-                            style: GoogleFonts.cairo(color: Colors.red)));
-                  } else if (state is ChatLoaded) {
-                    final messages = state.messages.reversed.toList(); 
+                  }  else if (state is ChatLoaded ||
+                      state is ChatModerationRejected) {
+                    final messages = state is ChatLoaded
+                        ? state.messages
+                        : (state as ChatModerationRejected).messages;
+
                     return ListView.builder(
-                      reverse: true, 
-                      padding: EdgeInsets.symmetric(
-                          horizontal: 16.w, vertical: 8.h),
+                      reverse: true,
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
                       itemCount: messages.length,
                       itemBuilder: (context, index) {
                         final message = messages[index];
                         final isMe = message.senderId == "ME" ||
                             message.senderId == currentUserId;
-                            
                         return _buildChatBubble(message, isMe, index);
                       },
                     );

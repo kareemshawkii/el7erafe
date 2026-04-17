@@ -11,11 +11,19 @@ class ChatLoaded extends ChatState {
   final bool hasReachedMax;
   final bool isOnline;
 
-  ChatLoaded(this.messages, {this.hasReachedMax = false, this.isOnline = false});
+  ChatLoaded(this.messages,
+      {this.hasReachedMax = false, this.isOnline = false});
 }
 
 class ChatError extends ChatState {
   final String message;
 
   ChatError(this.message);
+}
+
+class ChatModerationRejected extends ChatState {
+  final List<ChatMessageModel> messages;
+  final bool isOnline;
+
+  ChatModerationRejected(this.messages, {this.isOnline = false});
 }
