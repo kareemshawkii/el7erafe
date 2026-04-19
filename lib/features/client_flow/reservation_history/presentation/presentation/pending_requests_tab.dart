@@ -215,7 +215,12 @@ class PendingRequestsView extends StatelessWidget {
                   builder: (context) =>
                       QuickOffersPage(requestId: request.requestId),
                 ),
-              );
+              ).then((_) async {
+                await Future.delayed(const Duration(milliseconds: 300));
+                if (context.mounted) {
+                  context.read<PendingRequestsCubit>().fetchPendingRequests();
+                }
+              });
             }
           : null,
       secondaryButtonText: 'إلغاء الطلب',

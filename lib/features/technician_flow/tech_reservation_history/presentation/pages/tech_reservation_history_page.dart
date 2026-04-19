@@ -89,6 +89,7 @@ class TechReservationHistoryPage extends StatelessWidget {
             border: Border.all(color: const Color(0xFFE2DFDF)),
           ),
           child: TabBar(
+            overlayColor: WidgetStateProperty.all(Colors.transparent),
             indicatorSize: TabBarIndicatorSize.tab,
             dividerColor: Colors.transparent,
             labelPadding: EdgeInsets.zero,

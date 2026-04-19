@@ -91,6 +91,7 @@ class ReservationHistoryPage extends StatelessWidget {
           child: TabBar(
             indicatorSize: TabBarIndicatorSize.tab,
             dividerColor: Colors.transparent,
+            overlayColor: WidgetStateProperty.all(Colors.transparent),
             labelPadding: EdgeInsets.zero,
             indicator: BoxDecoration(
               borderRadius: BorderRadius.circular(24.r),

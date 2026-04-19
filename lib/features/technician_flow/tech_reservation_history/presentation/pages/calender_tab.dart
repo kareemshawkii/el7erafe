@@ -34,6 +34,7 @@ class _TechCurrentReservationsTabState extends State<TechCurrentReservationsTab>
   final ScrollController _scrollController = ScrollController();
   final List<DateTime> _calendarDays = [];
   late DateTime _today;
+  late DateTime _selectedDate = _today;
 
   @override
   bool get wantKeepAlive => true;
@@ -213,11 +214,9 @@ class _TechCurrentReservationsTabState extends State<TechCurrentReservationsTab>
   Widget _buildCalendarHeader() {
     return BlocBuilder<TechCalendarCubit, TechCalendarState>(
       builder: (context, state) {
-        DateTime selected = _today;
         if (state is TechCalendarLoaded) {
-          selected = state.selectedDate;
+          _selectedDate = state.selectedDate;
         }
-
         double screenWidth = MediaQuery.of(context).size.width;
         double itemWidth = (screenWidth - 32.w - (4 * 10.w)) / 5;
 
@@ -237,12 +236,13 @@ class _TechCurrentReservationsTabState extends State<TechCurrentReservationsTab>
                   padding: EdgeInsets.symmetric(horizontal: 16.w),
                   itemBuilder: (context, index) {
                     final dayDate = _calendarDays[index];
-                    final isSelected = dayDate.isAtSameMomentAs(selected);
-
+                    final isSelected = dayDate.isAtSameMomentAs(_selectedDate);
                     bool isFirstDayOfMonth = dayDate.day == 1 || index == 0;
-
                     return GestureDetector(
                       onTap: () {
+                        setState(() {
+                          _selectedDate = dayDate;
+                        });
                         context
                             .read<TechCalendarCubit>()
                             .fetchReservationsForDate(dayDate);

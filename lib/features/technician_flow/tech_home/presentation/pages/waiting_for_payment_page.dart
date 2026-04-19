@@ -1,7 +1,7 @@
 import 'package:el7erafe/core/utils/animated_navigaton_with_build.dart';
 import 'package:el7erafe/features/technician_flow/tech_home/presentation/cubit/available_requests_cubit.dart';
 import 'package:el7erafe/features/technician_flow/tech_home/presentation/cubit/available_requests_state.dart';
-import 'package:el7erafe/features/technician_flow/tech_home/presentation/pages/tech_payment_success_page.dart';
+import 'package:el7erafe/features/technician_flow/tech_home/presentation/pages/tech_home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -37,11 +37,12 @@ class WaitingForPaymentPage extends StatelessWidget {
     return BlocListener<AvailableRequestsCubit, AvailableRequestsState>(
       listener: (context, state) {
         if (state is PaymentReceivedSuccess) {
-          Navigator.pushReplacement(
+          Navigator.pushAndRemoveUntil(
             context,
             SlideRightRouteWithBuild(
-              builder: (_) => const TechPaymentSuccessPage(),
+              builder: (_) => const TechHomePage(),
             ),
+            (route) => false,
           );
         }
       },
