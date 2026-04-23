@@ -40,9 +40,14 @@ class ProfileRepository {
         await authLocalStorage.clearSession();
         return const Left("401");
       } else {
-        return const Left(
-          "فشل تحميل بيانات الملف الشخصي الرجاء المحاولة مرة اخرى.",
-        );
+        try {
+          final decodedData = jsonDecode(response.body);
+          return Left(decodedData['errorMessage'] ??
+              "فشل تحميل بيانات الملف الشخصي الرجاء المحاولة مرة اخرى.");
+        } catch (_) {
+          return const Left(
+              "فشل تحميل بيانات الملف الشخصي الرجاء المحاولة مرة اخرى.");
+        }
       }
     } catch (e) {
       return const Left(
@@ -70,7 +75,13 @@ class ProfileRepository {
         await authLocalStorage.clearSession();
         return const Left("401");
       } else {
-        return const Left("فشل حذف الحساب الرجاء المحاولة مرة اخرى.");
+        try {
+          final decodedData = jsonDecode(response.body);
+          return Left(decodedData['errorMessage'] ??
+              "فشل حذف الحساب الرجاء المحاولة مرة اخرى.");
+        } catch (_) {
+          return const Left("فشل حذف الحساب الرجاء المحاولة مرة اخرى.");
+        }
       }
     } catch (e) {
       return const Left(
@@ -98,9 +109,13 @@ class ProfileRepository {
         await authLocalStorage.clearSession();
         return const Left("401");
       } else {
-        return const Left(
-          "فشل تسجيل الخروج الرجاء المحاولة مرة اخرى.",
-        );
+        try {
+          final decodedData = jsonDecode(response.body);
+          return Left(decodedData['errorMessage'] ??
+              "فشل تسجيل الخروج الرجاء المحاولة مرة اخرى.");
+        } catch (_) {
+          return const Left("فشل تسجيل الخروج الرجاء المحاولة مرة اخرى.");
+        }
       }
     } catch (e) {
       return const Left(
@@ -141,7 +156,13 @@ class ProfileRepository {
         await authLocalStorage.clearSession();
         return const Left("401");
       } else {
-        return const Left("فشل تحديث البيانات، الرجاء المحاولة مرة أخرى.");
+        try {
+          final decodedData = jsonDecode(response.body);
+          return Left(decodedData['errorMessage'] ??
+              "فشل تحديث البيانات، الرجاء المحاولة مرة أخرى.");
+        } catch (_) {
+          return const Left("فشل تحديث البيانات، الرجاء المحاولة مرة أخرى.");
+        }
       }
     } catch (e) {
       return const Left(
@@ -164,14 +185,17 @@ class ProfileRepository {
       );
       if (response.statusCode == 200) {
         return const Right('تم إرسال كود التحقق بنجاح.');
-      } else if (response.statusCode == 400) {
-        return Left(jsonDecode(response.body)['errorMessage']);
       } else if (response.statusCode == 401) {
         AuthLocalStorage authLocalStorage = AuthLocalStorage();
         await authLocalStorage.clearSession();
         return const Left("401");
       } else {
-        return Left(jsonDecode(response.body)['errorMessage']);
+        try {
+          final decodedData = jsonDecode(response.body);
+          return Left(decodedData['errorMessage'] ?? "حدث خطأ غير متوقع.");
+        } catch (_) {
+          return const Left("حدث خطأ غير متوقع.");
+        }
       }
     } catch (e) {
       return const Left("حصل خطأ غير متوقع. يرجى التأكد من اتصالك بالإنترنت.");
@@ -194,15 +218,19 @@ class ProfileRepository {
       );
       if (response.statusCode == 200 || response.statusCode == 201) {
         return const Right('تم التحقق من الكود بنجاح');
-      } else if (response.statusCode == 400) {
-        return Left((jsonDecode(response.body)['errorMessage']));
       } else if (response.statusCode == 401) {
         AuthLocalStorage authLocalStorage = AuthLocalStorage();
         await authLocalStorage.clearSession();
         return const Left("401");
       } else {
-        return const Left(
-            ("حصل خطأ غير متوقع. يرجى المحاولة مرة أخرى لاحقًا."));
+        try {
+          final decodedData = jsonDecode(response.body);
+          return Left(decodedData['errorMessage'] ??
+              "حصل خطأ غير متوقع. يرجى المحاولة مرة أخرى لاحقًا.");
+        } catch (_) {
+          return const Left(
+              "حصل خطأ غير متوقع. يرجى المحاولة مرة أخرى لاحقًا.");
+        }
       }
     } catch (e) {
       return const Left(
@@ -226,14 +254,17 @@ class ProfileRepository {
       );
       if (response.statusCode == 200) {
         return const Right('تم تحديث البريد الإلكتروني بنجاح.');
-      } else if (response.statusCode == 400) {
-        return Left(jsonDecode(response.body)['errorMessage']);
       } else if (response.statusCode == 401) {
         AuthLocalStorage authLocalStorage = AuthLocalStorage();
         await authLocalStorage.clearSession();
         return const Left("401");
       } else {
-        return Left(jsonDecode(response.body)['errorMessage']);
+        try {
+          final decodedData = jsonDecode(response.body);
+          return Left(decodedData['errorMessage'] ?? "حدث خطأ غير متوقع.");
+        } catch (_) {
+          return const Left("حدث خطأ غير متوقع.");
+        }
       }
     } catch (e) {
       return const Left("حصل خطأ غير متوقع. يرجى التأكد من اتصالك بالإنترنت.");
@@ -259,15 +290,19 @@ class ProfileRepository {
         final prefs = await SharedPreferences.getInstance();
         await prefs.remove(_cacheKey);
         return const Right('تم التحقق من الكود بنجاح');
-      } else if (response.statusCode == 400) {
-        return Left((jsonDecode(response.body)['errorMessage']));
       } else if (response.statusCode == 401) {
         AuthLocalStorage authLocalStorage = AuthLocalStorage();
         await authLocalStorage.clearSession();
         return const Left("401");
       } else {
-        return const Left(
-            ("حصل خطأ غير متوقع. يرجى المحاولة مرة أخرى لاحقًا."));
+        try {
+          final decodedData = jsonDecode(response.body);
+          return Left(decodedData['errorMessage'] ??
+              "حصل خطأ غير متوقع. يرجى المحاولة مرة أخرى لاحقًا.");
+        } catch (_) {
+          return const Left(
+              "حصل خطأ غير متوقع. يرجى المحاولة مرة أخرى لاحقًا.");
+        }
       }
     } catch (e) {
       return const Left(
@@ -293,14 +328,17 @@ class ProfileRepository {
         final prefs = await SharedPreferences.getInstance();
         await prefs.remove(_cacheKey);
         return const Right('تم تحديث رقم الهاتف بنجاح.');
-      } else if (response.statusCode == 400) {
-        return Left(jsonDecode(response.body)['errorMessage']);
       } else if (response.statusCode == 401) {
         AuthLocalStorage authLocalStorage = AuthLocalStorage();
         await authLocalStorage.clearSession();
         return const Left("401");
       } else {
-        return Left(jsonDecode(response.body)['errorMessage']);
+        try {
+          final decodedData = jsonDecode(response.body);
+          return Left(decodedData['errorMessage'] ?? "حدث خطأ غير متوقع.");
+        } catch (_) {
+          return const Left("حدث خطأ غير متوقع.");
+        }
       }
     } catch (e) {
       return const Left("حصل خطأ غير متوقع. يرجى التأكد من اتصالك بالإنترنت.");

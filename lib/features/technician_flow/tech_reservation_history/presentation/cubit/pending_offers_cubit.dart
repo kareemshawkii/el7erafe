@@ -31,7 +31,6 @@ class PendingOffersCubit extends Cubit<PendingOffersState> {
   void initializeSignalR() async {
     await repository.connectAndListen(
       onSignalRRefreshNeeded: () {
-        // Triggered by OfferRejected or OfferAccepted from Client
         if (!isClosed) {
           fetchPendingOffers();
         }

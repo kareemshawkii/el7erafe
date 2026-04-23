@@ -1,7 +1,7 @@
 name: el7erafe
 description: "Software Solution for fixing the gap between the users and technicians."
 publish_to: 'none'
-version: 1.0.0+26
+version: 1.0.0+27
 
 environment:
   sdk: '>=3.0.0 <4.0.0' 

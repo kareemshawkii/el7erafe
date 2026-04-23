@@ -2074,7 +2074,7 @@ class _TimePickerDialogState extends State<TimePickerDialog> with RestorationMix
         vertical:
             (_entryMode.value == TimePickerEntryMode.input ||
                 _entryMode.value == TimePickerEntryMode.inputOnly)
-            ? 0
+            ? 24
             : 24,
       ),
       child: Padding(

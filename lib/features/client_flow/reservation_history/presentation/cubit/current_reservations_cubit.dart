@@ -56,7 +56,6 @@ class CurrentReservationsCubit extends Cubit<CurrentReservationsState> {
       if (e.toString().contains('UNAUTH')) {
         if (!isClosed) emit(CurrentUnauth());
       }
-      // Ignore background errors
     }
   }
 

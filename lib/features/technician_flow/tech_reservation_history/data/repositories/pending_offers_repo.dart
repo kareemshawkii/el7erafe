@@ -33,10 +33,15 @@ class PendingOffersRepo {
       } else if (response.statusCode == 401 || response.statusCode == 403) {
         return const Left("401");
       } else {
-        return const Left("Error");
+        try {
+          final decodedData = jsonDecode(response.body);
+          return Left(decodedData['errorMessage'] ?? "حدث خطأ غير متوقع");
+        } catch (_) {
+          return const Left("حدث خطأ غير متوقع");
+        }
       }
     } catch (e) {
-      return const Left("Error");
+      return const Left("حدث خطأ في الاتصال بالخادم");
     }
   }
 

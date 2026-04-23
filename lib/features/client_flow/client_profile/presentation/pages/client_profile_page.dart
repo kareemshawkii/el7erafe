@@ -106,7 +106,7 @@ class _ClientProfilePageViewState extends State<ClientProfilePageView> {
   }
 
   void _navigateToLogin(BuildContext context, String message) {
-    ModernSnackbar.showSuccess(context: context, message: message);
+    ModernSnackbar.showError(context: context, message: message);
     Navigator.pushAndRemoveUntil(
       context,
       SlideRightRouteWithBuild(
@@ -120,37 +120,59 @@ class _ClientProfilePageViewState extends State<ClientProfilePageView> {
   }
 
   void _onDeleteAccountPressed(BuildContext context) {
-    showDialog(
+    showGeneralDialog(
       context: context,
-      builder: (dialogContext) => Directionality(
-        textDirection: TextDirection.rtl,
-        child: AlertDialog(
-          backgroundColor: Colors.white,
-          shadowColor: Colors.black45,
-          title: Text("حذف الحساب",
-              style: GoogleFonts.cairo(fontWeight: FontWeight.bold)),
-          content: Text(
-            "هل أنت متأكد أنك تريد حذف حسابك نهائياً؟ لا يمكن التراجع عن هذا الإجراء.",
-            style: GoogleFonts.cairo(),
+      barrierDismissible: true,
+      barrierLabel: '',
+      transitionDuration: const Duration(milliseconds: 400),
+      pageBuilder: (ctx, anim1, anim2) => const SizedBox(),
+      transitionBuilder: (ctx, anim1, anim2, child) {
+        return Transform.scale(
+          scale: Curves.easeInOutBack.transform(anim1.value),
+          child: Opacity(
+            opacity: anim1.value,
+            child: Directionality(
+              textDirection: TextDirection.rtl,
+              child: AlertDialog(
+                backgroundColor: Colors.white,
+                shadowColor: Colors.black45,
+                title: Text(
+                  "حذف الحساب",
+                  style: GoogleFonts.cairo(fontWeight: FontWeight.bold),
+                ),
+                content: Text(
+                  "هل أنت متأكد أنك تريد حذف حسابك نهائياً؟ لا يمكن التراجع عن هذا الإجراء.",
+                  style: GoogleFonts.cairo(),
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(ctx),
+                    child: Text(
+                      "إلغاء",
+                      style: GoogleFonts.cairo(color: Colors.black),
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(ctx);
+                      context
+                          .read<ProfileCubit>()
+                          .deleteAccount(widget.token ?? "");
+                    },
+                    child: Text(
+                      "حذف",
+                      style: GoogleFonts.cairo(
+                        color: _dangerRed,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(dialogContext),
-              child:
-                  Text("إلغاء", style: GoogleFonts.cairo(color: Colors.black)),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.pop(dialogContext);
-                context.read<ProfileCubit>().deleteAccount(widget.token ?? "");
-              },
-              child: Text("حذف",
-                  style: GoogleFonts.cairo(
-                      color: _dangerRed, fontWeight: FontWeight.bold)),
-            ),
-          ],
-        ),
-      ),
+        );
+      },
     );
   }
 
@@ -164,37 +186,57 @@ class _ClientProfilePageViewState extends State<ClientProfilePageView> {
   }
 
   void _onLogoutPressed(BuildContext context) {
-    showDialog(
+    showGeneralDialog(
       context: context,
-      builder: (dialogContext) => Directionality(
-        textDirection: TextDirection.rtl,
-        child: AlertDialog(
-          backgroundColor: Colors.white,
-          shadowColor: Colors.black45,
-          title: Text("تسجيل الخروج",
-              style: GoogleFonts.cairo(fontWeight: FontWeight.bold)),
-          content: Text(
-            "هل أنت متأكد أنك تريد تسجيل الخروج؟",
-            style: GoogleFonts.cairo(),
+      barrierDismissible: true,
+      barrierLabel: '',
+      transitionDuration: const Duration(milliseconds: 400),
+      pageBuilder: (ctx, anim1, anim2) => const SizedBox(),
+      transitionBuilder: (ctx, anim1, anim2, child) {
+        return Transform.scale(
+          scale: Curves.easeInOutBack.transform(anim1.value),
+          child: Opacity(
+            opacity: anim1.value,
+            child: Directionality(
+              textDirection: TextDirection.rtl,
+              child: AlertDialog(
+                backgroundColor: Colors.white,
+                shadowColor: Colors.black45,
+                title: Text(
+                  "تسجيل الخروج",
+                  style: GoogleFonts.cairo(fontWeight: FontWeight.bold),
+                ),
+                content: Text(
+                  "هل أنت متأكد أنك تريد تسجيل الخروج؟",
+                  style: GoogleFonts.cairo(),
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(ctx),
+                    child: Text(
+                      "إلغاء",
+                      style: GoogleFonts.cairo(color: Colors.black),
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(ctx);
+                      context.read<ProfileCubit>().logout(widget.token ?? "");
+                    },
+                    child: Text(
+                      "خروج",
+                      style: GoogleFonts.cairo(
+                        color: _dangerRed,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(dialogContext),
-              child:
-                  Text("إلغاء", style: GoogleFonts.cairo(color: Colors.black)),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.pop(dialogContext);
-                context.read<ProfileCubit>().logout(widget.token ?? "");
-              },
-              child: Text("خروج",
-                  style: GoogleFonts.cairo(
-                      color: _dangerRed, fontWeight: FontWeight.bold)),
-            ),
-          ],
-        ),
-      ),
+        );
+      },
     );
   }
 

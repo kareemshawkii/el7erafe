@@ -36,10 +36,15 @@ class AvailableRequestsRepo {
         await _authLocal.clearSession();
         throw Exception("401 Unauthorized");
       } else {
-        throw Exception("Error");
+        try {
+          final decodedData = jsonDecode(response.body);
+          throw Exception(decodedData['errorMessage'] ?? "حدث خطأ غير متوقع");
+        } catch (_) {
+          throw Exception("حدث خطأ غير متوقع");
+        }
       }
     } catch (e) {
-      throw Exception("Error");
+      throw Exception(e.toString().replaceAll("Exception: ", ""));
     }
   }
 
@@ -173,9 +178,14 @@ class AvailableRequestsRepo {
         return const Right("تم تقديم العرض بنجاح");
       }
       if (response.statusCode == 401) return const Left("401");
-      return Left(jsonDecode(response.body)['errorMessage'] ?? "Error");
+      try {
+        final decodedData = jsonDecode(response.body);
+        return Left(decodedData['errorMessage'] ?? "حدث خطأ غير متوقع");
+      } catch (_) {
+        return const Left("حدث خطأ غير متوقع");
+      }
     } catch (_) {
-      return const Left("Error");
+      return const Left("حدث خطأ في الاتصال بالخادم");
     }
   }
 
@@ -197,9 +207,14 @@ class AvailableRequestsRepo {
       if (response.statusCode == 401 || response.statusCode == 403) {
         return const Left("401");
       }
-      return Left(jsonDecode(response.body)['errorMessage'] ?? "Error");
+      try {
+        final decodedData = jsonDecode(response.body);
+        return Left(decodedData['errorMessage'] ?? "حدث خطأ غير متوقع");
+      } catch (_) {
+        return const Left("حدث خطأ غير متوقع");
+      }
     } catch (e) {
-      return const Left("Error");
+      return const Left("حدث خطأ في الاتصال بالخادم");
     }
   }
 
@@ -221,9 +236,14 @@ class AvailableRequestsRepo {
       if (response.statusCode == 401 || response.statusCode == 403) {
         return const Left("401");
       }
-      return Left(jsonDecode(response.body)['errorMessage'] ?? "Error");
+      try {
+        final decodedData = jsonDecode(response.body);
+        return Left(decodedData['errorMessage'] ?? "حدث خطأ غير متوقع");
+      } catch (_) {
+        return const Left("حدث خطأ غير متوقع");
+      }
     } catch (e) {
-      return const Left("Error");
+      return const Left("حدث خطأ في الاتصال بالخادم");
     }
   }
 }

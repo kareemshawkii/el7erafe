@@ -63,12 +63,14 @@ class AvailableRequestsCubit extends Cubit<AvailableRequestsState> {
       );
     } catch (e) {
       if (!isClosed) {
-        final errorString = e.toString().toLowerCase();
+        final errorString =
+            e.toString().toLowerCase().replaceAll("exception: ", "");
         if (errorString.contains('401') ||
             errorString.contains('unauthorized')) {
           emit(AvailableRequestsUnauthorized());
         } else {
-          emit(AvailableRequestsError(e.toString()));
+          emit(AvailableRequestsError(
+              e.toString().replaceAll("Exception: ", "")));
         }
       }
     }
@@ -82,7 +84,8 @@ class AvailableRequestsCubit extends Cubit<AvailableRequestsState> {
     int? numberOfDays,
   }) async {
     final currentState = state;
-    emit(AvailableRequestsLoading());
+
+    emit(MakeOfferLoading());
 
     final result = await repository.submitOffer(
       requestId: requestId,

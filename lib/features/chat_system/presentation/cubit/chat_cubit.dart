@@ -135,8 +135,10 @@ class ChatCubit extends Cubit<ChatState> {
       );
 
       await repository.markMessagesAsRead(chatId);
-    } catch (_) {
-      if (!isClosed) emit(ChatError("حدث خطأ في الاتصال أو جلب الرسائل"));
+    } catch (e) {
+      if (!isClosed) {
+        emit(ChatError(e.toString().replaceAll("Exception: ", "")));
+      }
     }
   }
 
@@ -157,10 +159,10 @@ class ChatCubit extends Cubit<ChatState> {
       _messages.insert(0, optimisticMessage);
       emit(ChatLoaded(List.from(_messages), isOnline: _isReceiverOnline));
       await repository.sendMessage(chatId, content);
-    } catch (_) {
+    } catch (e) {
       _messages.remove(optimisticMessage);
       if (!isClosed) {
-        emit(ChatError("فشل في إرسال الرسالة"));
+        emit(ChatError(e.toString().replaceAll("Exception: ", "")));
         emit(ChatLoaded(List.from(_messages), isOnline: _isReceiverOnline));
       }
     }

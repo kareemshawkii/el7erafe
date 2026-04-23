@@ -35,7 +35,12 @@ class PreviousReservationsRepo {
       await authStorage.clearSession();
       throw Exception('UNAUTH');
     } else {
-      throw Exception('حدث خطأ أثناء جلب البيانات');
+      try {
+        final data = jsonDecode(response.body);
+        throw Exception(data['errorMessage'] ?? 'حدث خطأ أثناء جلب البيانات');
+      } catch (_) {
+        throw Exception('حدث خطأ أثناء جلب البيانات');
+      }
     }
   }
 }

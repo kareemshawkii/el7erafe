@@ -30,14 +30,14 @@ class ChatRepository {
         final decodedData = jsonDecode(response.body);
         return (decodedData['id'] ?? decodedData['chatId']) as int;
       } catch (_) {
-        throw Exception("Error");
+        throw Exception("حدث خطأ غير متوقع");
       }
     } else {
       try {
         final decodedData = jsonDecode(response.body);
-        throw Exception(decodedData['errorMessage'] ?? 'Error');
+        throw Exception(decodedData['errorMessage'] ?? 'حدث خطأ غير متوقع');
       } catch (_) {
-        throw Exception("Error");
+        throw Exception("حدث خطأ غير متوقع");
       }
     }
   }
@@ -65,10 +65,16 @@ class ChatRepository {
             .map((json) =>
                 ChatMessageModel.fromJson(json as Map<String, dynamic>))
             .toList();
+      } else {
+        try {
+          final decodedData = jsonDecode(response.body);
+          throw Exception(decodedData['errorMessage'] ?? 'حدث خطأ غير متوقع');
+        } catch (_) {
+          throw Exception("حدث خطأ غير متوقع");
+        }
       }
-      return [];
     } catch (e) {
-      throw Exception("Error");
+      throw Exception(e.toString().replaceAll("Exception: ", ""));
     }
   }
 
@@ -190,13 +196,13 @@ class ChatRepository {
 
   Future<void> sendMessage(int chatId, String content) async {
     final hub = SignalRService.instance.chatHub;
-    if (hub == null) throw Exception("Error");
+    if (hub == null) throw Exception("حدث خطأ في الاتصال");
     try {
       await hub.invoke("SendMessage", args: [
         {"chatId": chatId, "content": content, "messageType": "Text"}
       ]);
     } catch (e) {
-      throw Exception("Error");
+      throw Exception("حدث خطأ في الاتصال");
     }
   }
 

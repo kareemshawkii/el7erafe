@@ -37,7 +37,13 @@ class HomeRepository {
         SignalRService.instance.disconnect();
         return const Left("401 Unauthorized");
       } else {
-        return const Left("فشل تحميل الخدمات الرجاء المحاولة مرة اخرى.");
+        try {
+          final Map<String, dynamic> errorBody = jsonDecode(response.body);
+          return Left(errorBody['errorMessage'] ??
+              "فشل تحميل الخدمات الرجاء المحاولة مرة اخرى.");
+        } catch (_) {
+          return const Left("فشل تحميل الخدمات الرجاء المحاولة مرة اخرى.");
+        }
       }
     } catch (e) {
       return const Left(

@@ -64,29 +64,52 @@ class _ImagePickerButtonState extends State<ImagePickerButton> {
   }
 
   void _showSettingsDialog() {
-    showDialog(
+    showGeneralDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('إعدادات الإذن مطلوبة',
-            textDirection: TextDirection.rtl),
-        content: const Text(
-          'تم رفض الوصول إلى الكاميرا بشكل دائم. يرجى تمكينه في إعدادات التطبيق لالتقاط الصور.',
-          textDirection: TextDirection.rtl,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('إلغاء'),
+      barrierDismissible: true,
+      barrierLabel: '',
+      transitionDuration: const Duration(milliseconds: 400),
+      pageBuilder: (ctx, anim1, anim2) => Container(),
+      transitionBuilder: (ctx, anim1, anim2, child) {
+        var curve = Curves.easeInOutBack.transform(anim1.value);
+        return Transform.scale(
+          scale: curve,
+          child: Opacity(
+            opacity: anim1.value,
+            child: AlertDialog(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20)),
+              title: const Text(
+                'إعدادات الإذن مطلوبة',
+                textDirection: TextDirection.rtl,
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              content: const Text(
+                'تم رفض الوصول إلى الكاميرا بشكل دائم. يرجى تمكينه في إعدادات التطبيق لالتقاط الصور.',
+                textDirection: TextDirection.rtl,
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(ctx).pop(),
+                  child:
+                      const Text('إلغاء', style: TextStyle(color: Colors.grey)),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(ctx).pop();
+                    openAppSettings();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10)),
+                  ),
+                  child: const Text('فتح الإعدادات'),
+                ),
+              ],
+            ),
           ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(ctx).pop();
-              openAppSettings();
-            },
-            child: const Text('فتح الإعدادات'),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 

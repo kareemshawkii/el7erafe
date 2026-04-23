@@ -114,105 +114,129 @@ class _ServiceRequestPageState extends State<ServiceRequestPage> {
           body: BlocConsumer<ServiceRequestCubit, ServiceRequestState>(
             listener: (context, state) {
               if (state is ServiceRequestError) {
-                showDialog(
+                showGeneralDialog(
                   context: context,
-                  builder: (context) => Directionality(
-                    textDirection: TextDirection.rtl,
-                    child: AlertDialog(
-                      backgroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16.r)),
-                      title: Row(
-                        children: [
-                          Icon(Icons.warning_amber_rounded,
-                              color: Colors.red, size: 28.r),
-                          SizedBox(width: 8.w),
-                          Text(
-                            "تنبيه",
-                            style: GoogleFonts.cairo(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18.sp,
+                  barrierDismissible: true,
+                  barrierLabel: '',
+                  transitionDuration: const Duration(milliseconds: 400),
+                  pageBuilder: (ctx, anim1, anim2) => const SizedBox(),
+                  transitionBuilder: (ctx, anim1, anim2, child) {
+                    return Transform.scale(
+                      scale: Curves.easeInOutBack.transform(anim1.value),
+                      child: Opacity(
+                        opacity: anim1.value,
+                        child: Directionality(
+                          textDirection: TextDirection.rtl,
+                          child: AlertDialog(
+                            backgroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16.r)),
+                            title: Row(
+                              children: [
+                                Icon(Icons.warning_amber_rounded,
+                                    color: Colors.red, size: 28.r),
+                                SizedBox(width: 8.w),
+                                Text(
+                                  "تنبيه",
+                                  style: GoogleFonts.cairo(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 18.sp,
+                                  ),
+                                ),
+                              ],
                             ),
+                            content: Text(
+                              state.message,
+                              style: GoogleFonts.cairo(
+                                fontSize: 15.sp,
+                                color: Colors.black87,
+                              ),
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pop(ctx);
+                                },
+                                child: Text(
+                                  "حسناً",
+                                  style: GoogleFonts.cairo(
+                                    color: const Color(0xFF3775FA),
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                      content: Text(
-                        state.message,
-                        style: GoogleFonts.cairo(
-                          fontSize: 15.sp,
-                          color: Colors.black87,
                         ),
                       ),
-                      actions: [
-                        TextButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          child: Text(
-                            "حسناً",
-                            style: GoogleFonts.cairo(
-                              color: const Color(0xFF3775FA),
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                    );
+                  },
                 );
               } else if (state is ServiceRequestConflict) {
-                showDialog(
+                showGeneralDialog(
                   context: context,
-                  builder: (context) => Directionality(
-                    textDirection: TextDirection.rtl,
-                    child: AlertDialog(
-                      backgroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16.r)),
-                      title: Row(
-                        children: [
-                          Icon(Icons.warning_amber_rounded,
-                              color: Colors.red, size: 28.r),
-                          SizedBox(width: 8.w),
-                          Text(
-                            "تنبيه",
-                            style: GoogleFonts.cairo(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18.sp,
+                  barrierDismissible: true,
+                  barrierLabel: '',
+                  transitionDuration: const Duration(milliseconds: 400),
+                  pageBuilder: (ctx, anim1, anim2) => const SizedBox(),
+                  transitionBuilder: (ctx, anim1, anim2, child) {
+                    return Transform.scale(
+                      scale: Curves.easeInOutBack.transform(anim1.value),
+                      child: Opacity(
+                        opacity: anim1.value,
+                        child: Directionality(
+                          textDirection: TextDirection.rtl,
+                          child: AlertDialog(
+                            backgroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16.r)),
+                            title: Row(
+                              children: [
+                                Icon(Icons.warning_amber_rounded,
+                                    color: Colors.red, size: 28.r),
+                                SizedBox(width: 8.w),
+                                Text(
+                                  "تنبيه",
+                                  style: GoogleFonts.cairo(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 18.sp,
+                                  ),
+                                ),
+                              ],
                             ),
-                          ),
-                        ],
-                      ),
-                      content: Text(
-                        state.message,
-                        style: GoogleFonts.cairo(
-                          fontSize: 15.sp,
-                          color: Colors.black87,
-                        ),
-                      ),
-                      actions: [
-                        TextButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                            Navigator.pushAndRemoveUntil(
-                              context,
-                              SlideRightRouteWithBuild(
-                                builder: (context) => ClientHomePage(),
+                            content: Text(
+                              state.message,
+                              style: GoogleFonts.cairo(
+                                fontSize: 15.sp,
+                                color: Colors.black87,
                               ),
-                              (route) => false,
-                            );
-                          },
-                          child: Text(
-                            "حسناً",
-                            style: GoogleFonts.cairo(
-                              color: const Color(0xFF3775FA),
-                              fontWeight: FontWeight.bold,
                             ),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pop(ctx);
+                                  Navigator.pushAndRemoveUntil(
+                                    context,
+                                    SlideRightRouteWithBuild(
+                                      builder: (context) => ClientHomePage(),
+                                    ),
+                                    (route) => false,
+                                  );
+                                },
+                                child: Text(
+                                  "حسناً",
+                                  style: GoogleFonts.cairo(
+                                    color: const Color(0xFF3775FA),
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                      ],
-                    ),
-                  ),
+                      ),
+                    );
+                  },
                 );
               } else if (state is ServiceRequestUnauthorized) {
                 ModernSnackbar.showError(
@@ -502,6 +526,13 @@ class _ServiceRequestPageState extends State<ServiceRequestPage> {
                                     onValueChanged: (dates) {
                                       model.day =
                                           dates.isNotEmpty ? dates.first : null;
+                                      setState(() {
+                                        cubit.toggleAllDay(true);
+                                        selectedStartTime = null;
+                                        selectedEndTime = null;
+                                        model.availableFrom = null;
+                                        model.availableTo = null;
+                                      });
                                     },
                                   ),
                                 )),
@@ -529,7 +560,7 @@ class _ServiceRequestPageState extends State<ServiceRequestPage> {
                                           model.availableFrom = null;
                                           model.availableTo = null;
                                         });
-                                      } ),
+                                      }),
                                   _buildToggleOption(
                                       text: "من إلى (وقت محدد)",
                                       isSelected: !model.allDayAvailability,
@@ -596,31 +627,20 @@ class _ServiceRequestPageState extends State<ServiceRequestPage> {
                                           }
 
                                           setState(() {
-                                            final localizations =
-                                                MaterialLocalizations.of(
-                                                    context);
+                                            int displayHour =
+                                                t.hourOfPeriod == 0
+                                                    ? 12
+                                                    : t.hourOfPeriod;
+                                            String period =
+                                                t.period == DayPeriod.am
+                                                    ? 'صباحاً'
+                                                    : 'مساءً';
+                                            selectedStartTime =
+                                                '${displayHour.toString().padLeft(2, '0')}:00 $period';
 
-                                            TimeOfDay timeWithZeroMinutes =
-                                                TimeOfDay(
-                                                    hour: t.hour, minute: 0);
-
-                                            String formattedTime =
-                                                localizations.formatTimeOfDay(
-                                              timeWithZeroMinutes,
-                                              alwaysUse24HourFormat: false,
-                                            );
-
-                                            selectedStartTime = formattedTime
-                                                .replaceAll('AM', 'صباحاً')
-                                                .replaceAll('am', 'صباحاً')
-                                                .replaceAll('PM', 'مساءً')
-                                                .replaceAll('pm', 'مساءً');
-
-                                            String hour24 = timeWithZeroMinutes
-                                                .hour
+                                            String hour24 = t.hour
                                                 .toString()
                                                 .padLeft(2, '0');
-
                                             model.availableFrom = "$hour24:00";
                                           });
                                         },
@@ -636,59 +656,67 @@ class _ServiceRequestPageState extends State<ServiceRequestPage> {
                                           final now = DateTime.now();
                                           bool isToday = false;
                                           if (model.day != null) {
-                                            isToday = (model.day!.year == now.year &&
+                                            isToday = (model.day!.year ==
+                                                    now.year &&
                                                 model.day!.month == now.month &&
                                                 model.day!.day == now.day);
                                           }
 
-                                          int effectiveEndHour = (t.hour == 0 || t.hour == 12) ? 24 : t.hour;
+                                          int effectiveEndHour =
+                                              (t.hour == 0) ? 24 : t.hour;
 
                                           if (model.availableFrom != null &&
                                               model.availableFrom!.isNotEmpty) {
-                                            int startHour = int.parse(model.availableFrom!.split(":")[0]);
+                                            int startHour = int.parse(model
+                                                .availableFrom!
+                                                .split(":")[0]);
 
                                             if (effectiveEndHour <= startHour) {
                                               ModernSnackbar.showError(
                                                   context: context,
-                                                  message: "وقت النهاية يجب أن يكون بعد وقت البداية");
+                                                  message:
+                                                      "وقت النهاية يجب أن يكون بعد وقت البداية");
                                               return;
                                             }
                                           }
 
-                                          if (isToday && effectiveEndHour < now.hour) {
+                                          if (isToday &&
+                                              effectiveEndHour < now.hour) {
                                             ModernSnackbar.showError(
                                                 context: context,
-                                                message: "لا يمكن اختيار وقت نهاية في الماضي");
+                                                message:
+                                                    "لا يمكن اختيار وقت نهاية في الماضي");
                                             return;
                                           }
 
-                                          if (isToday && effectiveEndHour == now.hour) {
+                                          if (isToday &&
+                                              effectiveEndHour == now.hour) {
                                             ModernSnackbar.showError(
                                                 context: context,
-                                                message: "يجب اختيار ساعة تكون بعد الساعة الحالية");
+                                                message:
+                                                    "يجب اختيار ساعة تكون بعد الساعة الحالية");
                                             return;
                                           }
 
                                           setState(() {
-                                            if (t.hour == 0 || t.hour == 12) {
-                                              selectedEndTime = "12:00 مساءً";
+                                            if (t.hour == 0) {
+                                              selectedEndTime = "12:00 صباحاً ";
                                               model.availableTo = "23:59";
                                             } else {
-                                              final localizations = MaterialLocalizations.of(context);
-                                              TimeOfDay timeWithZeroMinutes = TimeOfDay(hour: t.hour, minute: 0);
+                                              int displayHour =
+                                                  t.hourOfPeriod == 0
+                                                      ? 12
+                                                      : t.hourOfPeriod;
+                                              String period =
+                                                  t.period == DayPeriod.am
+                                                      ? 'صباحاً'
+                                                      : 'مساءً';
+                                              selectedEndTime =
+                                                  '${displayHour.toString().padLeft(2, '0')}:00 $period';
 
-                                              String formattedTime = localizations.formatTimeOfDay(
-                                                timeWithZeroMinutes,
-                                                alwaysUse24HourFormat: false,
-                                              );
-
-                                              selectedEndTime = formattedTime
-                                                  .replaceAll('AM', 'صباحاً')
-                                                  .replaceAll('am', 'صباحاً')
-                                                  .replaceAll('PM', 'مساءً')
-                                                  .replaceAll('pm', 'مساءً');
-
-                                              String hour24 = timeWithZeroMinutes.hour.toString().padLeft(2, '0');
+                                              String hour24 = t.hour
+                                                  .toString()
+                                                  .padLeft(2, '0');
                                               model.availableTo = "$hour24:00";
                                             }
                                           });
@@ -840,7 +868,8 @@ class _ServiceRequestPageState extends State<ServiceRequestPage> {
                                               "برجاء كتابة وصف أكثر تفصيلاً لا يقل عن 10 حروف ولا يتجاوز 200 حرف");
                                       return;
                                     }
-                                    debugPrint("Navigating to TechnicianReservePage with requestModel: ${"${requestModel.availableFrom} - ${requestModel.availableTo}"}");
+                                    debugPrint(
+                                        "Navigating to TechnicianReservePage with requestModel: ${"${requestModel.availableFrom} - ${requestModel.availableTo}"}");
                                     Navigator.push(
                                       context,
                                       SlideRightRoute(
@@ -1008,7 +1037,8 @@ class _ServiceRequestPageState extends State<ServiceRequestPage> {
         TimeOfDay? t = await showTimePickerModified(
           context: context,
           initialTime: TimeOfDay.now(),
-          helpText: "اختار الوقت",
+          helpText:
+              "اختار الوقت (تأكد من تحديد صباحاً أو مساءً حيث ان 12 صباحاً تعني منتصف الليل و 12 مساءً تعني الظهر)",
           cancelText: "إلغاء",
           confirmText: "تأكيد",
           barrierColor: Colors.black45,

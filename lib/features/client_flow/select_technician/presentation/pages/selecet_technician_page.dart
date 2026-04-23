@@ -255,105 +255,141 @@ class _TechnicianRequestPageState extends State<TechnicianRequestPage> {
                                       is FetchTechniciansError
                                   ? state.message
                                   : (state as SubmitReservationError).message;
-                              showDialog(
+
+                              showGeneralDialog(
                                 context: context,
-                                builder: (context) => Directionality(
-                                  textDirection: TextDirection.rtl,
-                                  child: AlertDialog(
-                                    backgroundColor: Colors.white,
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(16.r)),
-                                    title: Row(
-                                      children: [
-                                        Icon(Icons.warning_amber_rounded,
-                                            color: Colors.red, size: 28.r),
-                                        SizedBox(width: 8.w),
-                                        Text(
-                                          "تنبيه",
-                                          style: GoogleFonts.cairo(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 18.sp),
-                                        ),
-                                      ],
-                                    ),
-                                    content: Text(
-                                      errorMessage,
-                                      style: GoogleFonts.cairo(
-                                          fontSize: 14.sp,
-                                          color: Colors.black87),
-                                    ),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () {
-                                          Navigator.pop(context);
-                                        },
-                                        child: Text(
-                                          "حسناً",
-                                          style: GoogleFonts.cairo(
-                                              color: const Color(0xFF3775FA),
-                                              fontWeight: FontWeight.bold),
+                                barrierDismissible: true,
+                                barrierLabel: '',
+                                transitionDuration:
+                                    const Duration(milliseconds: 400),
+                                pageBuilder: (ctx, anim1, anim2) =>
+                                    const SizedBox(),
+                                transitionBuilder: (ctx, anim1, anim2, child) {
+                                  return Transform.scale(
+                                    scale: Curves.easeInOutBack
+                                        .transform(anim1.value),
+                                    child: Opacity(
+                                      opacity: anim1.value,
+                                      child: Directionality(
+                                        textDirection: TextDirection.rtl,
+                                        child: AlertDialog(
+                                          backgroundColor: Colors.white,
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(16.r)),
+                                          title: Row(
+                                            children: [
+                                              Icon(Icons.warning_amber_rounded,
+                                                  color: Colors.red,
+                                                  size: 28.r),
+                                              SizedBox(width: 8.w),
+                                              Text(
+                                                "تنبيه",
+                                                style: GoogleFonts.cairo(
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 18.sp),
+                                              ),
+                                            ],
+                                          ),
+                                          content: Text(
+                                            errorMessage,
+                                            style: GoogleFonts.cairo(
+                                                fontSize: 14.sp,
+                                                color: Colors.black87),
+                                          ),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                              },
+                                              child: Text(
+                                                "حسناً",
+                                                style: GoogleFonts.cairo(
+                                                    color:
+                                                        const Color(0xFF3775FA),
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ),
-                                    ],
-                                  ),
-                                ),
+                                    ),
+                                  );
+                                },
                               );
                             } else if (state is ServiceRequestConflict) {
-                              showDialog(
+                              showGeneralDialog(
                                 context: context,
-                                builder: (context) => Directionality(
-                                  textDirection: TextDirection.rtl,
-                                  child: AlertDialog(
-                                    backgroundColor: Colors.white,
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(16.r)),
-                                    title: Row(
-                                      children: [
-                                        Icon(Icons.warning_amber_rounded,
-                                            color: Colors.red, size: 28.r),
-                                        SizedBox(width: 8.w),
-                                        Text(
-                                          "تنبيه",
-                                          style: GoogleFonts.cairo(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 18.sp,
+                                barrierDismissible: true,
+                                barrierLabel: '',
+                                transitionDuration:
+                                    const Duration(milliseconds: 400),
+                                pageBuilder: (ctx, anim1, anim2) =>
+                                    const SizedBox(),
+                                transitionBuilder: (ctx, anim1, anim2, child) {
+                                  return Transform.scale(
+                                    scale: Curves.easeInOutBack
+                                        .transform(anim1.value),
+                                    child: Opacity(
+                                      opacity: anim1.value,
+                                      child: Directionality(
+                                        textDirection: TextDirection.rtl,
+                                        child: AlertDialog(
+                                          backgroundColor: Colors.white,
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(16.r)),
+                                          title: Row(
+                                            children: [
+                                              Icon(Icons.warning_amber_rounded,
+                                                  color: Colors.red,
+                                                  size: 28.r),
+                                              SizedBox(width: 8.w),
+                                              Text(
+                                                "تنبيه",
+                                                style: GoogleFonts.cairo(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 18.sp,
+                                                ),
+                                              ),
+                                            ],
                                           ),
-                                        ),
-                                      ],
-                                    ),
-                                    content: Text(
-                                      state.message,
-                                      style: GoogleFonts.cairo(
-                                        fontSize: 15.sp,
-                                        color: Colors.black87,
-                                      ),
-                                    ),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () {
-                                          Navigator.pop(context);
-                                          Navigator.pushAndRemoveUntil(
-                                            context,
-                                            SlideRightRouteWithBuild(
-                                              builder: (context) =>
-                                                  ClientHomePage(),
+                                          content: Text(
+                                            state.message,
+                                            style: GoogleFonts.cairo(
+                                              fontSize: 15.sp,
+                                              color: Colors.black87,
                                             ),
-                                            (route) => false,
-                                          );
-                                        },
-                                        child: Text(
-                                          "حسناً",
-                                          style: GoogleFonts.cairo(
-                                            color: const Color(0xFF3775FA),
-                                            fontWeight: FontWeight.bold,
                                           ),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                                Navigator.pushAndRemoveUntil(
+                                                  context,
+                                                  SlideRightRouteWithBuild(
+                                                    builder: (context) =>
+                                                        ClientHomePage(),
+                                                  ),
+                                                  (route) => false,
+                                                );
+                                              },
+                                              child: Text(
+                                                "حسناً",
+                                                style: GoogleFonts.cairo(
+                                                  color:
+                                                      const Color(0xFF3775FA),
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ),
-                                    ],
-                                  ),
-                                ),
+                                    ),
+                                  );
+                                },
                               );
                             } else if (state is TechnicianRequestUnauth) {
                               ModernSnackbar.showError(

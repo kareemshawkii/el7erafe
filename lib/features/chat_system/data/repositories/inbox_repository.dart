@@ -33,10 +33,15 @@ class InboxRepository {
         await authLocalStorage.clearSession();
         return const Right("401 unauthorized");
       } else {
-        return const Right("Error");
+        try {
+          final decoded = json.decode(response.body);
+          return Right(decoded['errorMessage'] ?? "حدث خطأ غير متوقع");
+        } catch (_) {
+          return const Right("حدث خطأ غير متوقع");
+        }
       }
     } catch (e) {
-      return const Right("Error");
+      return const Right("حدث خطأ غير متوقع");
     }
   }
 

@@ -38,7 +38,6 @@ class PendingRequestsCubit extends Cubit<PendingRequestsState> {
           }
         },
         onSignalRRefreshNeeded: () async {
-          // Triggered by Offer Received or Request Rejected
           if (!isClosed) {
             try {
               final updatedData = await repository.getInitialPendingRequests();
@@ -52,12 +51,12 @@ class PendingRequestsCubit extends Cubit<PendingRequestsState> {
       );
     } catch (e) {
       if (!isClosed) {
-        final errorString = e.toString().toLowerCase();
-        if (errorString.contains('401') ||
-            errorString.contains('unauthorized')) {
+        final errorString = e.toString().replaceAll("Exception: ", "");
+        if (errorString.toLowerCase().contains('401') ||
+            errorString.toLowerCase().contains('unauthorized')) {
           emit(PendingRequestsUnauthorized());
         } else {
-          emit(PendingRequestsError(e.toString()));
+          emit(PendingRequestsError(errorString));
         }
       }
     }

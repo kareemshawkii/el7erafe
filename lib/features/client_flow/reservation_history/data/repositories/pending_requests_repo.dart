@@ -47,10 +47,15 @@ class PendingRequestsRepo {
         await _authLocal.clearSession();
         throw Exception("401 Unauthorized");
       } else {
-        throw Exception("Failed");
+        try {
+          final decodedData = jsonDecode(response.body);
+          throw Exception(decodedData['errorMessage'] ?? "حدث خطأ غير متوقع");
+        } catch (_) {
+          throw Exception("حدث خطأ غير متوقع");
+        }
       }
     } catch (e) {
-      throw Exception("Error");
+      throw Exception(e.toString().replaceAll("Exception: ", ""));
     }
   }
 
@@ -141,10 +146,18 @@ class PendingRequestsRepo {
         return Right(listData
             .map((e) => OfferModel.fromJson(e as Map<String, dynamic>))
             .toList());
+      } else if (response.statusCode == 401) {
+        return const Left("401");
+      } else {
+        try {
+          final decodedData = jsonDecode(response.body);
+          return Left(decodedData['errorMessage'] ?? "حدث خطأ غير متوقع");
+        } catch (_) {
+          return const Left("حدث خطأ غير متوقع");
+        }
       }
-      return const Left("Error");
     } catch (_) {
-      return const Left("Error");
+      return const Left("حدث خطأ غير متوقع");
     }
   }
 
@@ -161,10 +174,18 @@ class PendingRequestsRepo {
           body: jsonEncode({'requestId': requestId}));
       if (response.statusCode == 200 || response.statusCode == 204) {
         return const Right("تم إلغاء الطلب بنجاح");
+      } else if (response.statusCode == 401) {
+        return const Left("401");
+      } else {
+        try {
+          final decodedData = jsonDecode(response.body);
+          return Left(decodedData['errorMessage'] ?? "حدث خطأ غير متوقع");
+        } catch (_) {
+          return const Left("حدث خطأ غير متوقع");
+        }
       }
-      return const Left("Error");
     } catch (_) {
-      return const Left("Error");
+      return const Left("حدث خطأ غير متوقع");
     }
   }
 
@@ -181,10 +202,18 @@ class PendingRequestsRepo {
           body: jsonEncode({'offerId': offerId}));
       if (response.statusCode == 200 || response.statusCode == 204) {
         return const Right("تم قبول العرض بنجاح");
+      } else if (response.statusCode == 401) {
+        return const Left("401");
+      } else {
+        try {
+          final decodedData = jsonDecode(response.body);
+          return Left(decodedData['errorMessage'] ?? "حدث خطأ غير متوقع");
+        } catch (_) {
+          return const Left("حدث خطأ غير متوقع");
+        }
       }
-      return const Left("Error");
     } catch (_) {
-      return const Left("Error");
+      return const Left("حدث خطأ غير متوقع");
     }
   }
 
@@ -201,10 +230,18 @@ class PendingRequestsRepo {
           body: jsonEncode({'offerId': offerId}));
       if (response.statusCode == 200 || response.statusCode == 204) {
         return const Right("تم رفض العرض بنجاح");
+      } else if (response.statusCode == 401) {
+        return const Left("401");
+      } else {
+        try {
+          final decodedData = jsonDecode(response.body);
+          return Left(decodedData['errorMessage'] ?? "حدث خطأ غير متوقع");
+        } catch (_) {
+          return const Left("حدث خطأ غير متوقع");
+        }
       }
-      return const Left("Error");
     } catch (_) {
-      return const Left("Error");
+      return const Left("حدث خطأ غير متوقع");
     }
   }
 }

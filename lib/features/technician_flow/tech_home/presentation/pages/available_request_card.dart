@@ -255,52 +255,69 @@ class AvailableRequestCard extends StatelessWidget {
                         ).then((result) {
                           if (result == true) {
                             if (!context.mounted) return;
-                            showDialog(
+                            showGeneralDialog(
                               context: context,
-                              builder: (context) => Directionality(
-                                textDirection: TextDirection.rtl,
-                                child: AlertDialog(
-                                  backgroundColor: Colors.white,
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius:
-                                          BorderRadius.circular(16.r)),
-                                  title: Row(
-                                    children: [
-                                      Icon(Icons.check_circle,
-                                          color: Colors.green, size: 28.r),
-                                      SizedBox(width: 8.w),
-                                      Text(
-                                        "مهمة ناجحة",
-                                        style: GoogleFonts.cairo(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 18.sp,
+                              barrierDismissible: true,
+                              barrierLabel: '',
+                              transitionDuration:
+                                  const Duration(milliseconds: 400),
+                              pageBuilder: (ctx, anim1, anim2) =>
+                                  const SizedBox(),
+                              transitionBuilder: (ctx, anim1, anim2, child) {
+                                return Transform.scale(
+                                  scale: Curves.easeInOutBack
+                                      .transform(anim1.value),
+                                  child: Opacity(
+                                    opacity: anim1.value,
+                                    child: Directionality(
+                                      textDirection: TextDirection.rtl,
+                                      child: AlertDialog(
+                                        backgroundColor: Colors.white,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(16.r),
                                         ),
+                                        title: Row(
+                                          children: [
+                                            Icon(Icons.check_circle,
+                                                color: Colors.green,
+                                                size: 28.r),
+                                            SizedBox(width: 8.w),
+                                            Text(
+                                              "مهمة ناجحة",
+                                              style: GoogleFonts.cairo(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 18.sp,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        content: Text(
+                                          "تم تقديم العرض بنجاح!",
+                                          style: GoogleFonts.cairo(
+                                            fontSize: 15.sp,
+                                            color: Colors.black87,
+                                          ),
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () {
+                                              Navigator.pop(ctx);
+                                            },
+                                            child: Text(
+                                              "حسناً",
+                                              style: GoogleFonts.cairo(
+                                                color: const Color(0xFF3775FA),
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                    ],
-                                  ),
-                                  content: Text(
-                                    "تم تقديم العرض بنجاح!",
-                                    style: GoogleFonts.cairo(
-                                      fontSize: 15.sp,
-                                      color: Colors.black87,
                                     ),
                                   ),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.pop(context);
-                                      },
-                                      child: Text(
-                                        "حسناً",
-                                        style: GoogleFonts.cairo(
-                                          color: const Color(0xFF3775FA),
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
+                                );
+                              },
                             );
                             context
                                 .read<AvailableRequestsCubit>()

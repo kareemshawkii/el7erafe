@@ -36,7 +36,12 @@ class TechCalendarRepo {
         await AuthLocalStorage().clearSession();
         return const Left("401");
       } else {
-        return const Left("فشل في جلب الحجوزات");
+        try {
+          final decodedData = jsonDecode(response.body);
+          return Left(decodedData['errorMessage'] ?? "فشل في جلب الحجوزات");
+        } catch (_) {
+          return const Left("فشل في جلب الحجوزات");
+        }
       }
     } catch (e) {
       final errorString = e.toString().toLowerCase();
@@ -72,8 +77,12 @@ class TechCalendarRepo {
         await AuthLocalStorage().clearSession();
         return const Left("401");
       } else {
-        return Left(jsonDecode(response.body)['errorMessage'] ??
-            "حدث خطأ أثناء بدء العمل");
+        try {
+          return Left(jsonDecode(response.body)['errorMessage'] ??
+              "حدث خطأ أثناء بدء العمل");
+        } catch (_) {
+          return const Left("حدث خطأ أثناء بدء العمل");
+        }
       }
     } catch (e) {
       final errorString = e.toString().toLowerCase();
@@ -109,8 +118,12 @@ class TechCalendarRepo {
         await AuthLocalStorage().clearSession();
         return const Left("401");
       } else {
-        return Left(jsonDecode(response.body)['errorMessage'] ??
-            "حدث خطأ أثناء إلغاء الحجز");
+        try {
+          return Left(jsonDecode(response.body)['errorMessage'] ??
+              "حدث خطأ أثناء إلغاء الحجز");
+        } catch (_) {
+          return const Left("حدث خطأ أثناء إلغاء الحجز");
+        }
       }
     } catch (e) {
       final errorString = e.toString().toLowerCase();

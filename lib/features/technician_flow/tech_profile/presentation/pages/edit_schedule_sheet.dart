@@ -54,13 +54,13 @@ class _EditScheduleBottomSheetState extends State<EditScheduleBottomSheet> {
     int minute = parts.length > 1 ? int.parse(parts[1]) : 0;
 
     if (hour == 23 && minute >= 50) {
-      return const TimeOfDay(hour: 12, minute: 0);
+      return const TimeOfDay(hour: 0, minute: 0);
     }
     return TimeOfDay(hour: hour, minute: 0);
   }
 
   String _formatTimeForApi(TimeOfDay time, {bool isEndTime = false}) {
-    if (isEndTime && (time.hour == 0 || time.hour == 12)) {
+    if (isEndTime && time.hour == 0) {
       return "23:59:00";
     }
     return "${time.hour.toString().padLeft(2, '0')}:00:00";
@@ -101,9 +101,7 @@ class _EditScheduleBottomSheetState extends State<EditScheduleBottomSheet> {
       }
 
       int effectiveAllWeekToHour =
-          (_allWeekTo!.hour == 0 || _allWeekTo!.hour == 12)
-              ? 24
-              : _allWeekTo!.hour;
+          (_allWeekTo!.hour == 0) ? 24 : _allWeekTo!.hour;
 
       if (_allWeekFrom!.hour >= effectiveAllWeekToHour) {
         _showError("وقت البداية يجب أن يكون قبل وقت النهاية");
@@ -125,9 +123,7 @@ class _EditScheduleBottomSheetState extends State<EditScheduleBottomSheet> {
           }
 
           int effectiveDayToHour =
-              (day.toTime!.hour == 0 || day.toTime!.hour == 12)
-                  ? 24
-                  : day.toTime!.hour;
+              (day.toTime!.hour == 0) ? 24 : day.toTime!.hour;
 
           if (day.fromTime!.hour >= effectiveDayToHour) {
             _showError(
@@ -153,50 +149,64 @@ class _EditScheduleBottomSheetState extends State<EditScheduleBottomSheet> {
   }
 
   void _showError(String message) {
-    showDialog(
+    showGeneralDialog(
       context: context,
-      builder: (context) => Directionality(
-        textDirection: TextDirection.rtl,
-        child: AlertDialog(
-          backgroundColor: Colors.white,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
-          title: Row(
-            children: [
-              Icon(Icons.warning_amber_rounded, color: Colors.red, size: 28.r),
-              SizedBox(width: 8.w),
-              Text(
-                "تنبيه",
-                style: GoogleFonts.cairo(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18.sp,
+      barrierDismissible: true,
+      barrierLabel: '',
+      transitionDuration: const Duration(milliseconds: 400),
+      pageBuilder: (ctx, anim1, anim2) => const SizedBox(),
+      transitionBuilder: (ctx, anim1, anim2, child) {
+        return Transform.scale(
+          scale: Curves.easeInOutBack.transform(anim1.value),
+          child: Opacity(
+            opacity: anim1.value,
+            child: Directionality(
+              textDirection: TextDirection.rtl,
+              child: AlertDialog(
+                backgroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16.r),
                 ),
+                title: Row(
+                  children: [
+                    Icon(Icons.warning_amber_rounded,
+                        color: Colors.red, size: 28.r),
+                    SizedBox(width: 8.w),
+                    Text(
+                      "تنبيه",
+                      style: GoogleFonts.cairo(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18.sp,
+                      ),
+                    ),
+                  ],
+                ),
+                content: Text(
+                  message,
+                  style: GoogleFonts.cairo(
+                    fontSize: 15.sp,
+                    color: Colors.black87,
+                  ),
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(ctx);
+                    },
+                    child: Text(
+                      "حسناً",
+                      style: GoogleFonts.cairo(
+                        color: const Color(0xFF3775FA),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
-          content: Text(
-            message,
-            style: GoogleFonts.cairo(
-              fontSize: 15.sp,
-              color: Colors.black87,
             ),
           ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: Text(
-                "حسناً",
-                style: GoogleFonts.cairo(
-                  color: const Color(0xFF3775FA),
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
+        );
+      },
     );
   }
 
@@ -204,12 +214,14 @@ class _EditScheduleBottomSheetState extends State<EditScheduleBottomSheet> {
       TimeOfDay? currentValue, Function(TimeOfDay) onSave) {
     String displayTime = '-- ';
     if (currentValue != null) {
-      if (label == "الي" &&
-          (currentValue.hour == 0 || currentValue.hour == 12)) {
-        displayTime = '12  مساءً';
+      int displayHour =
+          currentValue.hourOfPeriod == 0 ? 12 : currentValue.hourOfPeriod;
+      String period = currentValue.period == DayPeriod.am ? 'صباحاً' : 'مساءً';
+
+      if (label == "الي" && currentValue.hour == 0) {
+        displayTime = '12:00 صباحاً ';
       } else {
-        displayTime =
-            '${currentValue.hourOfPeriod == 0 ? 12 : currentValue.hourOfPeriod.toString().padLeft(2, '0')} ${currentValue.period == DayPeriod.am ? 'صباحاً' : 'مساءً'}';
+        displayTime = '${displayHour.toString().padLeft(2, '0')}:00 $period';
       }
     }
 
@@ -220,7 +232,8 @@ class _EditScheduleBottomSheetState extends State<EditScheduleBottomSheet> {
           context: context,
           initialTime:
               currentValue ?? TimeOfDay(hour: TimeOfDay.now().hour, minute: 0),
-          helpText: "اختار الوقت",
+          helpText:
+              "اختار الوقت (تأكد من تحديد صباحاً أو مساءً حيث ان 12 صباحاً تعني منتصف الليل و 12 مساءً تعني الظهر)",
           cancelText: "إلغاء",
           confirmText: "تأكيد",
           barrierColor: Colors.black45,

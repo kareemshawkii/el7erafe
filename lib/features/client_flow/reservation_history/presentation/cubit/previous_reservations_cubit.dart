@@ -18,7 +18,7 @@ class PreviousReservationsCubit extends Cubit<PreviousReservationsState> {
         emit(PreviousReservationsUnauth());
       } else {
         emit(PreviousReservationsError(
-            "حدث خطأ أثناء جلب البيانات الرجاء المحاولة لاحقًا"));
+            e.toString().replaceAll("Exception: ", "")));
       }
     }
   }

@@ -46,7 +46,7 @@ class InboxCubit extends Cubit<InboxState> {
       );
     } catch (e) {
       if (!isClosed) {
-        emit(InboxError(e.toString()));
+        emit(InboxError(e.toString().replaceAll("Exception: ", "")));
       }
     }
   }

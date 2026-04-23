@@ -540,7 +540,6 @@ void _showCancelDialog(BuildContext context, int requestId) {
           backgroundColor: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16.r),
-            side: BorderSide(color: const Color(0xFF3775FA), width: 1.5.w),
           ),
           shadowColor: Colors.black45,
           surfaceTintColor: const Color(0xFFE2DFDF),

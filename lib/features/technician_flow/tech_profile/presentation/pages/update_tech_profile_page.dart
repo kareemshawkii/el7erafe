@@ -196,103 +196,114 @@ class _TechUpdateProfilePageState extends State<TechUpdateProfilePage> {
       ..._newPortfolioImages
     ];
 
-    showDialog(
+    showGeneralDialog(
       context: context,
-      builder: (context) {
-        return Directionality(
-          textDirection: TextDirection.rtl,
-          child: Dialog(
-            backgroundColor: Colors.white,
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16.r)),
-            insetPadding: EdgeInsets.all(16.r),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Padding(
-                  padding: EdgeInsets.all(16.r),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "معرض الأعمال",
-                        style: GoogleFonts.cairo(
-                          fontSize: 18.sp,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87,
-                        ),
-                      ),
-                      IconButton(
-                        icon: Icon(Icons.close,
-                            color: Colors.black54, size: 20.r),
-                        onPressed: () => Navigator.pop(context),
-                      ),
-                    ],
-                  ),
-                ),
-                Flexible(
-                  child: GridView.builder(
-                    padding:
-                        EdgeInsets.only(left: 16.w, right: 16.w, bottom: 24.h),
-                    shrinkWrap: true,
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 1,
-                      childAspectRatio: 1,
-                      crossAxisSpacing: 8.w,
-                      mainAxisSpacing: 8.h,
-                    ),
-                    itemCount: allImages.length,
-                    itemBuilder: (context, index) {
-                      final item = allImages[index];
-
-                      String? safeNetworkUrl;
-                      if (item is String) {
-                        safeNetworkUrl = _getValidImageUrl(item);
-                      }
-
-                      return Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12.r),
-                          border: Border.all(
-                            color: const Color(0xFF3775FA).withOpacity(0.5),
-                            width: 1.w,
+      barrierDismissible: true,
+      barrierLabel: '',
+      transitionDuration: const Duration(milliseconds: 400),
+      pageBuilder: (ctx, anim1, anim2) => const SizedBox(),
+      transitionBuilder: (ctx, anim1, anim2, child) {
+        return Transform.scale(
+          scale: Curves.easeInOutBack.transform(anim1.value),
+          child: Opacity(
+            opacity: anim1.value,
+            child: Directionality(
+              textDirection: TextDirection.rtl,
+              child: Dialog(
+                backgroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16.r)),
+                insetPadding: EdgeInsets.all(16.r),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.all(16.r),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "معرض الأعمال",
+                            style: GoogleFonts.cairo(
+                              fontSize: 18.sp,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87,
+                            ),
                           ),
+                          IconButton(
+                            icon: Icon(Icons.close,
+                                color: Colors.black54, size: 20.r),
+                            onPressed: () => Navigator.pop(ctx),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Flexible(
+                      child: GridView.builder(
+                        padding: EdgeInsets.only(
+                            left: 16.w, right: 16.w, bottom: 24.h),
+                        shrinkWrap: true,
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 1,
+                          childAspectRatio: 1,
+                          crossAxisSpacing: 8.w,
+                          mainAxisSpacing: 8.h,
                         ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(12.r),
-                          child: item is String
-                              ? (safeNetworkUrl!.isEmpty
-                                  ? Container(
-                                      color: Colors.grey.shade200,
-                                      child: const Icon(Icons.image,
-                                          color: Colors.grey))
-                                  : CachedNetworkImage(
-                                      imageUrl: safeNetworkUrl,
+                        itemCount: allImages.length,
+                        itemBuilder: (context, index) {
+                          final item = allImages[index];
+
+                          String? safeNetworkUrl;
+                          if (item is String) {
+                            safeNetworkUrl = _getValidImageUrl(item);
+                          }
+
+                          return Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12.r),
+                              border: Border.all(
+                                color: const Color(0xFF3775FA).withOpacity(0.5),
+                                width: 1.w,
+                              ),
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(12.r),
+                              child: item is String
+                                  ? (safeNetworkUrl!.isEmpty
+                                      ? Container(
+                                          color: Colors.grey.shade200,
+                                          child: const Icon(Icons.image,
+                                              color: Colors.grey))
+                                      : CachedNetworkImage(
+                                          imageUrl: safeNetworkUrl,
+                                          fit: BoxFit.cover,
+                                          placeholder: (context, url) =>
+                                              Container(
+                                            color: Colors.grey.shade200,
+                                            child: Center(
+                                              child: CircularProgressIndicator(
+                                                  strokeWidth: 2.w),
+                                            ),
+                                          ),
+                                          errorWidget: (context, url, error) =>
+                                              Container(
+                                            color: Colors.grey.shade200,
+                                            child: Icon(Icons.broken_image,
+                                                color: Colors.grey, size: 40.r),
+                                          ),
+                                        ))
+                                  : Image.file(
+                                      item as File,
                                       fit: BoxFit.cover,
-                                      placeholder: (context, url) => Container(
-                                        color: Colors.grey.shade200,
-                                        child: Center(
-                                          child: CircularProgressIndicator(
-                                              strokeWidth: 2.w),
-                                        ),
-                                      ),
-                                      errorWidget: (context, url, error) =>
-                                          Container(
-                                        color: Colors.grey.shade200,
-                                        child: Icon(Icons.broken_image,
-                                            color: Colors.grey, size: 40.r),
-                                      ),
-                                    ))
-                              : Image.file(
-                                  item as File,
-                                  fit: BoxFit.cover,
-                                ),
-                        ),
-                      );
-                    },
-                  ),
-                )
-              ],
+                                    ),
+                            ),
+                          );
+                        },
+                      ),
+                    )
+                  ],
+                ),
+              ),
             ),
           ),
         );

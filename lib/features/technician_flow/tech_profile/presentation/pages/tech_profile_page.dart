@@ -136,39 +136,59 @@ class _TechProfilePageViewState extends State<TechProfilePageView> {
   }
 
   void _onDeleteAccountPressed(BuildContext context) {
-    showDialog(
+    showGeneralDialog(
       context: context,
-      builder: (dialogContext) => Directionality(
-        textDirection: TextDirection.rtl,
-        child: AlertDialog(
-          backgroundColor: Colors.white,
-          shadowColor: Colors.black45,
-          title: Text("حذف الحساب",
-              style: GoogleFonts.cairo(fontWeight: FontWeight.bold)),
-          content: Text(
-            "هل أنت متأكد أنك تريد حذف حسابك نهائياً؟ لا يمكن التراجع عن هذا الإجراء.",
-            style: GoogleFonts.cairo(),
+      barrierDismissible: true,
+      barrierLabel: '',
+      transitionDuration: const Duration(milliseconds: 400),
+      pageBuilder: (ctx, anim1, anim2) => const SizedBox(),
+      transitionBuilder: (ctx, anim1, anim2, child) {
+        return Transform.scale(
+          scale: Curves.easeInOutBack.transform(anim1.value),
+          child: Opacity(
+            opacity: anim1.value,
+            child: Directionality(
+              textDirection: TextDirection.rtl,
+              child: AlertDialog(
+                backgroundColor: Colors.white,
+                shadowColor: Colors.black45,
+                title: Text(
+                  "حذف الحساب",
+                  style: GoogleFonts.cairo(fontWeight: FontWeight.bold),
+                ),
+                content: Text(
+                  "هل أنت متأكد أنك تريد حذف حسابك نهائياً؟ لا يمكن التراجع عن هذا الإجراء.",
+                  style: GoogleFonts.cairo(),
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(ctx),
+                    child: Text(
+                      "إلغاء",
+                      style: GoogleFonts.cairo(color: Colors.black),
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(ctx);
+                      context
+                          .read<TechProfileCubit>()
+                          .deleteAccount(widget.token ?? "");
+                    },
+                    child: Text(
+                      "حذف",
+                      style: GoogleFonts.cairo(
+                        color: _dangerRed,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(dialogContext),
-              child:
-                  Text("إلغاء", style: GoogleFonts.cairo(color: Colors.black)),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.pop(dialogContext);
-                context
-                    .read<TechProfileCubit>()
-                    .deleteAccount(widget.token ?? "");
-              },
-              child: Text("حذف",
-                  style: GoogleFonts.cairo(
-                      color: _dangerRed, fontWeight: FontWeight.bold)),
-            ),
-          ],
-        ),
-      ),
+        );
+      },
     );
   }
 
@@ -182,37 +202,59 @@ class _TechProfilePageViewState extends State<TechProfilePageView> {
   }
 
   void _onLogoutPressed(BuildContext context) {
-    showDialog(
+    showGeneralDialog(
       context: context,
-      builder: (dialogContext) => Directionality(
-        textDirection: TextDirection.rtl,
-        child: AlertDialog(
-          backgroundColor: Colors.white,
-          shadowColor: Colors.black45,
-          title: Text("تسجيل الخروج",
-              style: GoogleFonts.cairo(fontWeight: FontWeight.bold)),
-          content: Text(
-            "هل أنت متأكد أنك تريد تسجيل الخروج؟",
-            style: GoogleFonts.cairo(),
+      barrierDismissible: true,
+      barrierLabel: '',
+      transitionDuration: const Duration(milliseconds: 400),
+      pageBuilder: (ctx, anim1, anim2) => const SizedBox(),
+      transitionBuilder: (ctx, anim1, anim2, child) {
+        return Transform.scale(
+          scale: Curves.easeInOutBack.transform(anim1.value),
+          child: Opacity(
+            opacity: anim1.value,
+            child: Directionality(
+              textDirection: TextDirection.rtl,
+              child: AlertDialog(
+                backgroundColor: Colors.white,
+                shadowColor: Colors.black45,
+                title: Text(
+                  "تسجيل الخروج",
+                  style: GoogleFonts.cairo(fontWeight: FontWeight.bold),
+                ),
+                content: Text(
+                  "هل أنت متأكد أنك تريد تسجيل الخروج؟",
+                  style: GoogleFonts.cairo(),
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(ctx),
+                    child: Text(
+                      "إلغاء",
+                      style: GoogleFonts.cairo(color: Colors.black),
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(ctx);
+                      context
+                          .read<TechProfileCubit>()
+                          .logout(widget.token ?? "");
+                    },
+                    child: Text(
+                      "خروج",
+                      style: GoogleFonts.cairo(
+                        color: _dangerRed,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(dialogContext),
-              child:
-                  Text("إلغاء", style: GoogleFonts.cairo(color: Colors.black)),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.pop(dialogContext);
-                context.read<TechProfileCubit>().logout(widget.token ?? "");
-              },
-              child: Text("خروج",
-                  style: GoogleFonts.cairo(
-                      color: _dangerRed, fontWeight: FontWeight.bold)),
-            ),
-          ],
-        ),
-      ),
+        );
+      },
     );
   }
 
@@ -925,102 +967,113 @@ class _TechProfilePageViewState extends State<TechProfilePageView> {
   }
 
   void _showImageGallery(BuildContext context, List<String> images) {
-    showDialog(
+    showGeneralDialog(
       context: context,
-      builder: (context) {
-        return Directionality(
-          textDirection: TextDirection.rtl,
-          child: Dialog(
-            backgroundColor: Colors.white,
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16.r)),
-            insetPadding: EdgeInsets.all(16.r),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Padding(
-                  padding: EdgeInsets.all(16.r),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "معرض الأعمال",
-                        style: GoogleFonts.cairo(
-                          fontSize: 18.sp,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87,
-                        ),
-                      ),
-                      IconButton(
-                        icon: Icon(Icons.close,
-                            color: Colors.black54, size: 20.r),
-                        onPressed: () => Navigator.pop(context),
-                      ),
-                    ],
-                  ),
-                ),
-                Flexible(
-                  child: GridView.builder(
-                    padding:
-                        EdgeInsets.only(left: 16.w, right: 16.w, bottom: 24.h),
-                    shrinkWrap: true,
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 1,
-                      childAspectRatio: 1,
-                      crossAxisSpacing: 8,
-                      mainAxisSpacing: 8,
-                    ),
-                    itemCount: images.length,
-                    itemBuilder: (context, index) {
-                      String imageUrl = images[index];
-
-                      return Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12.r),
-                          border: Border.all(
-                            color: const Color(0xFF3775FA).withOpacity(0.5),
-                            width: 1.w,
+      barrierDismissible: true,
+      barrierLabel: '',
+      transitionDuration: const Duration(milliseconds: 400),
+      pageBuilder: (ctx, anim1, anim2) => const SizedBox(),
+      transitionBuilder: (ctx, anim1, anim2, child) {
+        return Transform.scale(
+          scale: Curves.easeInOutBack.transform(anim1.value),
+          child: Opacity(
+            opacity: anim1.value,
+            child: Directionality(
+              textDirection: TextDirection.rtl,
+              child: Dialog(
+                backgroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16.r)),
+                insetPadding: EdgeInsets.all(16.r),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.all(16.r),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "معرض الأعمال",
+                            style: GoogleFonts.cairo(
+                              fontSize: 18.sp,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87,
+                            ),
                           ),
+                          IconButton(
+                            icon: Icon(Icons.close,
+                                color: Colors.black54, size: 20.r),
+                            onPressed: () => Navigator.pop(ctx),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Flexible(
+                      child: GridView.builder(
+                        padding: EdgeInsets.only(
+                            left: 16.w, right: 16.w, bottom: 24.h),
+                        shrinkWrap: true,
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 1,
+                          childAspectRatio: 1,
+                          crossAxisSpacing: 8,
+                          mainAxisSpacing: 8,
                         ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(12.r),
-                          child: imageUrl.isEmpty
-                              ? Container(
-                                  color: Colors.grey.shade200,
-                                  child: const Icon(Icons.image,
-                                      color: Colors.grey))
-                              : Image.network(
-                                  imageUrl,
-                                  fit: BoxFit.cover,
-                                  loadingBuilder:
-                                      (context, child, loadingProgress) {
-                                    if (loadingProgress == null) {
-                                      return child;
-                                    }
-                                    return Container(
-                                      color: Colors.white,
-                                    ).withShimmerAi(
-                                      loading: true,
-                                      width: double.infinity,
-                                      height: double.infinity,
-                                      borderRadius: 12,
-                                    );
-                                  },
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return Container(
-                                      color: Colors.grey.shade300,
-                                      child: const Icon(Icons.broken_image,
-                                          color: Colors.grey),
-                                    );
-                                  },
-                                ),
-                        ),
-                      );
-                    },
-                  ),
-                )
-              ],
+                        itemCount: images.length,
+                        itemBuilder: (context, index) {
+                          String imageUrl = images[index];
+
+                          return Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12.r),
+                              border: Border.all(
+                                color: const Color(0xFF3775FA).withOpacity(0.5),
+                                width: 1.w,
+                              ),
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(12.r),
+                              child: imageUrl.isEmpty
+                                  ? Container(
+                                      color: Colors.grey.shade200,
+                                      child: const Icon(Icons.image,
+                                          color: Colors.grey))
+                                  : Image.network(
+                                      imageUrl,
+                                      fit: BoxFit.cover,
+                                      loadingBuilder:
+                                          (context, child, loadingProgress) {
+                                        if (loadingProgress == null) {
+                                          return child;
+                                        }
+                                        return Container(
+                                          color: Colors.white,
+                                        ).withShimmerAi(
+                                          loading: true,
+                                          width: double.infinity,
+                                          height: double.infinity,
+                                          borderRadius: 12,
+                                        );
+                                      },
+                                      errorBuilder:
+                                          (context, error, stackTrace) {
+                                        return Container(
+                                          color: Colors.grey.shade300,
+                                          child: const Icon(Icons.broken_image,
+                                              color: Colors.grey),
+                                        );
+                                      },
+                                    ),
+                            ),
+                          );
+                        },
+                      ),
+                    )
+                  ],
+                ),
+              ),
             ),
           ),
         );

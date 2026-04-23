@@ -322,86 +322,97 @@ class TechnicianDetailsPage extends StatelessWidget {
   }
 
   void _showImageGallery(BuildContext context, List<String> images) {
-    showDialog(
+    showGeneralDialog(
       context: context,
-      builder: (context) {
-        return Directionality(
-          textDirection: TextDirection.rtl,
-          child: Dialog(
-            backgroundColor: Colors.white,
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16.r)),
-            insetPadding: EdgeInsets.all(16.r),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Padding(
-                  padding: EdgeInsets.all(16.r),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "معرض الأعمال",
-                        style: GoogleFonts.cairo(
-                          fontSize: 18.sp,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87,
-                        ),
-                      ),
-                      IconButton(
-                        icon: Icon(Icons.close,
-                            color: Colors.black54, size: 20.r),
-                        onPressed: () => Navigator.pop(context),
-                      ),
-                    ],
-                  ),
+      barrierDismissible: true,
+      barrierLabel: '',
+      transitionDuration: const Duration(milliseconds: 400),
+      pageBuilder: (ctx, anim1, anim2) => const SizedBox(),
+      transitionBuilder: (ctx, anim1, anim2, child) {
+        return Transform.scale(
+          scale: Curves.easeInOutBack.transform(anim1.value),
+          child: Opacity(
+            opacity: anim1.value,
+            child: Directionality(
+              textDirection: TextDirection.rtl,
+              child: Dialog(
+                backgroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16.r),
                 ),
-                Flexible(
-                  child: GridView.builder(
-                    padding:
-                        EdgeInsets.only(left: 16.w, right: 16.w, bottom: 24.h),
-                    shrinkWrap: true,
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 1,
-                      childAspectRatio: 1,
-                      crossAxisSpacing: 8,
-                      mainAxisSpacing: 8,
-                    ),
-                    itemCount: images.length,
-                    itemBuilder: (context, index) {
-                      return Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12.r),
-                          border: Border.all(
-                            color: const Color(0xFF3775FA).withOpacity(0.5),
-                            width: 1.w,
+                insetPadding: EdgeInsets.all(16.r),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.all(16.r),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "معرض الأعمال",
+                            style: GoogleFonts.cairo(
+                              fontSize: 18.sp,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87,
+                            ),
                           ),
+                          IconButton(
+                            icon: Icon(Icons.close,
+                                color: Colors.black54, size: 20.r),
+                            onPressed: () => Navigator.pop(ctx),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Flexible(
+                      child: GridView.builder(
+                        padding: EdgeInsets.only(
+                            left: 16.w, right: 16.w, bottom: 24.h),
+                        shrinkWrap: true,
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 1,
+                          childAspectRatio: 1,
+                          crossAxisSpacing: 8,
+                          mainAxisSpacing: 8,
                         ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(12.r),
-                          child: CachedNetworkImage(
-                            imageUrl: images[index],
-                            fit: BoxFit.cover,
-                            placeholder: (context, url) => Container(
-                              color: Colors.grey.shade200,
-                              child: Center(
-                                child:
-                                    CircularProgressIndicator(strokeWidth: 2.w),
+                        itemCount: images.length,
+                        itemBuilder: (context, index) {
+                          return Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12.r),
+                              border: Border.all(
+                                color: const Color(0xFF3775FA).withOpacity(0.5),
+                                width: 1.w,
                               ),
                             ),
-                            errorWidget: (context, url, error) => Container(
-                              color: Colors.grey.shade200,
-                              child: Icon(Icons.broken_image,
-                                  color: Colors.grey, size: 40.r),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(12.r),
+                              child: CachedNetworkImage(
+                                imageUrl: images[index],
+                                fit: BoxFit.cover,
+                                placeholder: (context, url) => Container(
+                                  color: Colors.grey.shade200,
+                                  child: Center(
+                                    child: CircularProgressIndicator(
+                                        strokeWidth: 2.w),
+                                  ),
+                                ),
+                                errorWidget: (context, url, error) => Container(
+                                  color: Colors.grey.shade200,
+                                  child: Icon(Icons.broken_image,
+                                      color: Colors.grey, size: 40.r),
+                                ),
+                              ),
                             ),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                )
-              ],
+                          );
+                        },
+                      ),
+                    )
+                  ],
+                ),
+              ),
             ),
           ),
         );
@@ -419,103 +430,135 @@ class TechnicianDetailsPage extends StatelessWidget {
       child: BlocConsumer<TechnicianRequestCubit, TechnicianRequestState>(
         listener: (context, state) {
           if (state is SubmitReservationError) {
-            showDialog(
+            showGeneralDialog(
               context: context,
-              builder: (context) => Directionality(
-                textDirection: TextDirection.rtl,
-                child: AlertDialog(
-                  backgroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16.r)),
-                  title: Row(
-                    children: [
-                      Icon(Icons.warning_amber_rounded,
-                          color: Colors.red, size: 28.r),
-                      SizedBox(width: 8.w),
-                      Text("تنبيه",
+              barrierDismissible: true,
+              barrierLabel: '',
+              transitionDuration: const Duration(milliseconds: 400),
+              pageBuilder: (ctx, anim1, anim2) => const SizedBox(),
+              transitionBuilder: (ctx, anim1, anim2, child) {
+                return Transform.scale(
+                  scale: Curves.easeInOutBack.transform(anim1.value),
+                  child: Opacity(
+                    opacity: anim1.value,
+                    child: Directionality(
+                      textDirection: TextDirection.rtl,
+                      child: AlertDialog(
+                        backgroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16.r)),
+                        title: Row(
+                          children: [
+                            Icon(Icons.warning_amber_rounded,
+                                color: Colors.red, size: 28.r),
+                            SizedBox(width: 8.w),
+                            Text(
+                              "تنبيه",
+                              style: GoogleFonts.cairo(
+                                  fontWeight: FontWeight.bold, fontSize: 18.sp),
+                            ),
+                          ],
+                        ),
+                        content: Text(
+                          state.message,
                           style: GoogleFonts.cairo(
-                              fontWeight: FontWeight.bold, fontSize: 18.sp)),
-                    ],
-                  ),
-                  content: Text(state.message,
-                      style: GoogleFonts.cairo(
-                          fontSize: 14.sp, color: Colors.black87)),
-                  actions: [
-                    TextButton(
-                      onPressed: () {
-                        if (state.message ==
-                            "لقد قمت بالفعل بتقديم طلب لهذه الخدمة مسبقاً، يرجى انتظار عروض الفنيين للرد على طلبك") {
-                          Navigator.pop(context);
-                          Navigator.pushAndRemoveUntil(
-                            context,
-                            SlideRightRouteWithBuild(
-                                builder: (_) => const ClientHomePage()),
-                            (route) => false,
-                          );
-                        }
-                      },
-                      child: Text("حسناً",
-                          style: GoogleFonts.cairo(
-                              color: const Color(0xFF3775FA),
-                              fontWeight: FontWeight.bold)),
+                              fontSize: 14.sp, color: Colors.black87),
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              if (state.message ==
+                                  "لقد قمت بالفعل بتقديم طلب لهذه الخدمة مسبقاً، يرجى انتظار عروض الفنيين للرد على طلبك") {
+                                Navigator.pop(ctx);
+                                Navigator.pushAndRemoveUntil(
+                                  context,
+                                  SlideRightRouteWithBuild(
+                                      builder: (_) => const ClientHomePage()),
+                                  (route) => false,
+                                );
+                              } else {
+                                Navigator.pop(ctx);
+                              }
+                            },
+                            child: Text(
+                              "حسناً",
+                              style: GoogleFonts.cairo(
+                                  color: const Color(0xFF3775FA),
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ],
-                ),
-              ),
+                  ),
+                );
+              },
             );
           } else if (state is ServiceRequestConflict) {
-            showDialog(
+            showGeneralDialog(
               context: context,
-              builder: (context) => Directionality(
-                textDirection: TextDirection.rtl,
-                child: AlertDialog(
-                  backgroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16.r)),
-                  title: Row(
-                    children: [
-                      Icon(Icons.warning_amber_rounded,
-                          color: Colors.red, size: 28.r),
-                      SizedBox(width: 8.w),
-                      Text(
-                        "تنبيه",
-                        style: GoogleFonts.cairo(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18.sp,
+              barrierDismissible: true,
+              barrierLabel: '',
+              transitionDuration: const Duration(milliseconds: 400),
+              pageBuilder: (ctx, anim1, anim2) => const SizedBox(),
+              transitionBuilder: (ctx, anim1, anim2, child) {
+                return Transform.scale(
+                  scale: Curves.easeInOutBack.transform(anim1.value),
+                  child: Opacity(
+                    opacity: anim1.value,
+                    child: Directionality(
+                      textDirection: TextDirection.rtl,
+                      child: AlertDialog(
+                        backgroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16.r)),
+                        title: Row(
+                          children: [
+                            Icon(Icons.warning_amber_rounded,
+                                color: Colors.red, size: 28.r),
+                            SizedBox(width: 8.w),
+                            Text(
+                              "تنبيه",
+                              style: GoogleFonts.cairo(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18.sp,
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                    ],
-                  ),
-                  content: Text(
-                    state.message,
-                    style: GoogleFonts.cairo(
-                      fontSize: 15.sp,
-                      color: Colors.black87,
-                    ),
-                  ),
-                  actions: [
-                    TextButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                        Navigator.pushAndRemoveUntil(
-                          context,
-                          SlideRightRouteWithBuild(
-                            builder: (context) => ClientHomePage(),
+                        content: Text(
+                          state.message,
+                          style: GoogleFonts.cairo(
+                            fontSize: 15.sp,
+                            color: Colors.black87,
                           ),
-                          (route) => false,
-                        );
-                      },
-                      child: Text(
-                        "حسناً",
-                        style: GoogleFonts.cairo(
-                          color: const Color(0xFF3775FA),
-                          fontWeight: FontWeight.bold,
                         ),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pop(ctx);
+                              Navigator.pushAndRemoveUntil(
+                                context,
+                                SlideRightRouteWithBuild(
+                                  builder: (context) => ClientHomePage(),
+                                ),
+                                (route) => false,
+                              );
+                            },
+                            child: Text(
+                              "حسناً",
+                              style: GoogleFonts.cairo(
+                                color: const Color(0xFF3775FA),
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  ],
-                ),
-              ),
+                  ),
+                );
+              },
             );
           } else if (state is TechnicianRequestUnauth) {
             ModernSnackbar.showError(context: context, message: state.message);

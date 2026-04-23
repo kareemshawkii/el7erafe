@@ -31,11 +31,15 @@ class PreviousJobsRepo {
         await AuthLocalStorage().clearSession();
         return const Left("401");
       } else {
-        final data = jsonDecode(response.body);
-        return Left(data['errorMessage'] ?? "فشل في جلب الطلبات السابقة");
+        try {
+          final data = jsonDecode(response.body);
+          return Left(data['errorMessage'] ?? "فشل في جلب الطلبات السابقة");
+        } catch (_) {
+          return const Left("فشل في جلب الطلبات السابقة");
+        }
       }
     } catch (e) {
-      return  Left("حدث خطأ في الاتصال بالخادم برجاء المحاولة لاحقًا");
+      return const Left("حدث خطأ في الاتصال بالخادم برجاء المحاولة لاحقًا");
     }
   }
 }

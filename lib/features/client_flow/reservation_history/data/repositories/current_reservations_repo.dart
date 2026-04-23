@@ -28,8 +28,12 @@ class CurrentReservationsRepo {
     } else if (response.statusCode == 401) {
       throw Exception('UNAUTH');
     } else {
-      final data = jsonDecode(response.body);
-      throw Exception(data['errorMessage'] ?? 'Error');
+      try {
+        final data = jsonDecode(response.body);
+        throw Exception(data['errorMessage'] ?? 'حدث خطأ غير متوقع');
+      } catch (_) {
+        throw Exception('حدث خطأ غير متوقع');
+      }
     }
   }
 
@@ -44,8 +48,12 @@ class CurrentReservationsRepo {
     );
     if (response.statusCode == 401) throw Exception('UNAUTH');
     if (response.statusCode != 200 && response.statusCode != 204) {
-      final data = jsonDecode(response.body);
-      throw Exception(data['errorMessage'] ?? 'Error');
+      try {
+        final data = jsonDecode(response.body);
+        throw Exception(data['errorMessage'] ?? 'حدث خطأ غير متوقع');
+      } catch (_) {
+        throw Exception('حدث خطأ غير متوقع');
+      }
     }
   }
 
@@ -60,8 +68,12 @@ class CurrentReservationsRepo {
     );
     if (response.statusCode == 401) throw Exception('UNAUTH');
     if (response.statusCode == 200) return;
-    final data = jsonDecode(response.body);
-    throw Exception(data['errorMessage'] ?? 'Error');
+    try {
+      final data = jsonDecode(response.body);
+      throw Exception(data['errorMessage'] ?? 'حدث خطأ غير متوقع');
+    } catch (_) {
+      throw Exception('حدث خطأ غير متوقع');
+    }
   }
 
   Future<void> rateJob({required int rate, required int reservationId}) async {
@@ -75,7 +87,12 @@ class CurrentReservationsRepo {
     );
     if (response.statusCode == 401) throw Exception('UNAUTH');
     if (response.statusCode != 200 && response.statusCode != 204) {
-      throw Exception('Error');
+      try {
+        final data = jsonDecode(response.body);
+        throw Exception(data['errorMessage'] ?? 'حدث خطأ غير متوقع');
+      } catch (_) {
+        throw Exception('حدث خطأ غير متوقع');
+      }
     }
   }
 
